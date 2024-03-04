@@ -1,0 +1,5 @@
+# DSN (Database Source Name) to connect database
+dsn: sqlite://./data/iaas_requests.sqlite3
+
+# Path to generate document
+docPath: ./docs/db
