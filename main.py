@@ -25,7 +25,7 @@ def main(page: ft.Page):
     )
 
     # Page レイアウト
-    page.title = "AWX API Demo"
+    page.title = APP_TITLE
     page.padding = 10
     page.window_height = 720
     page.window_width = 1120
