@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  awx-api-demo2:
+    image: t-m0riyama/awx-api-demo2:latest
+    build:
+      context: ./
+    restart: always
+    volumes:
+      - awx-api-demo2-data:/app/data
+    ports:
+     - 8888:8888
+    environment:
+      - AWX_URL=https://awx.example.com/
+
+volumes:
+  awx-api-demo2-data:
