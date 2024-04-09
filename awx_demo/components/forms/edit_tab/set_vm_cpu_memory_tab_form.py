@@ -83,5 +83,4 @@ class SetVmCpuMemoryTabForm(ft.UserControl):
         self.textCpuslabel.update()
 
     def on_change_memorysize(self, e):
-        self.session.get('job_options')[
-            'memory_gb'] = self.dropMemorySize.value
+        self.session.get('job_options')['memory_gb'] = int(self.dropMemorySize.value)

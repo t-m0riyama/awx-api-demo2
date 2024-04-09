@@ -15,10 +15,12 @@ if __name__ == "__main__":
     job_options = {
         'vsphere_cluster': 'cluster-99',
         'target_vms': 'vm01,vm02',
-        'vcpus': '8',
-        # 'memory_gb': '16',
-        # 'reboot_before_change': 'yes',
-        # 'startup_after_change': 'yes',
+        'vcpus': 8,
+        'memory_gb': 16,
+        # 'change_vm_cpu_enabled': 'True',
+        # 'change_vm_memory_enabled': 'True',
+        'shutdown_before_change': True,
+        'startup_after_change': True,
     }
     # request
     for i in range(0, 30, 1):

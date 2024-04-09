@@ -100,6 +100,8 @@ class AWXApiHelper:
             else:
                 AWXApiHelper._add_activity_on_start_job(
                     db.get_db(), session.get('awx_loginid'), session.get('request_id'), False)
+                print('DEBUG: STATUS_CODE={}'.format(response.status_code))
+                print(response.text)
                 return AWXApiHelper.JOB_LAUNCH_FAILED
         except Exception as e:
             return AWXApiHelper.JOB_LAUNCH_CONNECTION_FAILED

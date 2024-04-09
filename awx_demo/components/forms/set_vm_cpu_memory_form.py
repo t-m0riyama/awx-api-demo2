@@ -25,14 +25,12 @@ class SetVmCpuMemoryForm(ft.UserControl):
         formTitle = FormTitle('CPU/メモリの割り当て変更', '変更内容', self.content_width)
         formDescription = FormDescription('仮想マシンに割り当てるCPUコア数とメモリ容量を変更します。')
         self.textCpuslabel = ft.Text(
-            value='CPUコア数: ' + str(self.session.get('job_options')
-                                   ['vcpus'] if 'vcpus' in self.session.get('job_options') else 2),
+            value='CPUコア数: ' + str(self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else 2),
             theme_style=ft.TextThemeStyle.BODY_SMALL,
             text_align=ft.TextAlign.LEFT,
         )
         self.sliderCpus = ft.Slider(
-            value=self.session.get('job_options')[
-                'vcpus'] if 'vcpus' in self.session.get('job_options') else 2,
+            value=self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else 2,
             min=1,
             max=8,
             divisions=7,
@@ -132,8 +130,7 @@ class SetVmCpuMemoryForm(ft.UserControl):
 
     def on_click_next(self, e):
         self.session.get('job_options')['vcpus'] = int(self.sliderCpus.value)
-        self.session.get('job_options')[
-            'memory_gb'] = self.dropMemorySize.value
+        self.session.get('job_options')['memory_gb'] = int(self.dropMemorySize.value)
         self.session.set('confirm_text', self.generate_confirm_text())
         print(self.session.get('job_options'))
         self.step_change_next(e)

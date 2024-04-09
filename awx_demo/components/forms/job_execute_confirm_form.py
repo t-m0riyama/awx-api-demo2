@@ -44,9 +44,13 @@ class JobExecuteConfirmForm(ft.UserControl):
             read_only=True,
         )
         self.checkShutdownBeforeChange = ft.Checkbox(
-            label='設定変更前に、仮想マシンを停止する', value=True)
+            label='設定変更前に、仮想マシンを停止する',
+            value=self.session.get('job_options')['shutdown_before_change'] if 'shutdown_before_change' in self.session.get('job_options') else True,
+        )
         self.checkStartupAfterChange = ft.Checkbox(
-            label='設定変更後に、仮想マシンを起動する', value=True)
+            label='設定変更後に、仮想マシンを起動する',
+            value=self.session.get('job_options')['startup_after_change'] if 'startup_after_change' in self.session.get('job_options') else True,
+        )
         self.btnNext = ft.ElevatedButton(
             '実行', on_click=self.on_click_send_request)
         self.btnPrev = ft.ElevatedButton(
@@ -99,12 +103,13 @@ class JobExecuteConfirmForm(ft.UserControl):
             'vsphere_cluster',
             'target_vms',
             'vcpus',
-            # 'memory_gb',
-            # 'reboot_before_change',
-            # 'startup_after_change',
+            'memory_gb',
+            # 'change_vm_cpu_enabled',
+            # 'change_vm_memory_enabled',
+            'shutdown_before_change',
+            'startup_after_change',
         ]
-        job_options = {key: str(self.session.get('job_options')[
-                                key]) for key in target_options}
+        job_options = {key: str(self.session.get('job_options')[key]) for key in target_options}
         return job_options
 
     def add_request(self, job_options, request_status):
@@ -132,6 +137,8 @@ class JobExecuteConfirmForm(ft.UserControl):
         self.step_change_previous(e)
 
     def on_click_send_request(self, e):
+        self.session.get('job_options')['shutdown_before_change'] = self.checkShutdownBeforeChange.value
+        self.session.get('job_options')['startup_after_change'] = self.checkStartupAfterChange.value
         job_options = self.generate_job_options()
 
         try:
@@ -150,8 +157,8 @@ class JobExecuteConfirmForm(ft.UserControl):
         )
 
         db_session = db.get_db()
-        IaasRequestHelper.update_request_iaas_user(db_session, self.session.get(
-            'document_id'), self.session.get('awx_loginid'), self.session)
+        IaasRequestHelper.update_request_iaas_user(
+            db_session, self.session.get('document_id'), self.session.get('awx_loginid'), self.session)
         if job_id > 0:
             self.session.set('job_id', job_id)
             IaasRequestHelper.update_job_id(

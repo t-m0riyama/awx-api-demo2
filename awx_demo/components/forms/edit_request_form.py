@@ -160,7 +160,7 @@ class EditRequestForm(ft.UserControl):
             self.session.get('job_options')['target_vms']
         confirm_text += '\nCPUコア数: ' + \
             str(self.session.get('job_options')['vcpus'])
-        # confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
+        confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
         return confirm_text
 
     def on_click_cancel(self, e):

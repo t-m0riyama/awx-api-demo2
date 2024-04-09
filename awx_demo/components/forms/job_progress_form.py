@@ -23,8 +23,6 @@ class JobProgressForm(ft.UserControl):
         self.content_width = width
         self.body_height = body_height
         self.step_change_exit = step_change_exit
-        # self.step_change_previous = step_change_previous
-        # self.step_change_cancel = step_change_cancel
         super().__init__()
 
     def build(self):
@@ -178,4 +176,4 @@ class JobProgressForm(ft.UserControl):
         self.pbJob.update()
 
     def exit_clicked(self, e):
-        self.step_change_cancel(e)
+        self.step_change_exit(e)

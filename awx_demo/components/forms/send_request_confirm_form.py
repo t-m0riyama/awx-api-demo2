@@ -47,9 +47,13 @@ class SendRequestConfirmForm(ft.UserControl):
         execute_disabled = True if self.session.get(
             'user_role') == UserRole.USER_ROLE else False
         self.checkShutdownBeforeChange = ft.Checkbox(
-            label='設定変更前に、仮想マシンを停止する', value=True)
+            label='設定変更前に、仮想マシンを停止する',
+            value=self.session.get('job_options')['shutdown_before_change'] if 'shutdown_before_change' in self.session.get('job_options') else True,
+        )
         self.checkStartupAfterChange = ft.Checkbox(
-            label='設定変更後に、仮想マシンを起動する', value=True)
+            label='設定変更後に、仮想マシンを起動する',
+            value=self.session.get('job_options')['startup_after_change'] if 'startup_after_change' in self.session.get('job_options') else True,
+        )
         self.checkExecuteJobImmediately = ft.Checkbox(
             label='この変更作業をすぐに実行する', value=False, disabled=execute_disabled)
         self.btnNext = ft.FilledButton(
@@ -105,9 +109,11 @@ class SendRequestConfirmForm(ft.UserControl):
             'vsphere_cluster',
             'target_vms',
             'vcpus',
-            # 'memory_gb',
-            # 'reboot_before_change',
-            # 'startup_after_change',
+            'memory_gb',
+            # 'change_vm_cpu_enabled',
+            # 'change_vm_memory_enabled',
+            'shutdown_before_change',
+            'startup_after_change',
         ]
         job_options = {key: str(self.session.get('job_options')[key]) for key in target_options}
         return job_options
@@ -137,6 +143,8 @@ class SendRequestConfirmForm(ft.UserControl):
         self.step_change_previous(e)
 
     def on_click_send_request(self, e):
+        self.session.get('job_options')['shutdown_before_change'] = self.checkShutdownBeforeChange.value
+        self.session.get('job_options')['startup_after_change'] = self.checkStartupAfterChange.value
         job_options = self.generate_job_options()
 
         if self.checkExecuteJobImmediately.value:
