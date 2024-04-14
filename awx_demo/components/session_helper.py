@@ -57,6 +57,7 @@ class SessionHelper:
     @staticmethod
     def load_request_to_session_from_db(session, db_session, request_id):
         print("REQUEST_ID: " + request_id)
+        session.set("document_id", request_id)
         request = IaasRequestHelper.get_request(db_session, request_id)
         session.set("request_date", request.request_date)
         session.set("request_text", request.request_text)

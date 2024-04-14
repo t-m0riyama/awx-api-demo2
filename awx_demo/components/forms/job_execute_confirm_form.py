@@ -142,7 +142,8 @@ class JobExecuteConfirmForm(ft.UserControl):
         job_options = self.generate_job_options()
 
         try:
-            self.add_request(job_options, RequestStatus.APPLYING)
+            if not self.session.get('document_id'):
+                self.add_request(job_options, RequestStatus.APPLYING)
         except Exception as ex:
             print('failed to insert record ')
             print(ex)

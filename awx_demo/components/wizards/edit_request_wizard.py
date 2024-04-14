@@ -74,6 +74,7 @@ class EditRequestWizard:
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
+                self._update_request()
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
             case "job_execute_confirm":
@@ -122,3 +123,4 @@ class EditRequestWizard:
         self.session.remove("job_options")
         self.wizard_dialog.open = False
         self.page.update()
+        self.parent_refresh_func()
