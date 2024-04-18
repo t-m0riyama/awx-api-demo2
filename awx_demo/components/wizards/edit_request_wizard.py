@@ -7,6 +7,7 @@ from awx_demo.components.forms.job_execute_confirm_form import JobExecuteConfirm
 from awx_demo.components.forms.job_progress_form import JobProgressForm
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
+from awx_demo.utils.doc_id_utils import DocIdUtils
 
 
 class EditRequestWizard:
@@ -16,6 +17,7 @@ class EditRequestWizard:
     CONTENT_WIDTH = 800
     BODY_HEIGHT = 370
     CONFIRM_FORM_TITLE = "ジョブ実行の確認"
+    DUCUMENT_ID_LENGTH = 7
 
     def __init__(self, session, page: ft.Page, parent_refresh_func):
         self.session = session
@@ -34,6 +36,7 @@ class EditRequestWizard:
             body_height=self.BODY_HEIGHT,
             click_execute_func=self.on_click_next,
             click_save_func=self.on_click_save,
+            click_duplicate_func=self.on_click_duplicate,
             click_cancel_func=self.on_click_cancel,
         )
         self.wizard_dialog = ft.AlertDialog(
@@ -45,6 +48,16 @@ class EditRequestWizard:
         self.page.dialog = self.wizard_dialog
         self.wizard_dialog.open = True
         self.page.update()
+
+    def _duplicate_request(self):
+        db_session = db.get_db()
+        IaasRequestHelper.duplicate_request(
+            db_session=db_session,
+            request_id=self.session.get("request_id"),
+            new_request_id=DocIdUtils.generate_id(self.DUCUMENT_ID_LENGTH),
+            session=self.session,
+        )
+        db_session.close()
 
     def _update_request(self):
         db_session = db.get_db()
@@ -105,6 +118,7 @@ class EditRequestWizard:
                     body_height=self.BODY_HEIGHT,
                     click_execute_func=self.on_click_next,
                     click_save_func=self.on_click_save,
+                    click_duplicate_func=self.on_click_duplicate,
                     click_cancel_func=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
@@ -115,6 +129,12 @@ class EditRequestWizard:
 
     def on_click_save(self, e):
         self._update_request()
+        self.wizard_dialog.open = False
+        self.page.update()
+        self.parent_refresh_func()
+
+    def on_click_duplicate(self, e):
+        self._duplicate_request()
         self.wizard_dialog.open = False
         self.page.update()
         self.parent_refresh_func()

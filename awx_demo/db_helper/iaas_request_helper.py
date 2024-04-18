@@ -29,6 +29,23 @@ class IaasRequestHelper:
             db_session, session.get('awx_loginid'), session.get('request_id'), True)
 
     @staticmethod
+    def duplicate_request(db_session, request_id, new_request_id, session):
+        request = db_session.query(base.IaasRequest).filter(
+            base.IaasRequest.request_id == request_id).first()
+        new_request = base.IaasRequest()
+
+        for column in base.IaasRequest.__table__.columns:
+            setattr(new_request, column.name, getattr(request, column.name))
+
+        new_request.id = None
+        new_request.request_id = new_request_id
+
+        db_session.add(new_request)
+        db_session.commit()
+        IaasRequestHelper._add_activity_on_insert(
+            db_session, session.get('awx_loginid'), session.get('request_id'), True)
+
+    @staticmethod
     def update_request(db_session, request_id, request_deadline, request_text, job_options, request_status, iaas_user, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
