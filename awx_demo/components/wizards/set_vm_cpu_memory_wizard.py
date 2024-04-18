@@ -4,7 +4,8 @@ from awx_demo.components.forms.create_request_form import CreateRequestForm
 from awx_demo.components.forms.job_progress_form import JobProgressForm
 from awx_demo.components.forms.select_target_form import SelectTargetForm
 from awx_demo.components.forms.send_request_confirm_form import SendRequestConfirmForm
-from awx_demo.components.forms.set_vm_cpu_memory_form import SetVmCpuMemoryForm
+from awx_demo.components.forms.set_vm_cpu_form import SetVmCpuForm
+from awx_demo.components.forms.set_vm_memory_form import SetVmMemoryForm
 
 
 class SetVmCpuMemoryWizard:
@@ -45,8 +46,8 @@ class SetVmCpuMemoryWizard:
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
             case "select_target":
-                self.session.set("new_request_wizard_step", "set_vm_cpu_memory")
-                formStep = SetVmCpuMemoryForm(
+                self.session.set("new_request_wizard_step", "set_vm_cpu")
+                formStep = SetVmCpuForm(
                     session=self.session,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
@@ -57,7 +58,20 @@ class SetVmCpuMemoryWizard:
                 )
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
-            case "set_vm_cpu_memory":
+            case "set_vm_cpu":
+                self.session.set("new_request_wizard_step", "set_vm_memory")
+                formStep = SetVmMemoryForm(
+                    session=self.session,
+                    height=self.CONTENT_HEIGHT,
+                    width=self.CONTENT_WIDTH,
+                    body_height=self.BODY_HEIGHT,
+                    step_change_next=self.on_click_next,
+                    step_change_previous=self.on_click_previous,
+                    step_change_cancel=self.on_click_cancel,
+                )
+                self.wizard_dialog.content = formStep
+                self.page.dialog = self.wizard_dialog
+            case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "send_request_confirm")
                 formStep = SendRequestConfirmForm(
                     session=self.session,
@@ -108,7 +122,7 @@ class SetVmCpuMemoryWizard:
                 )
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
-            case "set_vm_cpu_memory":
+            case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "select_target")
                 formStep = SelectTargetForm(
                     session=self.session,
@@ -121,9 +135,22 @@ class SetVmCpuMemoryWizard:
                 )
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
+            case "set_vm_memory":
+                self.session.set("new_request_wizard_step", "set_vm_cpu")
+                formStep = SetVmCpuForm(
+                    session=self.session,
+                    height=self.CONTENT_HEIGHT,
+                    width=self.CONTENT_WIDTH,
+                    body_height=self.BODY_HEIGHT,
+                    step_change_next=self.on_click_next,
+                    step_change_previous=self.on_click_previous,
+                    step_change_cancel=self.on_click_cancel,
+                )
+                self.wizard_dialog.content = formStep
+                self.page.dialog = self.wizard_dialog
             case "send_request_confirm":
-                self.session.set("new_request_wizard_step", "set_vm_cpu_memory")
-                formStep = SetVmCpuMemoryForm(
+                self.session.set("new_request_wizard_step", "set_vm_memory")
+                formStep = SetVmMemoryForm(
                     session=self.session,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,

@@ -4,7 +4,8 @@ from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.forms.edit_tab.manage_info_tab_form import ManageInfoTabForm
 from awx_demo.components.forms.edit_tab.request_common_info_tab_form import RequestCommonInfoTabForm
 from awx_demo.components.forms.edit_tab.select_target_tab_form import SelectTargetTabForm
-from awx_demo.components.forms.edit_tab.set_vm_cpu_memory_tab_form import SetVmCpuMemoryTabForm
+from awx_demo.components.forms.edit_tab.set_vm_cpu_tab_form import SetVmCpuTabForm
+from awx_demo.components.forms.edit_tab.set_vm_memory_tab_form import SetVmMemoryTabForm
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db import db
@@ -18,7 +19,7 @@ class EditRequestForm(ft.UserControl):
     CONTENT_WIDTH = 800
     BODY_HEIGHT = 380
 
-    def __init__(self, session, page: ft.Page, request_id=None, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, click_execute_func=None, click_save_func=None, click_cancel_func=None):
+    def __init__(self, session, page: ft.Page, request_id=None, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, click_execute_func=None, click_duplicate_func=None, click_save_func=None, click_cancel_func=None):
         self.session = session
         self.page = page
         self.request_id = request_id
@@ -26,6 +27,7 @@ class EditRequestForm(ft.UserControl):
         self.content_width = width
         self.body_height = body_height
         self.click_execute_func = click_execute_func
+        self.click_duplicate_func = click_duplicate_func
         self.click_save_func = click_save_func
         self.click_cancel_func = click_cancel_func
 
@@ -47,7 +49,13 @@ class EditRequestForm(ft.UserControl):
             self.tab_content_width,
             self.tab_body_height,
         )
-        self.formSetVmCpuMemory = SetVmCpuMemoryTabForm(
+        self.formSetVmCpu = SetVmCpuTabForm(
+            self.session,
+            self.tab_content_height,
+            self.tab_content_width,
+            self.tab_body_height,
+        )
+        self.formSetVmMemory = SetVmMemoryTabForm(
             self.session,
             self.tab_content_height,
             self.tab_content_width,
@@ -85,8 +93,12 @@ class EditRequestForm(ft.UserControl):
                     content=self.formSelectTarget,
                 ),
                 ft.Tab(
-                    text='CPU/メモリ',
-                    content=self.formSetVmCpuMemory,
+                    text='CPU',
+                    content=self.formSetVmCpu,
+                ),
+                ft.Tab(
+                    text='メモリ',
+                    content=self.formSetVmMemory,
                 ),
                 ft.Tab(
                     text='管理情報',
@@ -104,6 +116,8 @@ class EditRequestForm(ft.UserControl):
             '実行', on_click=self.on_click_execute, disabled=(is_execute_disabled or change_disabled))
         self.btnSave = ft.ElevatedButton(
             '保存', on_click=self.on_click_save, disabled=change_disabled)
+        self.btnDuplicate = ft.ElevatedButton(
+            '複製', on_click=self.on_click_duplicate, disabled=change_disabled)
         self.btnCancel = ft.FilledButton(
             '閉じる', on_click=self.on_click_cancel)
 
@@ -121,6 +135,7 @@ class EditRequestForm(ft.UserControl):
         footer = ft.Row(
             [
                 self.btnCancel,
+                self.btnDuplicate,
                 self.btnSave,
                 self.btnExecute,
             ],
@@ -165,6 +180,9 @@ class EditRequestForm(ft.UserControl):
 
     def on_click_cancel(self, e):
         self.click_cancel_func(e)
+
+    def on_click_duplicate(self, e):
+        self.click_duplicate_func(e)
 
     def on_click_save(self, e):
         self.click_save_func(e)

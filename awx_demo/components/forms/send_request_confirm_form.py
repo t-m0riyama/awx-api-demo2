@@ -110,8 +110,8 @@ class SendRequestConfirmForm(ft.UserControl):
             'target_vms',
             'vcpus',
             'memory_gb',
-            # 'change_vm_cpu_enabled',
-            # 'change_vm_memory_enabled',
+            'change_vm_cpu_enabled',
+            'change_vm_memory_enabled',
             'shutdown_before_change',
             'startup_after_change',
         ]
