@@ -56,6 +56,7 @@ class LoginForm(ft.UserControl):
                 if self.session.contains_key("awx_url")
                 else default_awx_url
             ),
+            on_submit=self.login_clicked,
         )
         self.txtLoginMessage = ft.Text(
             "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。",
