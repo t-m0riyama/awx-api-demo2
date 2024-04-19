@@ -26,6 +26,8 @@ class AWXApiHelper:
         try:
             response = requests.get(reqest_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
+            print('login_url: ' + reqest_url)
+            print('login_status: ' + str(response.status_code))
             if response.status_code == 200:
                 return True
             else:
@@ -112,30 +114,30 @@ class AWXApiHelper:
 
     @staticmethod
     def get_job_template_id(uri_base, loginid, password, job_template_name):
-        job_templates_url = uri_base + '/api/v2/job_templates/'
+        job_templates_url = uri_base + '/api/v2/job_templates/{}/'.format(job_template_name)
         headers = {'Content-Type': 'application/json'}
         try:
             response = requests.get(job_templates_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
             if response.status_code == 200:
-                response_results = jmespath.search(
-                    'results[?name == `{}`].id'.format(job_template_name), response.json())
-                return response_results[0]
+                return (response.json())['id']
             else:
                 return AWXApiHelper.JOB_TEMPLATE_ID_NOT_FOUND
         except Exception as e:
+            print(e)
+            print('job_template_url: ' + job_templates_url)
             return AWXApiHelper.JOB_TEMPLATE_ID_CONNECTION_FAILED
 
     @staticmethod
     def get_job_status(uri_base, loginid, password, job_id, session):
         job_status_url = uri_base + '/api/v2/jobs/{}/'.format(job_id)
         headers = {'Content-Type': 'application/json'}
+        print('job_status_url: ' + job_status_url)
         try:
             response = requests.get(job_status_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
-            print(response.status_code)
-            print(response.json())
-            print(jmespath.search('status', response.json()))
+            print('job_status_status: ' + str(response.status_code))
+            print('job_state: ' + jmespath.search('status', response.json()))
             if response.status_code == 200:
                 job_status = jmespath.search('status', response.json())
                 print("job_status: " + str(job_status))
@@ -151,6 +153,7 @@ class AWXApiHelper:
                     db.get_db(), session.get('awx_loginid'), session.get('request_id'), False)
                 return str(AWXApiHelper.JOB_STATUS_FAILED)
         except Exception as e:
+            print(e)
             AWXApiHelper._add_activity_on_job_completed(
                 db.get_db(), session.get('awx_loginid'), session.get('request_id'), False)
             return str(AWXApiHelper.JOB_STATUS_CONNECTION_FAILED)
