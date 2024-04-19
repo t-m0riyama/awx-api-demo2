@@ -18,7 +18,11 @@ awx-api-demo2
  |-- README.md: this document
  |-- awx_demo
  |   |-- awx_api: AWX API modules
- |   `-- components: Flet component modules
+ |   |-- components: Flet component modules
+ |   |-- db: SQLAlchemy database modules
+ |   |-- db_helper: Database helper modules
+ |   |-- models: SQLAlchemy database model modules
+ |   `-- utils: Utilitiy modules
  |-- docs: other documents
  |-- main.py: main script
  `-- requirements.txt: dependent modules
