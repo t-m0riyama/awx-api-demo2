@@ -108,7 +108,7 @@ class EditRequestWizard:
     def on_click_previous(self, e):
         match self.session.get("edit_request_wizard_step"):
             case "job_execute_confirm":
-                self.session.set("edit_request_wizard_step", "job_execute_confirm")
+                self.session.set("edit_request_wizard_step", "edit_request")
                 formStep = EditRequestForm(
                     session=self.session,
                     page=self.page,
