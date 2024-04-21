@@ -104,10 +104,11 @@ class SetVmMemoryForm(ft.UserControl):
             self.session.get('job_options')['vsphere_cluster']
         confirm_text += '\n仮想マシン: ' + \
             self.session.get('job_options')['target_vms']
-        confirm_text += '\nCPUコア数: ' + \
-            str(self.session.get('job_options')['vcpus'])
-        confirm_text += '\nメモリ容量(GB): ' + \
-            str(self.session.get('job_options')['memory_gb'])
+        if str(self.session.get('job_options')['change_vm_cpu_enabled']) == 'True':
+            confirm_text += '\nCPUコア数: ' + \
+                str(self.session.get('job_options')['vcpus'])
+        if str(self.session.get('job_options')['change_vm_memory_enabled']) == 'True':
+            confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
         return confirm_text
 
     def on_change_vm_memory_enabled(self, e):
