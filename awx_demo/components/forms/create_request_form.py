@@ -86,7 +86,10 @@ class CreateRequestForm(ft.UserControl):
             on_click=lambda _: self.dpRequestDeadline.pick_date(),
         )
         self.btnNext = ft.FilledButton(
-            '次へ', on_click=self.on_click_next)
+            '次へ',
+            on_click=self.on_click_next,
+            disabled=False if self.dpRequestDeadline.value else True,
+        )
         self.btnCancel = ft.ElevatedButton(
             'キャンセル', on_click=self.on_click_cancel)
 
@@ -139,7 +142,12 @@ class CreateRequestForm(ft.UserControl):
     def on_change_request_deadline(self, e):
         self.lblReleseDeadline.value = 'リリース希望日: ' + \
             self.dpRequestDeadline.value.strftime('%Y/%m/%d')
+        if self.dpRequestDeadline.value:
+            self.btnNext.disabled = False
+        else:
+            self.btnNext.disabled = True
         self.lblReleseDeadline.update()
+        self.btnNext.update()
 
     def on_click_cancel(self, e):
         self.step_change_cancel(e)
