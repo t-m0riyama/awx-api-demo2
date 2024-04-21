@@ -8,15 +8,16 @@ services:
     restart: always
     volumes:
       - awx-api-demo2-data:/app/data
+      - ./log:/app/log
     expose:
       - 8888
     environment:
       - AWX_URL=https://awx.example.com
-      - FLET_WEB_APP_PATH=/awx_api_demo2
+      - FLET_WEB_APP_PATH=/awx-api-demo2
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.awx_api_demo2.entrypoints=web"
-      - "traefik.http.routers.awx_api_demo2.rule=PathPrefix(`/awx_api_demo2/`)"
+      - "traefik.http.routers.awx_api_demo2.entrypoints=web-secure"
+      - "traefik.http.routers.awx_api_demo2.rule=PathPrefix(`/awx-api-demo2/`)"
       - "traefik.http.routers.awx_api_demo2.service=awx_api_demo2"
       - "traefik.http.services.awx_api_demo2.loadbalancer.server.port=8888"
       #- traefik.http.routers.awx_api_demo2.tls=false
