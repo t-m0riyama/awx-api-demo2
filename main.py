@@ -10,7 +10,8 @@ from awx_demo.components.navigation_router import NavigationRouter
 DEFAULT_FLET_PATH = "app"
 DEFAULT_FLET_PORT = 8888
 APP_TITLE = "AWX API Demo"
-
+LOG_DIR = "./log"
+LOG_FILE = "awx_api_demo2.log"
 
 def main(page: ft.Page):
 
@@ -43,7 +44,12 @@ def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        filename='{}/{}'.format(LOG_DIR, LOG_FILE),
+        format="\"%(asctime)s\"\t%(levelname)s\t%(message)s",
+        datefmt='%Y/%m/%d %H:%M:%S',
+        level=logging.INFO,
+    )
     flet_path = os.getenv("FLET_PATH", DEFAULT_FLET_PATH)
     flet_port = int(os.getenv("FLET_PORT", DEFAULT_FLET_PORT))
     # ft.app(name=flet_path, target=main, port=flet_port, view=None)
