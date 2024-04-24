@@ -35,6 +35,15 @@ def main(page: ft.Page):
     page.on_route_change = route_change
     page.theme_mode = "light"
 
+    # Locale Settings
+    page.locale_configuration = ft.LocaleConfiguration(
+        supported_locales=[
+            ft.Locale("ja", "JP"),
+            ft.Locale("en", "US")
+        ],
+        current_locale=ft.Locale("ja", "JP")
+    )
+
     # Add Dialog
     page.dialog = dlgLogin
 
