@@ -22,8 +22,9 @@ class SelectTargetTabForm(ft.UserControl):
         self.dropCluster = ft.Dropdown(
             label='クラスタ',
             value=self.session.get('job_options')[
-                'vsphere_cluster'] if 'vsphere_cluster' in self.session.get('job_options') else 'cluster-1',
+                'vsphere_cluster'] if 'vsphere_cluster' in self.session.get('job_options') else '指定なし',
             options=[
+                ft.dropdown.Option("指定なし"),
                 ft.dropdown.Option("cluster-1"),
                 ft.dropdown.Option("cluster-99"),
             ],
@@ -39,8 +40,7 @@ class SelectTargetTabForm(ft.UserControl):
         )
 
         # 申請者ロールの場合は、変更できないようにする
-        change_disabled = True if self.session.get(
-            'user_role') == UserRole.USER_ROLE else False
+        change_disabled = True if self.session.get('user_role') == UserRole.USER_ROLE else False
 
         # Content
         body = ft.Column(

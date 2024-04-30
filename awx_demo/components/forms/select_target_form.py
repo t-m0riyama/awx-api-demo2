@@ -3,6 +3,7 @@ import flet as ft
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
+from awx_demo.components.types.user_role import UserRole
 
 
 class SelectTargetForm(ft.UserControl):
@@ -24,16 +25,22 @@ class SelectTargetForm(ft.UserControl):
 
     def build(self):
         formTitle = FormTitle('変更対象の選択', 'クラスタと仮想マシンの指定', self.content_width)
-        formDescription = FormDescription('変更対象の仮想マシンと稼働するクラスタを指定します。')
+        formDescription = FormDescription('変更対象の仮想マシンと稼働するクラスタを指定します。クラスタは作業時に担当者が指定します。')
+
+        # 申請者ロールの場合は、変更できないようにする
+        change_disabled = (
+            True if self.session.get("user_role") == UserRole.USER_ROLE else False
+        )
         self.dropCluster = ft.Dropdown(
             label='クラスタ',
-            value=self.session.get('job_options')[
-                'vsphere_cluster'] if 'vsphere_cluster' in self.session.get('job_options') else 'cluster-1',
+            value=self.session.get('job_options')['vsphere_cluster'] if 'vsphere_cluster' in self.session.get('job_options') else '指定なし',
             options=[
+                ft.dropdown.Option("指定なし"),
                 ft.dropdown.Option("cluster-1"),
                 ft.dropdown.Option("cluster-99"),
             ],
             hint_text='仮想マシンの稼働するクラスタ名を指定します。',
+            disabled=change_disabled,
         )
         self.tfVms = ParameterInputText(
             value=self.session.get('job_options')[
