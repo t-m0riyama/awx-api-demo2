@@ -7,6 +7,7 @@ from requests.auth import HTTPBasicAuth
 from awx_demo.db import db
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.db_helper.types.activity_type import ActivityStatus, ActivityType
+from awx_demo.utils.logging import Logging
 
 
 class AWXApiHelper:
@@ -26,14 +27,14 @@ class AWXApiHelper:
         try:
             response = requests.get(reqest_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
-            print('login_url: ' + reqest_url)
-            print('login_status: ' + str(response.status_code))
+            Logging.info('login_url: ' + reqest_url)
+            Logging.info('login_status: ' + str(response.status_code))
             if response.status_code == 200:
                 return True
             else:
                 return False
         except Exception as e:
-            print(e)
+            Logging.error(e)
             return False
 
     @staticmethod
@@ -44,17 +45,17 @@ class AWXApiHelper:
             response_me = requests.get(reqest_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
             if response_me.status_code != 200:
-                print("Failed to retrieve information for user")
+                Logging.error("Failed to retrieve information for user")
                 return False
 
-            print("awx_teams_url" +
+            Logging.info("awx_teams_url" +
                   jmespath.search("results[0].related.teams", response_me.json()))
             teams_url = uri_base + \
                 jmespath.search("results[0].related.teams", response_me.json())
             response_teams = requests.get(
                 teams_url, headers=headers, auth=HTTPBasicAuth(loginid, password), verify=False)
             if response_teams.status_code != 200:
-                print("Failed to retrieve information for teams")
+                Logging.error("Failed to retrieve information for teams")
                 return False
 
             teams = []
@@ -62,7 +63,7 @@ class AWXApiHelper:
                 teams.append(team_name)
             return teams
         except Exception as e:
-            print(e)
+            Logging.error(e)
             return None
 
     @staticmethod
@@ -77,7 +78,7 @@ class AWXApiHelper:
             else:
                 return None
         except Exception as e:
-            print(e)
+            Logging.error(e)
             return None
 
     @staticmethod
@@ -89,21 +90,21 @@ class AWXApiHelper:
                 uri_base, loginid, password, job_template_name)
             launch_url = uri_base + \
                 '/api/v2/job_templates/{}/launch/'.format(job_template_id)
-            print('launch_url: ' + launch_url)
-            print('vars: ' + vars_json)
+            Logging.info('launch_url: ' + launch_url)
+            Logging.info('vars: ' + vars_json)
             response = requests.post(launch_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False, data=vars_json)
             if response.status_code == 201:
                 response_results = jmespath.search('job', response.json())
-                print('job_id: ' + str(response_results))
+                Logging.info('job_id: ' + str(response_results))
                 AWXApiHelper._add_activity_on_start_job(
                     db.get_db(), session.get('awx_loginid'), session.get('request_id'), True)
                 return response_results
             else:
                 AWXApiHelper._add_activity_on_start_job(
                     db.get_db(), session.get('awx_loginid'), session.get('request_id'), False)
-                print('DEBUG: STATUS_CODE={}'.format(response.status_code))
-                print(response.text)
+                Logging.error('status: {}'.format(response.status_code))
+                Logging.error('response: {}'.format(response.text))
                 return AWXApiHelper.JOB_LAUNCH_FAILED
         except Exception as e:
             return AWXApiHelper.JOB_LAUNCH_CONNECTION_FAILED
@@ -124,23 +125,23 @@ class AWXApiHelper:
             else:
                 return AWXApiHelper.JOB_TEMPLATE_ID_NOT_FOUND
         except Exception as e:
-            print(e)
-            print('job_template_url: ' + job_templates_url)
+            Logging.error(e)
+            Logging.error('job_template_url: ' + job_templates_url)
             return AWXApiHelper.JOB_TEMPLATE_ID_CONNECTION_FAILED
 
     @staticmethod
     def get_job_status(uri_base, loginid, password, job_id, session):
         job_status_url = uri_base + '/api/v2/jobs/{}/'.format(job_id)
         headers = {'Content-Type': 'application/json'}
-        print('job_status_url: ' + job_status_url)
+        Logging.info('job_status_url: ' + job_status_url)
         try:
             response = requests.get(job_status_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
-            print('job_status_status: ' + str(response.status_code))
-            print('job_state: ' + jmespath.search('status', response.json()))
+            Logging.info('job_status_status: ' + str(response.status_code))
+            Logging.info('job_state: ' + jmespath.search('status', response.json()))
             if response.status_code == 200:
                 job_status = jmespath.search('status', response.json())
-                print("job_status: " + str(job_status))
+                Logging.info("job_status: " + str(job_status))
                 if job_status == 'successful':
                     AWXApiHelper._add_activity_on_job_completed(
                         db.get_db(), session.get('awx_loginid'), session.get('request_id'), True)
@@ -153,7 +154,7 @@ class AWXApiHelper:
                     db.get_db(), session.get('awx_loginid'), session.get('request_id'), False)
                 return str(AWXApiHelper.JOB_STATUS_FAILED)
         except Exception as e:
-            print(e)
+            Logging.error(e)
             AWXApiHelper._add_activity_on_job_completed(
                 db.get_db(), session.get('awx_loginid'), session.get('request_id'), False)
             return str(AWXApiHelper.JOB_STATUS_CONNECTION_FAILED)

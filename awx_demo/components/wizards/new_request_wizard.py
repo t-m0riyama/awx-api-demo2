@@ -2,6 +2,7 @@ import flet as ft
 
 from awx_demo.components.forms.create_request_form import CreateRequestForm
 from awx_demo.components.wizards.set_vm_cpu_memory_wizard import SetVmCpuMemoryWizard
+from awx_demo.utils.logging import Logging
 
 
 class NewRequestWizard:
@@ -57,13 +58,13 @@ class NewRequestWizard:
                         )
                         child_wizard.on_click_next(e)
                     case _:
-                        print("undefined operation!!!")
+                        Logging.error("undefined operation!!!")
             case _:
-                print("undefined step!!!")
+                Logging.error("undefined step!!!")
         self.page.update()
 
     def on_click_previous(self, e):
         match self.session.get("new_request_wizard_step"):
             case _:
-                print("undefined step!!!")
+                Logging.error("undefined step!!!")
         self.page.update()

@@ -2,6 +2,7 @@ import flet as ft
 
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
+from awx_demo.utils.logging import Logging
 
 
 class SetVmMemoryForm(ft.UserControl):
@@ -126,5 +127,5 @@ class SetVmMemoryForm(ft.UserControl):
         self.session.get('job_options')['change_vm_memory_enabled'] = self.checkChangeVmMemoryEnabled.value
         self.session.get('job_options')['memory_gb'] = int(self.dropMemorySize.value)
         self.session.set('confirm_text', self.generate_confirm_text())
-        print(self.session.get('job_options'))
+        Logging.info(self.session.get('job_options'))
         self.step_change_next(e)

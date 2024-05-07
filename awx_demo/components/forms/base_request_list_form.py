@@ -12,6 +12,7 @@ from awx_demo.components.types.user_role import UserRole
 from awx_demo.components.wizards.edit_request_wizard import EditRequestWizard
 from awx_demo.components.wizards.new_request_wizard import NewRequestWizard
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.utils.logging import Logging
 
 
 class BaseRequestListForm(ft.UserControl, metaclass=abc.ABCMeta):
@@ -393,7 +394,7 @@ class BaseRequestListForm(ft.UserControl, metaclass=abc.ABCMeta):
         self.page.update()
 
     def on_click_edit_request_execute(self, e):
-        print(self.session.get("job_options"))
+        Logging.info(self.session.get("job_options"))
         self.dlgEditRequest.open = False
         self.page.update()
 

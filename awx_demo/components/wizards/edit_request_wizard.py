@@ -8,6 +8,7 @@ from awx_demo.components.forms.job_progress_form import JobProgressForm
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.utils.doc_id_utils import DocIdUtils
+from awx_demo.utils.logging import Logging
 
 
 class EditRequestWizard:
@@ -102,7 +103,7 @@ class EditRequestWizard:
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
             case _:
-                print("undefined step!!!")
+                Logging.error("undefined step!!!")
         self.page.update()
 
     def on_click_previous(self, e):
@@ -124,7 +125,7 @@ class EditRequestWizard:
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
             case _:
-                print("undefined step!!!")
+                Logging.error("undefined step!!!")
         self.page.update()
 
     def on_click_save(self, e):

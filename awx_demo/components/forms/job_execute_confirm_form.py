@@ -9,6 +9,7 @@ from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.doc_id_utils import DocIdUtils
+from awx_demo.utils.logging import Logging
 
 
 class JobExecuteConfirmForm(ft.UserControl):
@@ -145,8 +146,8 @@ class JobExecuteConfirmForm(ft.UserControl):
             if not self.session.get('document_id'):
                 self.add_request(job_options, RequestStatus.APPLYING)
         except Exception as ex:
-            print('failed to insert record ')
-            print(ex)
+            Logging.error('failed to insert record ')
+            Logging.error(ex)
 
         job_id = AWXApiHelper.start_job(
             uri_base=self.session.get('awx_url'),

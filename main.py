@@ -5,6 +5,7 @@ import flet as ft
 
 from awx_demo.components.forms.login_form import LoginForm
 from awx_demo.components.navigation_router import NavigationRouter
+from awx_demo.utils.logging import Logging
 
 # const
 DEFAULT_FLET_PATH = "app"
@@ -53,12 +54,7 @@ def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        filename='{}/{}'.format(LOG_DIR, LOG_FILE),
-        format="\"%(asctime)s\"\t%(levelname)s\t%(message)s",
-        datefmt='%Y/%m/%d %H:%M:%S',
-        level=logging.INFO,
-    )
+    Logging.init(LOG_DIR, LOG_FILE, logging.INFO)
     flet_path = os.getenv("FLET_PATH", DEFAULT_FLET_PATH)
     flet_port = int(os.getenv("FLET_PORT", DEFAULT_FLET_PORT))
     # ft.app(name=flet_path, target=main, port=flet_port, view=None)

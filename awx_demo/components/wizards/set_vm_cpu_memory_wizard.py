@@ -6,6 +6,7 @@ from awx_demo.components.forms.select_target_form import SelectTargetForm
 from awx_demo.components.forms.send_request_confirm_form import SendRequestConfirmForm
 from awx_demo.components.forms.set_vm_cpu_form import SetVmCpuForm
 from awx_demo.components.forms.set_vm_memory_form import SetVmMemoryForm
+from awx_demo.utils.logging import Logging
 
 
 class SetVmCpuMemoryWizard:
@@ -102,7 +103,7 @@ class SetVmCpuMemoryWizard:
                     self.parent_refresh_func()
                     self.page.update()
             case _:
-                print("undefined step!!!")
+                Logging.error("undefined step!!!")
 
         self.page.update()
 
@@ -162,5 +163,5 @@ class SetVmCpuMemoryWizard:
                 self.wizard_dialog.content = formStep
                 self.page.dialog = self.wizard_dialog
             case _:
-                print("undefined step!!!")
+                Logging.error("undefined step!!!")
         self.page.update()

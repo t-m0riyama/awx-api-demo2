@@ -1,6 +1,7 @@
 import json
 
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
+from awx_demo.utils.logging import Logging
 
 
 class SessionHelper:
@@ -23,7 +24,7 @@ class SessionHelper:
     @staticmethod
     def dump_session(session):
         for k in session.get_keys():
-            print("SESSION_DUMP {}: {}".format(k, session.get(k)))
+            Logging.info("SESSION_DUMP {}: {}".format(k, session.get(k)))
 
     @staticmethod
     def clean_request_from_session(session):
@@ -56,7 +57,7 @@ class SessionHelper:
 
     @staticmethod
     def load_request_to_session_from_db(session, db_session, request_id):
-        print("REQUEST_ID: " + request_id)
+        Logging.info("REQUEST_ID: " + request_id)
         session.set("document_id", request_id)
         request = IaasRequestHelper.get_request(db_session, request_id)
         session.set("request_date", request.request_date)

@@ -10,6 +10,7 @@ from awx_demo.components.forms.my_activity_list_form import MyActivityListForm
 from awx_demo.components.forms.my_request_list_form import MyRequestListForm
 from awx_demo.components.sidebar import Sidebar
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.utils.logging import Logging
 
 
 class NavigationRouter:
@@ -57,7 +58,7 @@ class NavigationRouter:
                             self.session, self.page)
                         navigation_selected_index = 0
                     case _:
-                        print("error undefined route")
+                        Logging.error("error undefined route")
                         navigation_selected_index = 0
             else:
                 match troute.route:
@@ -86,7 +87,7 @@ class NavigationRouter:
                             self.session, self.page)
                         navigation_selected_index = 0
                     case _:
-                        print("error undefined route")
+                        Logging.error("error undefined route")
                         navigation_selected_index = 0
 
             layout = ft.ResponsiveRow(

@@ -10,6 +10,7 @@ from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db import db
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.utils.logging import Logging
 
 
 class EditRequestForm(ft.UserControl):
@@ -191,5 +192,5 @@ class EditRequestForm(ft.UserControl):
 
     def on_click_execute(self, e):
         self.session.set('confirm_text', self.generate_confirm_text())
-        print('JOB_OPTIONS: ' + str(self.session.get('job_options')))
+        Logging.info('JOB_OPTIONS: ' + str(self.session.get('job_options')))
         self.click_execute_func(e)
