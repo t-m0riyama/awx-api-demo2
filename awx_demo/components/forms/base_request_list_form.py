@@ -183,7 +183,7 @@ class BaseRequestListForm(ft.UserControl, metaclass=abc.ABCMeta):
         match self.session.get("user_role"):
             case UserRole.ADMIN_ROLE:
                 popup_menu_items = [
-                    ft.PopupMenuItem(icon=ft.icons.ROCKET_LAUNCH, text="実行"),
+                    # ft.PopupMenuItem(icon=ft.icons.ROCKET_LAUNCH, text="実行"),
                     ft.PopupMenuItem(
                         content=ft.PopupMenuButton(
                             items=[
@@ -232,7 +232,7 @@ class BaseRequestListForm(ft.UserControl, metaclass=abc.ABCMeta):
 
             case UserRole.OPERATOR_ROLE:
                 popup_menu_items = [
-                    ft.PopupMenuItem(icon=ft.icons.ROCKET_LAUNCH, text="実行"),
+                    # ft.PopupMenuItem(icon=ft.icons.ROCKET_LAUNCH, text="実行"),
                     ft.PopupMenuItem(
                         content=ft.PopupMenuButton(
                             items=[
