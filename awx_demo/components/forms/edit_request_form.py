@@ -112,7 +112,7 @@ class EditRequestForm(ft.UserControl):
         change_disabled = True if self.session.get(
             'user_role') == UserRole.USER_ROLE else False
         is_execute_disabled = self.session.get('request_status') not in [
-            RequestStatus.APPROVED, RequestStatus.APPLYING, RequestStatus.COMPLETED]
+            RequestStatus.APPROVED, RequestStatus.COMPLETED]
         self.btnExecute = ft.ElevatedButton(
             '実行', on_click=self.on_click_execute, disabled=(is_execute_disabled or change_disabled))
         self.btnSave = ft.ElevatedButton(
