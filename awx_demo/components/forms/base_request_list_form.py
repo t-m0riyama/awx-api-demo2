@@ -15,7 +15,7 @@ from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
 
-class BaseRequestListForm(ft.UserControl, metaclass=abc.ABCMeta):
+class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
 
     # const
     CONTENT_HEIGHT = 640
@@ -168,7 +168,7 @@ class BaseRequestListForm(ft.UserControl, metaclass=abc.ABCMeta):
             self.session.get("awx_loginid"),
             self.session.get("awx_password"),
         )
-        # iaas_users = []  # for DEBUG
+        iaas_users = []  # for DEBUG
         iaas_user_items = []
         for iaas_user in iaas_users:
             iaas_user_items.append(

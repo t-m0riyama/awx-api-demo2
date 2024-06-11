@@ -3,7 +3,7 @@ import flet as ft
 from awx_demo.components.types.user_role import UserRole
 
 
-class Sidebar(ft.UserControl):
+class Sidebar(ft.Column):
 
     # const
     CONTENT_HEIGHT = 640

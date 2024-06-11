@@ -1,21 +1,16 @@
 import flet as ft
 
 
-class AppTitle(ft.UserControl):
+class AppTitle(ft.Container):
 
     def __init__(self, title, width):
-        self.title = title
-        self.title_width = width
-        super().__init__()
-
-    def build(self):
-        return ft.Container(
+        super().__init__(
             ft.Text(
-                self.title,
+                title,
                 theme_style=ft.TextThemeStyle.DISPLAY_MEDIUM,
                 weight=ft.FontWeight.BOLD,
                 color=ft.colors.PRIMARY,
-                width=self.title_width,
+                width=width,
                 text_align=ft.TextAlign.CENTER),
             margin=ft.margin.only(bottom=20),
         )
