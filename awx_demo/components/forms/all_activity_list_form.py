@@ -2,7 +2,7 @@ import flet as ft
 
 from awx_demo.components.forms.base_activity_list_form import BaseActivityListForm
 from awx_demo.db_helper.activity_helper import ActivityHelper
-from awx_demo.db_helper.types.activity_type import ActivityType
+from awx_demo.utils.event_helper import EventType
 
 
 class AllActivityListForm(BaseActivityListForm):
@@ -25,6 +25,6 @@ class AllActivityListForm(BaseActivityListForm):
             filters.append(ActivityHelper.get_filter_user(
                 self.session.get('filter_activity_user')))
         if self.session.get('filter_activity_type') and self.session.get('filter_activity_type') != 'すべての操作':
-            filters.append(ActivityHelper.get_filter_activity_type(
-                ActivityType.to_formal(self.session.get('filter_activity_type'))))
+            filters.append(ActivityHelper.get_filter_event_type(
+                EventType.to_formal(self.session.get('filter_activity_type'))))
         return filters

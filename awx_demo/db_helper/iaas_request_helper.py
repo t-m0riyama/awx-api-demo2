@@ -1,15 +1,21 @@
+import copy
 import datetime
 
 from sqlalchemy import and_, asc, desc
 
 from awx_demo.db import base
 from awx_demo.db_helper.activity_helper import ActivityHelper
-from awx_demo.db_helper.types.activity_type import ActivityStatus, ActivityType
+from awx_demo.db_helper.iaas_request_report_helper import IaasRequestReportHelper
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.notification.notification_spec import NotificationMethod, NotificationSpec
+from awx_demo.notification.notificator import Notificator
+from awx_demo.notification.teams_notificator import WARNING_ICON_FILE
+from awx_demo.utils.event_helper import EventType
+from awx_demo.utils.event_manager import EventManager
 
 
 class IaasRequestHelper:
-
+    
     @staticmethod
     def add_request(db_session, request_id, request_deadline, request_user, request_category, request_operation, request_text, job_options, request_status, session):
         request = base.IaasRequest(
@@ -23,36 +29,61 @@ class IaasRequestHelper:
             job_options=job_options,
             request_status=request_status,
         )
+        detail = IaasRequestReportHelper.generate_request_detail(request)
         db_session.add(request)
         db_session.commit()
-        IaasRequestHelper._add_activity_on_insert(
-            db_session, session.get('awx_loginid'), session.get('request_id'), True)
+
+        IaasRequestHelper._emit_event_on_insert(
+            db_session=db_session,
+            user=session.get('awx_loginid'),
+            request_id=request_id,
+            request_category=request_category,
+            request_operation=request_operation,
+            request_text=request_text,
+            request_deadline=request_deadline,
+            detail=detail,
+            is_succeeded=True
+        )
 
     @staticmethod
     def duplicate_request(db_session, request_id, new_request_id, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
-        new_request = base.IaasRequest()
 
+        # 新しい申請レコードを作成し、各フィールドをコピーする
+        new_request = base.IaasRequest()
         for column in base.IaasRequest.__table__.columns:
             setattr(new_request, column.name, getattr(request, column.name))
-
         new_request.id = None
         new_request.request_id = new_request_id
-
         db_session.add(new_request)
+        detail = IaasRequestReportHelper.generate_request_detail(new_request)
         db_session.commit()
-        IaasRequestHelper._add_activity_on_insert(
-            db_session, session.get('awx_loginid'), session.get('request_id'), True)
+        
+        IaasRequestHelper._emit_event_on_duplicate(
+            db_session=db_session,
+            user=session.get('awx_loginid'),
+            request_id=request_id,
+            request_id_new=new_request_id,
+            request_category=new_request.request_category,
+            request_operation=new_request.request_operation,
+            request_text=request.request_text,
+            request_deadline=request.request_deadline,
+            detail=detail,
+            is_succeeded=True
+        )
 
     @staticmethod
     def update_request(db_session, request_id, request_deadline, request_text, job_options, request_status, iaas_user, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
 
-        # 更新前のIaaS作業担当者とステータスを取得
-        iaas_user_current = request.iaas_user
-        request_status_current = request.request_status
+        # 更新前の申請内容を保存
+        request_deadline_old = request.request_deadline
+        request_text_old = request.request_text
+        job_options_old = request.job_options
+        request_status_old = request.request_status
+        iaas_user_old = request.iaas_user
 
         request.request_deadline = request_deadline
         # request.request_category=request_category
@@ -61,25 +92,50 @@ class IaasRequestHelper:
         request.job_options = job_options
         request.request_status = request_status
         request.iaas_user = iaas_user
+        detail = IaasRequestReportHelper.generate_diff_request(request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old)
+        detail += IaasRequestReportHelper.generate_request_detail(request)
         db_session.commit()
-        IaasRequestHelper._add_activity_on_update(
-            db_session, session.get('awx_loginid'), session.get('request_id'), True)
-        if iaas_user != iaas_user_current:
-            IaasRequestHelper._add_activity_on_update_iaas_user(
+
+        IaasRequestHelper._emit_event_on_update(
+            db_session=db_session,
+            user=session.get('awx_loginid'),
+            request_id=session.get('request_id'),
+            request_category=request.request_category,
+            request_operation=request.request_operation,
+            request_text=request.request_text,
+            request_deadline=request.request_deadline,
+            # job_options=job_options,
+            detail=detail,
+            is_succeeded=True
+        )
+        if iaas_user != iaas_user_old:
+            IaasRequestHelper._emit_event_on_update_iaas_user(
                 db_session=db_session,
                 user=session.get('awx_loginid'),
                 request_id=session.get('request_id'),
-                additional_info='({} -> {})'.format(iaas_user_current,
+                request_category=session.get('request_category'),
+                request_operation=session.get('request_operation'),
+                request_text=request_text,
+                request_deadline=request_deadline,
+                additional_info='({} -> {})'.format(iaas_user_old,
                                                     iaas_user),
+                # job_options=job_options,
+                detail=detail,
                 is_succeeded=True,
             )
-        if request_status != request_status_current:
-            IaasRequestHelper._add_activity_on_update_request_status(
+        if request_status != request_status_old:
+            IaasRequestHelper._emit_event_on_update_request_status(
                 db_session=db_session,
                 user=session.get('awx_loginid'),
                 request_id=session.get('request_id'),
+                request_category=session.get('request_category'),
+                request_operation=session.get('request_operation'),
+                request_text=request_text,
+                request_deadline=request_deadline,
                 additional_info='({} -> {})'.format(RequestStatus.to_friendly(
-                    request_status_current), RequestStatus.to_friendly(request_status)),
+                    request_status_old), RequestStatus.to_friendly(request_status)),
+                # job_options=job_options,
+                detail=detail,
                 is_succeeded=True,
             )
 
@@ -89,14 +145,23 @@ class IaasRequestHelper:
             base.IaasRequest.request_id == request_id).first()
         # 更新前のステータスを取得
         request_status_current = request.request_status
+    
         request.request_status = request_status
+        detail = IaasRequestReportHelper.generate_request_detail(request)
+        request_report = copy.deepcopy(request)
         db_session.commit()
-        IaasRequestHelper._add_activity_on_update_request_status(
+
+        IaasRequestHelper._emit_event_on_update_request_status(
             db_session=db_session,
             user=session.get('awx_loginid'),
-            request_id=request_id,
+            request_id=request_report.request_id,
+            request_category=request_report.request_category,
+            request_operation=request_report.request_operation,
+            request_text=request_report.request_text,
+            request_deadline=request_report.request_deadline,
             additional_info='({} -> {})'.format(RequestStatus.to_friendly(
                 request_status_current), RequestStatus.to_friendly(request_status)),
+            detail=detail,
             is_succeeded=True,
         )
 
@@ -106,13 +171,21 @@ class IaasRequestHelper:
             base.IaasRequest.request_id == request_id).first()
         # 更新前のIaaS作業担当者を取得
         iaas_user_current = request.iaas_user
+
         request.iaas_user = iaas_user
+        detail = IaasRequestReportHelper.generate_request_detail(request)
         db_session.commit()
-        IaasRequestHelper._add_activity_on_update_iaas_user(
+
+        IaasRequestHelper._emit_event_on_update_iaas_user(
             db_session=db_session,
             user=session.get('awx_loginid'),
             request_id=request_id,
+            request_category=request.request_category,
+            request_operation=request.request_operation,
+            request_text=request.request_text,
+            request_deadline=request.request_deadline,
             additional_info='({} -> {})'.format(iaas_user_current, iaas_user),
+            detail=detail,
             is_succeeded=True,
         )
 
@@ -128,9 +201,19 @@ class IaasRequestHelper:
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
         db_session.delete(request)
+        detail = IaasRequestReportHelper.generate_request_detail(request)
         db_session.commit()
-        IaasRequestHelper._add_activity_on_delete(
-            db_session, session.get('awx_loginid'), request_id, True)
+        IaasRequestHelper._emit_event_on_delete(
+            db_session=db_session,
+            user=session.get('awx_loginid'),
+            request_id=request_id, 
+            request_category=request.request_category,
+            request_operation=request.request_operation,
+            request_text=request.request_text,
+            request_deadline=request.request_deadline,
+            detail=detail, 
+            is_succeeded=True,
+        )
 
     @staticmethod
     def count_requests(db_session, filters):
@@ -209,53 +292,195 @@ class IaasRequestHelper:
         return asc(base.IaasRequest.request_text) if is_asc else desc(base.IaasRequest.request_text)
 
     @staticmethod
-    def _add_activity(db_session, user, request_id, activity_type, status, summary, detail=''):
-        ActivityHelper.add_activity(
+    def _emit_event(db_session, notification_method: NotificationMethod, title, sub_title, sub_title2, user, request_id, event_type, status, summary, detail='', request_text=None, request_deadline=None, icon=None):
+        activity_spec = ActivityHelper.ActivitySpec(
             db_session=db_session,
             user=user,
             request_id=request_id,
-            activity_type=activity_type,
+            event_type=event_type,
             status=status,
             summary=summary,
             detail=detail,
         )
 
-    @staticmethod
-    def _add_activity_on_insert(db_session, user, request_id, is_succeeded):
-        status = ActivityStatus.SUCCEED if is_succeeded else ActivityStatus.FAILED
-        summary = '{}に{}しました。'.format(
-            ActivityType.REQUEST_SENT_FRIENDLY, ActivityStatus.to_friendly(status))
-        IaasRequestHelper._add_activity(
-            db_session, user, request_id, ActivityType.REQUEST_SENT, status, summary)
+        notification_specs = []
+        # Teams通知を指定された場合
+        if notification_method == NotificationMethod.NOTIFY_TEMAS_ONLY or notification_method == NotificationMethod.NOTIFY_TEMAS_AND_MAIL:
+            notification_specs.append(
+                NotificationSpec(
+                    notification_type=Notificator.TEAMS_NOTIFICATION,
+                    title=title,
+                    sub_title=sub_title,
+                    sub_title2=sub_title2,
+                    user=user,
+                    request_id=request_id,
+                    event_type=event_type,
+                    status=status,
+                    summary=summary,
+                    detail=detail,
+                    request_text=request_text,
+                    request_deadline=request_deadline,
+                    icon=icon,
+                )
+            )
+        # メール通知を指定された場合
+        if notification_method == NotificationMethod.NOTIFY_MAIL_ONLY or notification_method == NotificationMethod.NOTIFY_TEMAS_AND_MAIL:
+            notification_specs.append(
+                NotificationSpec(
+                    notification_type=Notificator.MAIL_NOTIFICATION,
+                    title=summary,
+                    sub_title="",
+                    sub_title2="",
+                    user=user,
+                    request_id=request_id,
+                    event_type=event_type,
+                    status=status,
+                    summary=summary,
+                    detail=detail,
+                    request_text=request_text,
+                    request_deadline=request_deadline,
+                )
+            )
+        EventManager.emit_event(
+            activity_spec=activity_spec,
+            notification_specs=notification_specs,
+        )
 
     @staticmethod
-    def _add_activity_on_update(db_session, user, request_id, is_succeeded):
-        status = ActivityStatus.SUCCEED if is_succeeded else ActivityStatus.FAILED
-        summary = '{}に{}しました。'.format(
-            ActivityType.REQUEST_CHANGED_FRIENDLY, ActivityStatus.to_friendly(status))
-        IaasRequestHelper._add_activity(
-            db_session, user, request_id, ActivityType.REQUEST_CHANGED, status, summary)
+    def _emit_event_on_insert(db_session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+        title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_SENT_FRIENDLY, is_succeeded, request_text, request_deadline)
+        sub_title = "新しい申請({} / {})が作成されました。".format(request_category, request_operation)
+        sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
+        IaasRequestHelper._emit_event(
+            db_session=db_session,
+            notification_method=NotificationMethod.NOTIFY_TEMAS_AND_MAIL,
+            title=title,
+            sub_title=sub_title,
+            sub_title2=sub_title2,
+            user=user,
+            request_id=request_id,
+            event_type=EventType.REQUEST_SENT,
+            status=status,
+            summary=summary,
+            detail=detail,
+            request_text=request_text,
+            request_deadline=request_deadline,
+        )
 
     @staticmethod
-    def _add_activity_on_update_request_status(db_session, user, request_id, additional_info, is_succeeded):
-        status = ActivityStatus.SUCCEED if is_succeeded else ActivityStatus.FAILED
-        summary = '{}に{}しました。{}'.format(
-            ActivityType.REQUEST_STATUS_CHANGED_FRIENDLY, ActivityStatus.to_friendly(status), additional_info)
-        IaasRequestHelper._add_activity(
-            db_session, user, request_id, ActivityType.REQUEST_STATUS_CHANGED, status, summary)
+    def _emit_event_on_duplicate(db_session, user, request_id, request_id_new, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+        title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_DUPLICATE_FRIENDLY, is_succeeded, request_text, request_deadline)
+        sub_title = "申請({} / {})が複製されました。({} -> {})".format(request_category, request_operation, request_id, request_id_new)
+        sub_title2 = "複製した申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id_new)
+        IaasRequestHelper._emit_event(
+            db_session=db_session, 
+            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            title=title,
+            sub_title=sub_title,
+            sub_title2=sub_title2,
+            user=user,
+            request_id=request_id,
+            event_type=EventType.REQUEST_DUPLICATE,
+            status=status, 
+            summary=summary,
+            detail=detail,
+            request_text=request_text,
+            request_deadline=request_deadline,
+        )
+        IaasRequestHelper._emit_event_on_insert(
+            db_session=db_session,
+            user=user,
+            request_id=request_id_new,
+            request_category=request_category,
+            request_operation=request_operation,
+            request_text=request_text,
+            request_deadline=request_deadline,
+            detail=detail,
+            is_succeeded=is_succeeded
+        )
 
     @staticmethod
-    def _add_activity_on_update_iaas_user(db_session, user, request_id, additional_info, is_succeeded):
-        status = ActivityStatus.SUCCEED if is_succeeded else ActivityStatus.FAILED
-        summary = '{}に{}しました。{}'.format(
-            ActivityType.REQUEST_IAAS_USER_ASSIGNED_FRIENDLY, ActivityStatus.to_friendly(status), additional_info)
-        IaasRequestHelper._add_activity(
-            db_session, user, request_id, ActivityType.REQUEST_IAAS_USER_ASSIGNED, status, summary)
+    def _emit_event_on_update(db_session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+        title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_CHANGED_FRIENDLY, is_succeeded, request_text, request_deadline)
+        sub_title = "申請({} / {})の内容が変更されました。".format(request_category, request_operation)
+        sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
+        IaasRequestHelper._emit_event(
+            db_session=db_session,
+            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            title=title,
+            sub_title=sub_title,
+            sub_title2=sub_title2,
+            user=user,
+            request_id=request_id,
+            event_type=EventType.REQUEST_CHANGED,
+            status=status,
+            summary=summary,
+            # detail=IaasRequestReportHelper.to_friendly_job_options(job_options),
+            detail=detail,
+            request_text=request_text,
+            request_deadline=request_deadline,
+        )
 
     @staticmethod
-    def _add_activity_on_delete(db_session, user, request_id, is_succeeded):
-        status = ActivityStatus.SUCCEED if is_succeeded else ActivityStatus.FAILED
-        summary = '{}に{}しました。'.format(
-            ActivityType.REQUEST_DELETED_FRIENDLY, ActivityStatus.to_friendly(status))
-        IaasRequestHelper._add_activity(
-            db_session, user, request_id, ActivityType.REQUEST_DELETED, status, summary)
+    def _emit_event_on_update_request_status(db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded):
+        title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_STATUS_CHANGED_FRIENDLY, is_succeeded, request_text, request_deadline, additional_info)
+        sub_title = "申請({} / {})の状態が変更されました。".format(request_category, request_operation)
+        sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
+        IaasRequestHelper._emit_event(
+            db_session=db_session,
+            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            title=title,
+            sub_title=sub_title,
+            sub_title2=sub_title2,
+            user=user,
+            request_id=request_id,
+            event_type=EventType.REQUEST_STATUS_CHANGED,
+            status=status,
+            summary=summary,
+            detail=detail,
+            request_text=request_text,
+            request_deadline=request_deadline,
+        )
+
+    @staticmethod
+    def _emit_event_on_update_iaas_user(db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded):
+        title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_IAAS_USER_ASSIGNED_FRIENDLY, is_succeeded, request_text, request_deadline, additional_info)
+        sub_title = "申請({} / {})の作業担当者が変更されました。".format(request_category, request_operation)
+        sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
+        IaasRequestHelper._emit_event(
+            db_session=db_session,
+            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            title=title,
+            sub_title=sub_title,
+            sub_title2=sub_title2,
+            user=user,
+            request_id=request_id,
+            event_type=EventType.REQUEST_IAAS_USER_ASSIGNED,
+            status=status,
+            summary=summary,
+            detail=detail,
+            request_text=request_text,
+            request_deadline=request_deadline,
+        )
+
+    @staticmethod
+    def _emit_event_on_delete(db_session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+        title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_DELETED_FRIENDLY, is_succeeded, request_text, request_deadline)
+        sub_title = "申請({} / {})が削除されました。".format(request_category, request_operation)
+        sub_title2 = "申請 {} が削除されました。".format(request_id)
+        IaasRequestHelper._emit_event(
+            db_session=db_session,
+            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            title=title,
+            sub_title=sub_title,
+            sub_title2=sub_title2,
+            user=user,
+            request_id=request_id,
+            event_type=EventType.REQUEST_DELETED,
+            status=status,
+            summary=summary,
+            detail=detail,
+            request_text=request_text,
+            request_deadline=request_deadline,
+            icon=WARNING_ICON_FILE,
+        )

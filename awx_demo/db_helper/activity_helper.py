@@ -5,14 +5,24 @@ from awx_demo.db import base, db
 
 class ActivityHelper:
 
+    class ActivitySpec():
+        def __init__(self, db_session=None, user=None, request_id=None, event_type=None, status=None, summary=None, detail=None):
+            self.db_session=db_session
+            self.user=user
+            self.request_id=request_id
+            self.event_type=event_type
+            self.status=status
+            self.summary=summary
+            self.detail=detail
+
     @staticmethod
-    def add_activity(db_session=None, user=None, request_id=None, activity_type=None, status=None, summary=None, detail=None):
+    def add_activity(db_session=None, user=None, request_id=None, event_type=None, status=None, summary=None, detail=None):
         db_session, is_fallback = ActivityHelper.fallback_db_session(
             db_session)
         request = base.Activity(
             user=user,
             request_id=request_id,
-            activity_type=activity_type,
+            activity_type=event_type,
             status=status,
             summary=summary,
             detail=detail,
@@ -22,6 +32,18 @@ class ActivityHelper:
 
         if not is_fallback:
             db_session.close()
+
+    @staticmethod
+    def add_activity2(activity_spec: ActivitySpec):
+        ActivityHelper.add_activity(
+            db_session=activity_spec.db_session,
+            user=activity_spec.user,
+            request_id=activity_spec.request_id,
+            event_type=activity_spec.event_type,
+            status=activity_spec.status,
+            summary=activity_spec.summary,
+            detail=activity_spec.detail,
+        )
 
     @staticmethod
     def fallback_db_session(db_session):
@@ -59,9 +81,9 @@ class ActivityHelper:
             return None
 
     @staticmethod
-    def get_filter_activity_type(activity_type):
-        if activity_type:
-            return and_(base.Activity.activity_type == activity_type)
+    def get_filter_event_type(event_type):
+        if event_type:
+            return and_(base.Activity.event_type == event_type)
         else:
             return None
 
@@ -80,8 +102,8 @@ class ActivityHelper:
             return None
 
     @staticmethod
-    def get_orderspec_activity_type(is_asc):
-        return asc(base.Activity.activity_type) if is_asc else desc(base.Activity.activity_type)
+    def get_orderspec_event_type(is_asc):
+        return asc(base.Activity.event_type) if is_asc else desc(base.Activity.event_type)
 
     @staticmethod
     def get_orderspec_request_id(is_asc):

@@ -6,7 +6,7 @@ from requests.auth import HTTPBasicAuth
 
 from awx_demo.db import db
 from awx_demo.db_helper.activity_helper import ActivityHelper
-from awx_demo.db_helper.types.activity_type import ActivityStatus, ActivityType
+from awx_demo.utils.event_helper import EventStatus, EventType
 from awx_demo.utils.logging import Logging
 
 
@@ -160,12 +160,12 @@ class AWXApiHelper:
             return str(AWXApiHelper.JOB_STATUS_CONNECTION_FAILED)
 
     @staticmethod
-    def _add_activity(db_session, user, request_id, activity_type, status, summary, detail=''):
+    def _add_activity(db_session, user, request_id, event_type, status, summary, detail=''):
         ActivityHelper.add_activity(
             db_session=db_session,
             user=user,
             request_id=request_id,
-            activity_type=activity_type,
+            event_type=event_type,
             status=status,
             summary=summary,
             detail=detail,
@@ -173,16 +173,16 @@ class AWXApiHelper:
 
     @staticmethod
     def _add_activity_on_start_job(db_session, user, request_id, is_succeeded):
-        status = ActivityStatus.SUCCEED if is_succeeded else ActivityStatus.FAILED
+        status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
         summary = '{}に{}しました。'.format(
-            ActivityType.REQUEST_EXECUTE_STARTED_FRIENDLY, ActivityStatus.to_friendly(status))
+            EventType.REQUEST_EXECUTE_STARTED_FRIENDLY, EventStatus.to_friendly(status))
         AWXApiHelper._add_activity(
-            db_session, user, request_id, ActivityType.REQUEST_EXECUTE_STARTED, status, summary)
+            db_session, user, request_id, EventType.REQUEST_EXECUTE_STARTED, status, summary)
 
     @staticmethod
     def _add_activity_on_job_completed(db_session, user, request_id, is_succeeded):
-        status = ActivityStatus.SUCCEED if is_succeeded else ActivityStatus.FAILED
+        status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
         summary = '{}に{}しました。'.format(
-            ActivityType.REQUEST_EXECUTE_COMPLETED_FRIENDLY, ActivityStatus.to_friendly(status))
+            EventType.REQUEST_EXECUTE_COMPLETED_FRIENDLY, EventStatus.to_friendly(status))
         AWXApiHelper._add_activity(
-            db_session, user, request_id, ActivityType.REQUEST_EXECUTE_COMPLETED, status, summary)
+            db_session, user, request_id, EventType.REQUEST_EXECUTE_COMPLETED, status, summary)

@@ -3,10 +3,10 @@ import flet as ft
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.activity_helper import ActivityHelper
-from awx_demo.db_helper.types.activity_type import ActivityStatus, ActivityType
+from awx_demo.utils.event_helper import EventStatus, EventType
 
 
-class AppHeader(ft.UserControl):
+class AppHeader(ft.Row):
 
     def __init__(self, session, page: ft.Page, app_title):
         super().__init__()
@@ -71,8 +71,8 @@ class AppHeader(ft.UserControl):
         ActivityHelper.add_activity(
             user=self.session.get("awx_loginid"),
             request_id="",
-            activity_type=ActivityType.LOGOUT,
-            status=ActivityStatus.SUCCEED,
+            event_type=EventType.LOGOUT,
+            status=EventStatus.SUCCEED,
             summary="ログアウトに成功しました。",
             detail="",
         )

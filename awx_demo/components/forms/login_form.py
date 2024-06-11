@@ -7,7 +7,7 @@ from awx_demo.components.compounds.app_title import AppTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.activity_helper import ActivityHelper
-from awx_demo.db_helper.types.activity_type import ActivityStatus, ActivityType
+from awx_demo.utils.event_helper import EventStatus, EventType
 
 
 class LoginForm(ft.UserControl):
@@ -135,8 +135,8 @@ class LoginForm(ft.UserControl):
             ActivityHelper.add_activity(
                 user=loginid,
                 request_id="",
-                activity_type=ActivityType.LOGIN,
-                status=ActivityStatus.FAILED,
+                event_type=EventType.LOGIN,
+                status=EventStatus.FAILED,
                 summary="ログインに失敗しました。認証に失敗しました。ログインIDとパスワードを確認して下さい。",
                 detail="",
             )
@@ -149,8 +149,8 @@ class LoginForm(ft.UserControl):
             ActivityHelper.add_activity(
                 user=loginid,
                 request_id="",
-                activity_type=ActivityType.LOGIN,
-                status=ActivityStatus.FAILED,
+                event_type=EventType.LOGIN,
+                status=EventStatus.FAILED,
                 summary="ログインに失敗しました。指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。",
                 detail="",
             )
@@ -161,8 +161,8 @@ class LoginForm(ft.UserControl):
             ActivityHelper.add_activity(
                 user=loginid,
                 request_id="",
-                activity_type=ActivityType.LOGIN,
-                status=ActivityStatus.SUCCEED,
+                event_type=EventType.LOGIN,
+                status=EventStatus.SUCCEED,
                 summary="ログインに成功しました。{}ロールが付与されました。".format(
                     self.session.get("user_role")
                 ),

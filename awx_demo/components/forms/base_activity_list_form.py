@@ -7,10 +7,10 @@ from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.forms.helper.activity_row_helper import ActivityRowData, ActivityRowHelper
 from awx_demo.components.types.user_role import UserRole
-from awx_demo.db_helper.types.activity_type import ActivityType
+from awx_demo.utils.event_helper import EventType
 
 
-class BaseActivityListForm(ft.UserControl, metaclass=abc.ABCMeta):
+class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
 
     # const
     CONTENT_HEIGHT = 640
@@ -75,7 +75,7 @@ class BaseActivityListForm(ft.UserControl, metaclass=abc.ABCMeta):
             activity_row_data = ActivityRowData(
                 user=activity_data.user,
                 created=activity_data.created.strftime("%Y/%m/%d %H:%M"),
-                activity_type=ActivityType.to_friendly(activity_data.activity_type),
+                activity_type=EventType.to_friendly(activity_data.activity_type),
                 status=activity_data.status,
                 summary=activity_data.summary,
                 detail=activity_data.detail,
@@ -109,7 +109,7 @@ class BaseActivityListForm(ft.UserControl, metaclass=abc.ABCMeta):
         else:
             iaas_users = []
 
-        # iaas_users = []  # for DEBUG
+        iaas_users = []  # for DEBUG
         iaas_users.insert(0, {"username": "すべてのユーザ"})
         for iaas_user in iaas_users:
             iaas_user_options.append(ft.dropdown.Option(iaas_user["username"]))
@@ -140,16 +140,16 @@ class BaseActivityListForm(ft.UserControl, metaclass=abc.ABCMeta):
             ),
             options=[
                 ft.dropdown.Option("すべての操作"),
-                ft.dropdown.Option(ActivityType.LOGIN_FRIENDLY),
-                ft.dropdown.Option(ActivityType.LOGOUT_FRIENDLY),
-                ft.dropdown.Option(ActivityType.REQUEST_SENT_FRIENDLY),
-                ft.dropdown.Option(ActivityType.REQUEST_CHANGED_FRIENDLY),
-                ft.dropdown.Option(ActivityType.REQUEST_STATUS_CHANGED_FRIENDLY),
-                ft.dropdown.Option(ActivityType.REQUEST_IAAS_USER_ASSIGNED_FRIENDLY),
-                ft.dropdown.Option(ActivityType.REQUEST_EXECUTE_STARTED_FRIENDLY),
-                ft.dropdown.Option(ActivityType.REQUEST_EXECUTE_COMPLETED_FRIENDLY),
-                ft.dropdown.Option(ActivityType.REQUEST_DELETED_FRIENDLY),
-                ft.dropdown.Option(ActivityType.GLOBAL_SETTING_CHANGED_FRIENDLY),
+                ft.dropdown.Option(EventType.LOGIN_FRIENDLY),
+                ft.dropdown.Option(EventType.LOGOUT_FRIENDLY),
+                ft.dropdown.Option(EventType.REQUEST_SENT_FRIENDLY),
+                ft.dropdown.Option(EventType.REQUEST_CHANGED_FRIENDLY),
+                ft.dropdown.Option(EventType.REQUEST_STATUS_CHANGED_FRIENDLY),
+                ft.dropdown.Option(EventType.REQUEST_IAAS_USER_ASSIGNED_FRIENDLY),
+                ft.dropdown.Option(EventType.REQUEST_EXECUTE_STARTED_FRIENDLY),
+                ft.dropdown.Option(EventType.REQUEST_EXECUTE_COMPLETED_FRIENDLY),
+                ft.dropdown.Option(EventType.REQUEST_DELETED_FRIENDLY),
+                ft.dropdown.Option(EventType.GLOBAL_SETTING_CHANGED_FRIENDLY),
             ],
             hint_text="操作種別を指定します。",
             on_change=self.on_change_filter_activity_type,

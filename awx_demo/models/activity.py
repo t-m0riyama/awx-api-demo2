@@ -22,7 +22,7 @@ class Activity(Base):
     activity_type = Column(String(32), nullable=False)
     status = Column(String(32), nullable=False)
     summary = Column(String(128), nullable=False)
-    detail = Column(String(255), nullable=False)
+    detail = Column(String(512), nullable=False)
     created = Column(DateTime, default=datetime.now, nullable=False)
     updated = Column(DateTime, default=datetime.now,
                      onupdate=datetime.now, nullable=False)

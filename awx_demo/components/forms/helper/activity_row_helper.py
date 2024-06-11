@@ -2,7 +2,7 @@ import flet as ft
 
 from awx_demo.db import db
 from awx_demo.db_helper.activity_helper import ActivityHelper
-from awx_demo.db_helper.types.activity_type import ActivityStatus, ActivityType
+from awx_demo.utils.event_helper import EventStatus, EventType
 
 
 class ActivityRowData():
@@ -36,12 +36,12 @@ class ActivityRowHelper():
     @staticmethod
     def _activity_status_to_icon(activity_status):
         match activity_status:
-            case ActivityStatus.SUCCEED:
-                return ft.Icon(name=ft.icons.CHECK_CIRCLE, color=ft.colors.PRIMARY, tooltip=ActivityStatus.SUCCEED_FRIENDLY)
-            case ActivityStatus.FAILED:
-                return ft.Icon(name=ft.icons.ERROR_OUTLINED, color=ft.colors.ERROR, tooltip=ActivityStatus.FAILED_FRIENDLY)
-            case ActivityStatus.UNKNOWN:
-                return ft.Icon(name=ft.icons.QUESTION_MARK, color=ft.colors.PRIMARY, tooltip=ActivityStatus.UNKNOWN_FRIENDLY)
+            case EventStatus.SUCCEED:
+                return ft.Icon(name=ft.icons.CHECK_CIRCLE, color=ft.colors.PRIMARY, tooltip=EventStatus.SUCCEED_FRIENDLY)
+            case EventStatus.FAILED:
+                return ft.Icon(name=ft.icons.ERROR_OUTLINED, color=ft.colors.ERROR, tooltip=EventStatus.FAILED_FRIENDLY)
+            case EventStatus.UNKNOWN:
+                return ft.Icon(name=ft.icons.QUESTION_MARK, color=ft.colors.PRIMARY, tooltip=EventStatus.UNKNOWN_FRIENDLY)
 
     @staticmethod
     def refresh_data_rows(activity_list_form):
@@ -52,7 +52,7 @@ class ActivityRowHelper():
             activity_row_data = ActivityRowData(
                 user=activity_data.user,
                 created=activity_data.created.strftime('%Y/%m/%d %H:%M'),
-                activity_type=ActivityType.to_friendly(
+                activity_type=EventType.to_friendly(
                     activity_data.activity_type),
                 status=activity_data.status,
                 summary=activity_data.summary,
@@ -115,7 +115,7 @@ class ActivityRowHelper():
                 orderspec = ActivityHelper.get_orderspec_user(
                     activity_list_form.dtActivities.sort_ascending)
             case '操作種別':
-                orderspec = ActivityHelper.get_orderspec_activity_type(
+                orderspec = ActivityHelper.get_orderspec_event_type(
                     activity_list_form.dtActivities.sort_ascending)
             case '依頼ID':
                 orderspec = ActivityHelper.get_orderspec_request_id(
