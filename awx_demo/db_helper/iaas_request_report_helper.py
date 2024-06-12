@@ -124,7 +124,8 @@ class IaasRequestReportHelper:
                     request_friendry[IaasRequestReportHelper.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value).strftime('%Y/%m/%d')
                 else:
                     request_friendry[IaasRequestReportHelper.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value)
-        request_friendry["ジョブ設定"] = IaasRequestReportHelper.to_friendly_job_options(job_options_str=json.dumps(request_friendry["ジョブ設定"]), convert_to_yaml=False)
+        if request_friendry.get("ジョブ設定"):
+            request_friendry["ジョブ設定"] = IaasRequestReportHelper.to_friendly_job_options(job_options_str=json.dumps(request_friendry["ジョブ設定"]), convert_to_yaml=False)
         yaml_string = yaml.safe_dump(data=request_friendry, allow_unicode=True, sort_keys=False)
         return yaml_string
 

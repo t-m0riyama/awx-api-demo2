@@ -86,12 +86,11 @@ class IaasRequestHelper:
         iaas_user_old = request.iaas_user
 
         request.request_deadline = request_deadline
-        # request.request_category=request_category
-        # request.request_operation=request_operation
         request.request_text = request_text
         request.job_options = job_options
         request.request_status = request_status
         request.iaas_user = iaas_user
+        request_report = copy.deepcopy(request)
         detail = IaasRequestReportHelper.generate_diff_request(request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old)
         detail += IaasRequestReportHelper.generate_request_detail(request)
         db_session.commit()
@@ -99,12 +98,11 @@ class IaasRequestHelper:
         IaasRequestHelper._emit_event_on_update(
             db_session=db_session,
             user=session.get('awx_loginid'),
-            request_id=session.get('request_id'),
-            request_category=request.request_category,
-            request_operation=request.request_operation,
-            request_text=request.request_text,
-            request_deadline=request.request_deadline,
-            # job_options=job_options,
+            request_id=request_report.request_id,
+            request_category=request_report.request_category,
+            request_operation=request_report.request_operation,
+            request_text=request_report.request_text,
+            request_deadline=request_report.request_deadline,
             detail=detail,
             is_succeeded=True
         )
@@ -112,31 +110,33 @@ class IaasRequestHelper:
             IaasRequestHelper._emit_event_on_update_iaas_user(
                 db_session=db_session,
                 user=session.get('awx_loginid'),
-                request_id=session.get('request_id'),
-                request_category=session.get('request_category'),
-                request_operation=session.get('request_operation'),
+                request_id=request_report.request_id,
+                request_category=request_report.request_category,
+                request_operation=request_report.request_operation,
                 request_text=request_text,
                 request_deadline=request_deadline,
                 additional_info='({} -> {})'.format(iaas_user_old,
                                                     iaas_user),
-                # job_options=job_options,
                 detail=detail,
                 is_succeeded=True,
             )
         if request_status != request_status_old:
+            # ステータスが完了の場合、Teamsに加えてメールでも通知を行う
+            notification_method = NotificationMethod.NOTIFY_TEMAS_AND_MAIL if request_report.request_status == RequestStatus.COMPLETED else NotificationMethod.NOTIFY_TEMAS_ONLY
+
             IaasRequestHelper._emit_event_on_update_request_status(
                 db_session=db_session,
                 user=session.get('awx_loginid'),
-                request_id=session.get('request_id'),
-                request_category=session.get('request_category'),
-                request_operation=session.get('request_operation'),
+                request_id=request_report.request_id,
+                request_category=request_report.request_category,
+                request_operation=request_report.request_operation,
                 request_text=request_text,
                 request_deadline=request_deadline,
                 additional_info='({} -> {})'.format(RequestStatus.to_friendly(
                     request_status_old), RequestStatus.to_friendly(request_status)),
-                # job_options=job_options,
                 detail=detail,
                 is_succeeded=True,
+                notification_method=notification_method,
             )
 
     @staticmethod
@@ -151,6 +151,9 @@ class IaasRequestHelper:
         request_report = copy.deepcopy(request)
         db_session.commit()
 
+        # ステータスが完了の場合、Teamsに加えてメールでも通知を行う
+        notification_method = NotificationMethod.NOTIFY_TEMAS_AND_MAIL if request_report.request_status == RequestStatus.COMPLETED else NotificationMethod.NOTIFY_TEMAS_ONLY
+
         IaasRequestHelper._emit_event_on_update_request_status(
             db_session=db_session,
             user=session.get('awx_loginid'),
@@ -163,6 +166,7 @@ class IaasRequestHelper:
                 request_status_current), RequestStatus.to_friendly(request_status)),
             detail=detail,
             is_succeeded=True,
+            notification_method=notification_method,
         )
 
     @staticmethod
@@ -415,20 +419,19 @@ class IaasRequestHelper:
             event_type=EventType.REQUEST_CHANGED,
             status=status,
             summary=summary,
-            # detail=IaasRequestReportHelper.to_friendly_job_options(job_options),
             detail=detail,
             request_text=request_text,
             request_deadline=request_deadline,
         )
 
     @staticmethod
-    def _emit_event_on_update_request_status(db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded):
+    def _emit_event_on_update_request_status(db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded, notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_STATUS_CHANGED_FRIENDLY, is_succeeded, request_text, request_deadline, additional_info)
         sub_title = "申請({} / {})の状態が変更されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         IaasRequestHelper._emit_event(
             db_session=db_session,
-            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            notification_method=notification_method,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
