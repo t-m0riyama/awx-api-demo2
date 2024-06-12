@@ -168,7 +168,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
             self.session.get("awx_loginid"),
             self.session.get("awx_password"),
         )
-        iaas_users = []  # for DEBUG
+        # iaas_users = []  # for DEBUG
         iaas_user_items = []
         for iaas_user in iaas_users:
             iaas_user_items.append(

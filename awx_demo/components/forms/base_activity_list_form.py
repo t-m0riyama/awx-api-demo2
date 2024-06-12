@@ -109,7 +109,7 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
         else:
             iaas_users = []
 
-        iaas_users = []  # for DEBUG
+        # iaas_users = []  # for DEBUG
         iaas_users.insert(0, {"username": "すべてのユーザ"})
         for iaas_user in iaas_users:
             iaas_user_options.append(ft.dropdown.Option(iaas_user["username"]))
