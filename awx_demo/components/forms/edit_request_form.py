@@ -36,6 +36,11 @@ class EditRequestForm(ft.UserControl):
         self.tab_content_width = self.content_width
         self.tab_body_height = self.body_height - 80
 
+        db_session = db.get_db()
+        SessionHelper.load_request_to_session_from_db(
+            self.session, db_session, self.request_id)
+        db_session.close()
+
         # overlayを利用する可能性があるコントロールは、あらかじめインスタンスを作成する
         self.formCreateRequest = RequestCommonInfoTabForm(
             self.session,
@@ -75,11 +80,6 @@ class EditRequestForm(ft.UserControl):
             formTitle = FormTitle('申請の詳細', '', self.content_width)
         else:
             formTitle = FormTitle('申請の編集', '', self.content_width)
-
-        db_session = db.get_db()
-        SessionHelper.load_request_to_session_from_db(
-            self.session, db_session, self.request_id)
-        db_session.close()
 
         self.tabRequest = ft.Tabs(
             selected_index=0,
