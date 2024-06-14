@@ -20,7 +20,10 @@ class IaasRequestReportHelper:
         "request_operation",
         "request_text",
         "request_status",
+        "iaas_user",
         "job_options",
+        "job_id",
+        "updated",
     ]
     REQUEST_FRIENDLY_KEYS = [
         "申請ID",
@@ -31,7 +34,10 @@ class IaasRequestReportHelper:
         "申請項目",
         "依頼内容",
         "ステータス",
+        "作業担当者",
         "ジョブ設定",
+        "ジョブID",
+        "最終更新日",
     ]
     JOB_OPTIONS_KEYS = [
         "vsphere_cluster",
