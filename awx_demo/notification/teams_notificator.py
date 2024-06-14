@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import datetime
 import os
@@ -80,6 +81,7 @@ class TeamsNotificator():
 
         # teams_message.printme()
         try:
-            teams_message.send()
+            asyncio.new_event_loop().run_in_executor(None, teams_message.send)
         except Exception as e:
+            Logging.error("Notification failed: Teamsメッセージの通知に失敗しました。")
             Logging.error(e)
