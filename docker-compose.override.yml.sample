@@ -1,0 +1,7 @@
+services:
+  awx-api-demo2:
+    environment:
+      - AWX_URL=<YOUR AWX URL>
+      - TEAMS_WEB_HOOK_URL=<YOUR TEAMS WEBHOOK URL>
+      - TEAMS_WEB_HOOK_MESSAGE_DELAY_MSEC=300
+
