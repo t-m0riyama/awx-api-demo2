@@ -149,16 +149,18 @@ class JobExecuteConfirmForm(ft.UserControl):
             Logging.error('failed to insert record ')
             Logging.error(ex)
 
+        db_session = db.get_db()
+        request = IaasRequestHelper.get_request(db_session, self.session.get('document_id'))
         job_id = AWXApiHelper.start_job(
             uri_base=self.session.get('awx_url'),
             loginid=self.session.get('awx_loginid'),
             password=self.session.get('awx_password'),
             job_template_name=self.JOB_TEMPLATE_NAME,
+            request=request,
             job_options=job_options,
             session=self.session,
         )
 
-        db_session = db.get_db()
         IaasRequestHelper.update_request_iaas_user(
             db_session, self.session.get('document_id'), self.session.get('awx_loginid'), self.session)
         if job_id > 0:

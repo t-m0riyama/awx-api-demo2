@@ -17,8 +17,9 @@ class JobProgressForm(ft.UserControl):
     BODY_HEIGHT = 250
     JOB_STATUS_CHECK_ID = 'job_status_check'
 
-    def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
+    def __init__(self, session, request_id, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
         self.session = session
+        self.request_id = request_id
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
@@ -96,14 +97,18 @@ class JobProgressForm(ft.UserControl):
         )
 
     def refresh_progress(self):
+        db_session = db.get_db()
+        request = IaasRequestHelper.get_request(db_session, self.request_id)
         job_status = AWXApiHelper.get_job_status(
             uri_base=self.session.get('awx_url'),
             loginid=self.session.get('awx_loginid'),
             password=self.session.get('awx_password'),
+            request=request,
             job_id=self.session.get('job_id'),
             session=self.session,
         )
-        if job_status == 'successful':
+        db_session.close()
+        if job_status == AWXApiHelper.JOB_STATUS_SUCCEEDED:
             self.pbJob.value = 1.0
             try:
                 self.scheduler.remove_job(self.JOB_STATUS_CHECK_ID)
@@ -138,7 +143,7 @@ class JobProgressForm(ft.UserControl):
             self.btnExit.update()
             IaasRequestHelper.update_request_status(db.get_db(), self.session.get(
                 'document_id'), RequestStatus.COMPLETED, self.session)
-        elif job_status == 'failed':
+        elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
             try:
                 self.scheduler.remove_job(self.JOB_STATUS_CHECK_ID)
                 self.scheduler.pause()
@@ -170,7 +175,7 @@ class JobProgressForm(ft.UserControl):
             self.lvProgressLog.update()
             self.btnExit.update()
 
-        if job_status == 'running':
+        if job_status == AWXApiHelper.JOB_STATUS_RUNNING:
             if self.pbJob.value < 0.9:
                 self.pbJob.value += 0.1
         self.pbJob.update()

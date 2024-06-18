@@ -91,6 +91,7 @@ class SetVmCpuMemoryWizard:
                     self.session.set("new_request_wizard_step", "job_progress")
                     formStep = JobProgressForm(
                         session=self.session,
+                        request_id=self.session.get("request_id"),
                         height=self.CONTENT_HEIGHT,
                         width=self.CONTENT_WIDTH,
                         body_height=self.BODY_HEIGHT,
