@@ -8,6 +8,7 @@ from awx_demo.components.compounds.parameter_input_text import ParameterInputTex
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.utils.event_helper import EventStatus, EventType
+from awx_demo.utils.event_manager import EventManager
 
 
 class LoginForm(ft.UserControl):
@@ -132,7 +133,7 @@ class LoginForm(ft.UserControl):
     def login_auth(self, awx_url, loginid, password):
         login_result = AWXApiHelper.login(awx_url, loginid, password)
         if not login_result:
-            ActivityHelper.add_activity(
+            activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
                 event_type=EventType.LOGIN,
@@ -140,13 +141,17 @@ class LoginForm(ft.UserControl):
                 summary="ログインに失敗しました。認証に失敗しました。ログインIDとパスワードを確認して下さい。",
                 detail="",
             )
+            EventManager.emit_event(
+                activity_spec=activity_spec,
+                notification_specs=[],
+            )
             self.show_login_failed_message()
             return False
         teams = AWXApiHelper.get_teams_user_belong(awx_url, loginid, password)
         role = self.check_role(teams)
 
         if role is None:
-            ActivityHelper.add_activity(
+            activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
                 event_type=EventType.LOGIN,
@@ -154,11 +159,15 @@ class LoginForm(ft.UserControl):
                 summary="ログインに失敗しました。指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。",
                 detail="",
             )
+            EventManager.emit_event(
+                activity_spec=activity_spec,
+                notification_specs=[],
+            )
             self.show_lack_authority_message()
             return False
         else:
             self.session.set("user_role", role)
-            ActivityHelper.add_activity(
+            activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
                 event_type=EventType.LOGIN,
@@ -167,6 +176,10 @@ class LoginForm(ft.UserControl):
                     self.session.get("user_role")
                 ),
                 detail="",
+            )
+            EventManager.emit_event(
+                activity_spec=activity_spec,
+                notification_specs=[],
             )
             return login_result
 

@@ -10,7 +10,7 @@ class EventManager:
 
     @staticmethod
     def emit_event(activity_spec: ActivityHelper.ActivitySpec, notification_specs: list[NotificationSpec]):
-        ActivityHelper.add_activity2(
+        ActivityHelper.add_activity(
             activity_spec
         )
         for notification_spec in notification_specs:

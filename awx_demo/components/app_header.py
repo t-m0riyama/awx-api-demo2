@@ -4,6 +4,7 @@ from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.utils.event_helper import EventStatus, EventType
+from awx_demo.utils.event_manager import EventManager
 
 
 class AppHeader(ft.Row):
@@ -68,13 +69,17 @@ class AppHeader(ft.Row):
         self.page.update()
 
     def logout_clicked(self, e):
-        ActivityHelper.add_activity(
+        activity_spec = ActivityHelper.ActivitySpec(
             user=self.session.get("awx_loginid"),
             request_id="",
             event_type=EventType.LOGOUT,
             status=EventStatus.SUCCEED,
             summary="ログアウトに成功しました。",
             detail="",
+        )
+        EventManager.emit_event(
+            activity_spec=activity_spec,
+            notification_specs=[],
         )
         SessionHelper.clean_session(self.session)
         SessionHelper.dump_session(self.session)

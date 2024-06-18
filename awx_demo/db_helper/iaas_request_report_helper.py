@@ -71,7 +71,9 @@ class IaasRequestReportHelper:
             diff_request['request_status'] = '{} -> {}'.format(RequestStatus.to_friendly(request_status_old), RequestStatus.to_friendly(request.request_status))
         if request.iaas_user != iaas_user_old:
             diff_request['iaas_user'] = '{} -> {}'.format(iaas_user_old, request.iaas_user)
-        diff_request['job_options'] = IaasRequestReportHelper.diff_job_options(request.job_options, job_options_old)
+        job_options_dict = IaasRequestReportHelper.diff_job_options(request.job_options, job_options_old)
+        if job_options_dict != {}:
+            diff_request['job_options'] = job_options_dict
 
         return diff_request
 
@@ -101,7 +103,11 @@ class IaasRequestReportHelper:
             request_status_old=request_status_old,
             iaas_user_old=iaas_user_old,
         )
-        return "\n== 変更内容の詳細 =============\n" + IaasRequestReportHelper.to_friendly_request(diff_request)
+        print(diff_request)
+        if diff_request != {}:
+            return "\n== 変更内容の詳細 =============\n" + IaasRequestReportHelper.to_friendly_request(diff_request)
+        else:
+            return None
 
     @staticmethod
     def generate_common_fields(request_id, event_type_friendly, is_succeeded, request_text=None, request_deadline=None, additional_info=None):

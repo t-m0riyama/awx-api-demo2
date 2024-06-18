@@ -16,34 +16,22 @@ class ActivityHelper:
             self.detail=detail
 
     @staticmethod
-    def add_activity(db_session=None, user=None, request_id=None, event_type=None, status=None, summary=None, detail=None):
+    def add_activity(activity_spec: ActivitySpec):
         db_session, is_fallback = ActivityHelper.fallback_db_session(
-            db_session)
+            activity_spec.db_session)
         request = base.Activity(
-            user=user,
-            request_id=request_id,
-            activity_type=event_type,
-            status=status,
-            summary=summary,
-            detail=detail,
-        )
-        db_session.add(request)
-        db_session.commit()
-
-        if not is_fallback:
-            db_session.close()
-
-    @staticmethod
-    def add_activity2(activity_spec: ActivitySpec):
-        ActivityHelper.add_activity(
-            db_session=activity_spec.db_session,
             user=activity_spec.user,
             request_id=activity_spec.request_id,
-            event_type=activity_spec.event_type,
+            activity_type=activity_spec.event_type,
             status=activity_spec.status,
             summary=activity_spec.summary,
             detail=activity_spec.detail,
         )
+        db_session.add(request)
+        db_session.commit()
+
+        if is_fallback:
+            db_session.close()
 
     @staticmethod
     def fallback_db_session(db_session):
