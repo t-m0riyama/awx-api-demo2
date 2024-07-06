@@ -1,4 +1,5 @@
 import os
+import re
 
 import flet as ft
 
@@ -30,7 +31,7 @@ class LoginForm(ft.UserControl):
         super().__init__()
 
     def build(self):
-        default_awx_url = os.getenv("AWX_URL", self.DEFAULT_AWX_URL)
+        default_awx_url = re.sub('/$', '', os.getenv("RMX_AWX_URL", self.DEFAULT_AWX_URL))
         self.tfLoginid = ParameterInputText(
             label="Login ID",
             value=(

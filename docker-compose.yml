@@ -13,7 +13,7 @@ services:
       - 8888
     environment:
       - TZ=Asia/Tokyo
-      - AWX_URL=https://awx.example.com
+      - RMX_AWX_URL=https://awx.example.com
       - FLET_WEB_APP_PATH=/awx-api-demo2
     labels:
       - "traefik.enable=true"

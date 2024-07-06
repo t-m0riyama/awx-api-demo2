@@ -15,9 +15,9 @@ class ActivityHelper:
             self.summary=summary
             self.detail=detail
 
-    @staticmethod
-    def add_activity(activity_spec: ActivitySpec):
-        db_session, is_fallback = ActivityHelper.fallback_db_session(
+    @classmethod
+    def add_activity(cls, activity_spec: ActivitySpec):
+        db_session, is_fallback = cls.fallback_db_session(
             activity_spec.db_session)
         request = base.Activity(
             user=activity_spec.user,
@@ -63,31 +63,19 @@ class ActivityHelper:
 
     @staticmethod
     def get_filter_user(user):
-        if user:
-            return and_(base.Activity.user == user)
-        else:
-            return None
+        return and_(base.Activity.user == user) if user else None
 
     @staticmethod
     def get_filter_event_type(event_type):
-        if event_type:
-            return and_(base.Activity.event_type == event_type)
-        else:
-            return None
+        return and_(base.Activity.event_type == event_type) if event_type else None
 
     @staticmethod
     def get_filter_summary(summary_contains):
-        if summary_contains:
-            return and_(base.Activity.summary.contains(summary_contains))
-        else:
-            return None
+        return and_(base.Activity.summary.contains(summary_contains)) if summary_contains else None
 
     @staticmethod
     def get_filter_status(statuses):
-        if statuses:
-            return and_(base.Activity.status.in_(statuses))
-        else:
-            return None
+        return and_(base.Activity.status.in_(statuses)) if statuses else None
 
     @staticmethod
     def get_orderspec_event_type(is_asc):

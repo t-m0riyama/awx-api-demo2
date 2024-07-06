@@ -9,12 +9,12 @@ class LoginDialog(ft.UserControl):
     """Login Dialog"""
 
     # const
-    DEFAULT_AWX_URL = 'https://gzbox01.moriyama.internal:8043'
+    DEFAULT_AWX_URL = 'https://awx.example.com'
 
     def __init__(self, session, page: ft.Page):
         self.session = session
         self.page = page
-        self.default_awx_url = os.getenv('AWX_URL', self.DEFAULT_AWX_URL)
+        self.default_awx_url = os.getenv('RMX_AWX_URL', self.DEFAULT_AWX_URL)
         # formLogin = LoginForm(session=session, page=page, default_awx_url=default_awx_url)
         # controls = [
         #                 formLogin,
