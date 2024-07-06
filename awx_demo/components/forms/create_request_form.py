@@ -5,6 +5,7 @@ import flet as ft
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
+from awx_demo.utils.logging import Logging
 
 
 class CreateRequestForm(ft.UserControl):
@@ -139,6 +140,7 @@ class CreateRequestForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def on_change_request_deadline(self, e):
         self.lblReleseDeadline.value = 'リリース希望日: ' + \
             self.dpRequestDeadline.value.strftime('%Y/%m/%d')
@@ -149,9 +151,11 @@ class CreateRequestForm(ft.UserControl):
         self.lblReleseDeadline.update()
         self.btnNext.update()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.step_change_cancel(e)
 
+    @Logging.func_logger
     def on_click_next(self, e):
         self.session.set('request_text', self.tfRequestText.value)
         self.session.set('request_category', self.dropCategory.value)

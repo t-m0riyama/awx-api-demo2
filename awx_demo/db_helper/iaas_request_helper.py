@@ -12,11 +12,13 @@ from awx_demo.notification.notificator import Notificator
 from awx_demo.notification.teams_notificator import WARNING_ICON_FILE
 from awx_demo.utils.event_helper import EventType
 from awx_demo.utils.event_manager import EventManager
+from awx_demo.utils.logging import Logging
 
 
 class IaasRequestHelper:
     
     @classmethod
+    @Logging.func_logger
     def add_request(cls, db_session, request_id, request_deadline, request_user, request_category, request_operation, request_text, job_options, request_status, session):
         request = base.IaasRequest(
             request_id=request_id,
@@ -46,6 +48,7 @@ class IaasRequestHelper:
         )
 
     @classmethod
+    @Logging.func_logger
     def duplicate_request(cls, db_session, request_id, new_request_id, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
@@ -74,6 +77,7 @@ class IaasRequestHelper:
         )
 
     @classmethod
+    @Logging.func_logger
     def update_request(cls, db_session, request_id, request_deadline, request_text, job_options, request_status, iaas_user, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
@@ -147,6 +151,7 @@ class IaasRequestHelper:
                 pass
 
     @classmethod
+    @Logging.func_logger
     def update_request_status(cls, db_session, request_id, request_status, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
@@ -180,6 +185,7 @@ class IaasRequestHelper:
             pass
 
     @classmethod
+    @Logging.func_logger
     def update_request_iaas_user(cls, db_session, request_id, iaas_user, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
@@ -207,6 +213,7 @@ class IaasRequestHelper:
             pass
 
     @classmethod
+    @Logging.func_logger
     def update_job_id(cls, db_session, request_id, job_id):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
@@ -214,6 +221,7 @@ class IaasRequestHelper:
         db_session.commit()
 
     @classmethod
+    @Logging.func_logger
     def delete_request(cls, db_session, request_id, session):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
@@ -233,12 +241,14 @@ class IaasRequestHelper:
         )
 
     @classmethod
+    @Logging.func_logger
     def count_requests(cls, db_session, filters):
         # filters中のNoneなど無効な要素を削除
         filters = list(filter(lambda x: x is not None, filters))
         return db_session.query(base.IaasRequest).filter(*filters).count()
 
     @classmethod
+    @Logging.func_logger
     def get_requests(cls, db_session, filters, orderspec, offset_row, limit_rows):
         # filters中のNoneなど無効な要素を削除
         filters = list(filter(lambda x: x is not None, filters))
@@ -247,12 +257,14 @@ class IaasRequestHelper:
         return requests_data
 
     @classmethod
+    @Logging.func_logger
     def get_request(cls, db_session, request_id):
         request_data = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
         return request_data
 
     @classmethod
+    @Logging.func_logger
     def get_filter_iaas_user(cls, request_user):
         if request_user:
             return and_(base.IaasRequest.iaas_user == request_user)
@@ -260,6 +272,7 @@ class IaasRequestHelper:
             return None
 
     @classmethod
+    @Logging.func_logger
     def get_filter_request_user(cls, request_user):
         if request_user:
             return and_(base.IaasRequest.request_user == request_user)
@@ -267,6 +280,7 @@ class IaasRequestHelper:
             return None
 
     @classmethod
+    @Logging.func_logger
     def get_filter_request_text(cls, request_text_contains):
         if request_text_contains:
             return and_(base.IaasRequest.request_text.contains(request_text_contains))
@@ -274,6 +288,7 @@ class IaasRequestHelper:
             return None
 
     @classmethod
+    @Logging.func_logger
     def get_filter_request_status(cls, request_statuses):
         if request_statuses:
             return and_(base.IaasRequest.request_status.in_(request_statuses))
@@ -281,30 +296,37 @@ class IaasRequestHelper:
             return None
 
     @classmethod
+    @Logging.func_logger
     def get_orderspec_request_id(cls, is_asc):
         return asc(base.IaasRequest.request_id) if is_asc else desc(base.IaasRequest.request_id)
 
     @classmethod
+    @Logging.func_logger
     def get_orderspec_request_deadline(cls, is_asc):
         return asc(base.IaasRequest.request_deadline) if is_asc else desc(base.IaasRequest.request_deadline)
 
     @classmethod
+    @Logging.func_logger
     def get_orderspec_updated(cls, is_asc):
         return asc(base.IaasRequest.updated) if is_asc else desc(base.IaasRequest.updated)
 
     @classmethod
+    @Logging.func_logger
     def get_orderspec_request_user(cls, is_asc):
         return asc(base.IaasRequest.request_user) if is_asc else desc(base.IaasRequest.request_user)
 
     @classmethod
+    @Logging.func_logger
     def get_orderspec_iaas_user(cls, is_asc):
         return asc(base.IaasRequest.iaas_user) if is_asc else desc(base.IaasRequest.iaas_user)
 
     @classmethod
+    @Logging.func_logger
     def get_orderspec_request_operation(cls, is_asc):
         return asc(base.IaasRequest.request_operation) if is_asc else desc(base.IaasRequest.request_operation)
 
     @classmethod
+    @Logging.func_logger
     def get_orderspec_request_text(cls, is_asc):
         return asc(base.IaasRequest.request_text) if is_asc else desc(base.IaasRequest.request_text)
 

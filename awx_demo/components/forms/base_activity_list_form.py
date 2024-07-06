@@ -8,6 +8,7 @@ from awx_demo.components.compounds.parameter_input_text import ParameterInputTex
 from awx_demo.components.forms.helper.activity_row_helper import ActivityRowData, ActivityRowHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.utils.event_helper import EventType
+from awx_demo.utils.logging import Logging
 
 
 class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
@@ -244,34 +245,41 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
             # padding=ft.padding.all(0),
         )
 
+    @Logging.func_logger
     def on_request_edit_open(self, e):
         self.session.set("request_id", e.control.content.value)
         self.open_edit_request_dialog()
 
+    @Logging.func_logger
     def on_change_filter_activity_user(self, e):
         self.session.set("filter_activity_user", e.control.value)
         ActivityRowHelper.query_activity_all(self)
         self.refresh()
 
+    @Logging.func_logger
     def on_change_filter_activity_type(self, e):
         self.session.set("filter_activity_type", e.control.value)
         ActivityRowHelper.query_activity_all(self)
         self.refresh()
 
+    @Logging.func_logger
     def on_click_heading_column(self, e):
         ActivityRowHelper.sort_column(self, self.session, e.control.label.value)
 
+    @Logging.func_logger
     def on_click_next_page(self, e):
         request_data_count = ActivityRowHelper.count_activity_all(self)
         if (self.data_row_offset + 1) < request_data_count:
             self.data_row_offset += self.DATA_ROW_MAX
             self.refresh()
 
+    @Logging.func_logger
     def on_click_previous_page(self, e):
         if (self.data_row_offset + 1) > self.DATA_ROW_MAX:
             self.data_row_offset -= self.DATA_ROW_MAX
             self.refresh()
 
+    @Logging.func_logger
     def on_click_search_summary(self, e):
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchSummary.value)

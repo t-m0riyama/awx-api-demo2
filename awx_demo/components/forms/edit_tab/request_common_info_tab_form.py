@@ -4,6 +4,7 @@ import flet as ft
 
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.utils.logging import Logging
 
 
 class RequestCommonInfoTabForm(ft.UserControl):
@@ -29,8 +30,7 @@ class RequestCommonInfoTabForm(ft.UserControl):
         # overlay settings
         start_date = datetime.datetime.now() + datetime.timedelta(days=self.START_DATE_DAYS)
         end_date = datetime.datetime.now() + datetime.timedelta(days=self.END_DATE_DAYS)
-        current_date = self.session.get('request_deadline') if self.session.contains_key(
-            'request_deadline') else start_date
+        current_date = self.session.get('request_deadline') if self.session.contains_key('request_deadline') else start_date
         self.dpRequestDeadline = ft.DatePicker(
             on_change=self.on_change_request_deadline,
             # on_dismiss=date_picker_dismissed,
@@ -138,9 +138,11 @@ class RequestCommonInfoTabForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def on_change_request_text(self, e):
         self.session.set('request_text', e.control.value)
 
+    @Logging.func_logger
     def on_change_request_deadline(self, e):
         self.session.set('request_deadline', self.dpRequestDeadline.value)
         self.textReleseDeadline.value = 'リリース希望日: ' + \

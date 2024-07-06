@@ -90,6 +90,7 @@ class SetVmMemoryForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def generate_confirm_text(self):
         confirm_text = '== 基本情報 ====================='
         confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
@@ -112,17 +113,21 @@ class SetVmMemoryForm(ft.UserControl):
             confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
         return confirm_text
 
+    @Logging.func_logger
     def on_change_vm_memory_enabled(self, e):
         self.session.get('job_options')['change_vm_memory_enabled'] = e.control.value
         self.dropMemorySize.disabled = False if e.control.value else True
         self.dropMemorySize.update()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.step_change_cancel(e)
 
+    @Logging.func_logger
     def on_click_previous(self, e):
         self.step_change_previous(e)
 
+    @Logging.func_logger
     def on_click_next(self, e):
         self.session.get('job_options')['change_vm_memory_enabled'] = self.checkChangeVmMemoryEnabled.value
         self.session.get('job_options')['memory_gb'] = int(self.dropMemorySize.value)

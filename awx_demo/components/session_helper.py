@@ -7,6 +7,7 @@ from awx_demo.utils.logging import Logging
 class SessionHelper:
 
     @classmethod
+    @Logging.func_logger
     def clean_session(cls, session):
         cls.clean_request_from_session(session)
         cls.clean_wizard_steps(session)
@@ -15,6 +16,7 @@ class SessionHelper:
         session.remove("user_role")
 
     @staticmethod
+    @Logging.func_logger
     def clean_wizard_steps(session):
         if session.contains_key("edit_request_wizard_step"):
             session.remove("edit_request_wizard_step")
@@ -22,11 +24,13 @@ class SessionHelper:
             session.remove("new_request_wizard_step")
 
     @staticmethod
+    @Logging.func_logger
     def dump_session(session):
         for k in session.get_keys():
             Logging.info(f"SESSION_DUMP {k}: {session.get(k)}")
 
     @staticmethod
+    @Logging.func_logger
     def clean_request_from_session(session):
         if session.contains_key("request_id"):
             session.remove("request_id")
@@ -56,6 +60,7 @@ class SessionHelper:
             session.remove("confirm_text")
 
     @staticmethod
+    @Logging.func_logger
     def load_request_to_session_from_db(session, db_session, request_id):
         Logging.info("REQUEST_ID: " + request_id)
         session.set("document_id", request_id)

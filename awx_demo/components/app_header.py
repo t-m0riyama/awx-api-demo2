@@ -5,6 +5,7 @@ from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.utils.event_helper import EventStatus, EventType
 from awx_demo.utils.event_manager import EventManager
+from awx_demo.utils.logging import Logging
 
 
 class AppHeader(ft.Row):
@@ -63,11 +64,13 @@ class AppHeader(ft.Row):
     def build(self):
         return self.page.appbar
 
+    @Logging.func_logger
     def toggle_icon(self, e):
         self.page.theme_mode = "dark" if self.page.theme_mode == "light" else "light"
         self.toggle_dark_light_icon.selected = not self.toggle_dark_light_icon.selected
         self.page.update()
 
+    @Logging.func_logger
     def logout_clicked(self, e):
         activity_spec = ActivityHelper.ActivitySpec(
             user=self.session.get("awx_loginid"),

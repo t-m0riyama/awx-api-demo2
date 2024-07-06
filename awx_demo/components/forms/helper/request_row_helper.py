@@ -5,6 +5,7 @@ import flet as ft
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.utils.logging import Logging
 
 
 class RequestRowData():
@@ -22,6 +23,7 @@ class RequestRowData():
 class RequestRowHelper():
 
     @staticmethod
+    @Logging.func_logger
     def generate_request_row(request_list_form, id, request_data: RequestRowData):
         return ft.DataRow(
             cells=[
@@ -52,6 +54,7 @@ class RequestRowHelper():
                 return ft.Icon(name=ft.icons.CHECK_CIRCLE, color=ft.colors.PRIMARY, tooltip=RequestStatus.COMPLETED_FRIENDLY)
 
     @staticmethod
+    @Logging.func_logger
     def delete_selected_requests(request_list_form):
         db_session = db.get_db()
         for row in request_list_form.dtRequests.rows:
@@ -65,6 +68,7 @@ class RequestRowHelper():
         request_list_form.btnActions.update()
 
     @staticmethod
+    @Logging.func_logger
     def update_request(session):
         db_session = db.get_db()
         IaasRequestHelper.update_request(
@@ -80,6 +84,7 @@ class RequestRowHelper():
         db_session.close()
 
     @staticmethod
+    @Logging.func_logger
     def update_selected_request_status(request_list_form, request_status):
         db_session = db.get_db()
         for row in request_list_form.dtRequests.rows:
@@ -93,6 +98,7 @@ class RequestRowHelper():
         request_list_form.btnActions.update()
 
     @staticmethod
+    @Logging.func_logger
     def update_selected_request_iaas_user(request_list_form, iaas_user):
         db_session = db.get_db()
         for row in request_list_form.dtRequests.rows:
@@ -106,6 +112,7 @@ class RequestRowHelper():
         request_list_form.btnActions.update()
 
     @staticmethod
+    @Logging.func_logger
     def refresh_data_rows(request_list_form):
         requests_data = RequestRowHelper.query_request_all(request_list_form)
         request_list_form.dtRequests.rows = []
@@ -130,6 +137,7 @@ class RequestRowHelper():
         request_list_form.dtRequests.update()
 
     @staticmethod
+    @Logging.func_logger
     def refresh_page_indicator(request_list_form):
         range_min, range_max, request_data_count = RequestRowHelper.get_page_range(
             request_list_form)
@@ -154,6 +162,7 @@ class RequestRowHelper():
         request_list_form.btnPreviousPage.update()
 
     @staticmethod
+    @Logging.func_logger
     def get_page_range(request_list_form):
         record_count = RequestRowHelper.count_request_all(request_list_form)
         range_min = 0 if record_count == 0 else (
@@ -165,6 +174,7 @@ class RequestRowHelper():
         return range_min, range_max, record_count
 
     @staticmethod
+    @Logging.func_logger
     def query_request_all(request_list_form):
         db_session = db.get_db()
         requests_data = None
@@ -203,6 +213,7 @@ class RequestRowHelper():
         return requests_data
 
     @staticmethod
+    @Logging.func_logger
     def count_request_all(request_list_form):
         db_session = db.get_db()
         filters = request_list_form.get_query_filters()
@@ -211,6 +222,7 @@ class RequestRowHelper():
         return requests_data
 
     @staticmethod
+    @Logging.func_logger
     def sort_column(request_list_form, session, column_lubel):
         session.set('sort_target_column', column_lubel)
         # ソート対象が同じ列の場合、昇順と降順を逆転させる

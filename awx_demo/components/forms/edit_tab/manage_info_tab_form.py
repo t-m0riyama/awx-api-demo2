@@ -3,6 +3,7 @@ import flet as ft
 from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.utils.logging import Logging
 
 
 class ManageInfoTabForm(ft.UserControl):
@@ -117,8 +118,10 @@ class ManageInfoTabForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def on_change_iaas_user(self, e):
         self.session.set("iaas_user", e.control.value)
 
+    @Logging.func_logger
     def on_change_request_status(self, e):
         self.session.set("request_status", RequestStatus.to_formal(e.control.value))

@@ -38,6 +38,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
     def get_query_filters(self):
         pass
 
+    @Logging.func_logger
     def activate_action_button(self):
         # １件以上の申請が選択されていて、申請者以外のロールである場合、アクションメニューを有効化
         self.btnActions.disabled = True
@@ -48,6 +49,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
                     break
         self.btnActions.update()
 
+    @Logging.func_logger
     def open_delete_confirm_dialog(self):
         formDeleteConfirm = DeleteConfirmForm(self.session, self.page)
         self.dlgDeleteConfirm = ft.AlertDialog(
@@ -66,11 +68,13 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
         self.dlgDeleteConfirm.open = True
         self.page.update()
 
+    @Logging.func_logger
     def open_add_request_dialog(self):
         SessionHelper.clean_request_from_session(self.session)
         wzdNewRequest = NewRequestWizard(self.session, self.page, self.refresh)
         wzdNewRequest.open_wizard()
 
+    @Logging.func_logger
     def open_edit_request_dialog(self):
         wzdEditRequest = EditRequestWizard(
             session=self.session,
@@ -79,6 +83,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
         )
         wzdEditRequest.open_wizard()
 
+    @Logging.func_logger
     def refresh(self):
         RequestRowHelper.refresh_data_rows(self)
         RequestRowHelper.refresh_page_indicator(self)
@@ -346,15 +351,18 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
             # padding=ft.padding.all(0),
         )
 
+    @Logging.func_logger
     def on_request_row_select(self, e):
         e.control.selected = not e.control.selected
         self.activate_action_button()
         e.control.update()
 
+    @Logging.func_logger
     def on_request_edit_open(self, e):
         self.session.set("request_id", e.control.content.value)
         self.open_edit_request_dialog()
 
+    @Logging.func_logger
     def on_change_request_status(self, e):
         match e.control.text:
             case RequestStatus.START_FRIENDLY:
@@ -367,54 +375,66 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
                 request_status = ""
         RequestRowHelper.update_selected_request_status(self, request_status)
 
+    @Logging.func_logger
     def on_change_request_iaas_user(self, e):
         RequestRowHelper.update_selected_request_iaas_user(self, e.control.text)
 
+    @Logging.func_logger
     def on_click_heading_column(self, e):
         RequestRowHelper.sort_column(self, self.session, e.control.label.value)
 
+    @Logging.func_logger
     def on_selected_delete(self, e):
         self.open_delete_confirm_dialog()
 
+    @Logging.func_logger
     def on_click_add_request(self, e):
         self.open_add_request_dialog()
 
+    @Logging.func_logger
     def on_click_delete_request_cancel(self, e):
         self.dlgDeleteConfirm.open = False
         self.page.update()
 
+    @Logging.func_logger
     def on_click_delete_request_yes(self, e):
         RequestRowHelper.delete_selected_requests(self)
         self.dlgDeleteConfirm.open = False
         self.page.update()
         self.refresh()
 
+    @Logging.func_logger
     def on_click_edit_request_cancel(self, e):
         self.dlgEditRequest.open = False
         self.page.update()
 
+    @Logging.func_logger
     def on_click_edit_request_execute(self, e):
         Logging.info(self.session.get("job_options"))
         self.dlgEditRequest.open = False
         self.page.update()
 
+    @Logging.func_logger
     def on_click_edit_request_save(self, e):
         RequestRowHelper.update_request(self.session)
         self.dlgEditRequest.open = False
         self.page.update()
         self.refresh()
 
+    @Logging.func_logger
     def on_click_next_page(self, e):
         request_data_count = RequestRowHelper.count_request_all(self)
         if (self.data_row_offset + 1) < request_data_count:
             self.data_row_offset += self.DATA_ROW_MAX
             self.refresh()
 
+    @Logging.func_logger
     def on_click_previous_page(self, e):
         if (self.data_row_offset + 1) > self.DATA_ROW_MAX:
             self.data_row_offset -= self.DATA_ROW_MAX
             self.refresh()
 
+    @Logging.func_logger
     def on_click_search_request_text(self, e):
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchRequestText.value)

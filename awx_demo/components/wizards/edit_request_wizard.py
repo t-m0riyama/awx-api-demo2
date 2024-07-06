@@ -26,6 +26,7 @@ class EditRequestWizard:
         self.parent_refresh_func = parent_refresh_func
         super().__init__()
 
+    @Logging.func_logger
     def open_wizard(self):
         self.session.set("edit_request_wizard_step", "edit_request")
         formStep = EditRequestForm(
@@ -74,6 +75,7 @@ class EditRequestWizard:
         )
         db_session.close()
 
+    @Logging.func_logger
     def on_click_next(self, e):
         match self.session.get("edit_request_wizard_step"):
             case "edit_request":
@@ -107,6 +109,7 @@ class EditRequestWizard:
                 Logging.error("undefined step!!!")
         self.page.update()
 
+    @Logging.func_logger
     def on_click_previous(self, e):
         match self.session.get("edit_request_wizard_step"):
             case "job_execute_confirm":
@@ -129,18 +132,21 @@ class EditRequestWizard:
                 Logging.error("undefined step!!!")
         self.page.update()
 
+    @Logging.func_logger
     def on_click_save(self, e):
         self._update_request()
         self.wizard_dialog.open = False
         self.page.update()
         self.parent_refresh_func()
 
+    @Logging.func_logger
     def on_click_duplicate(self, e):
         self._duplicate_request()
         self.wizard_dialog.open = False
         self.page.update()
         self.parent_refresh_func()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.session.remove("job_options")
         self.wizard_dialog.open = False

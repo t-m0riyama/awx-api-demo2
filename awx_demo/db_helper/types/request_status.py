@@ -1,3 +1,6 @@
+from awx_demo.utils.logging import Logging
+
+
 class RequestStatus():
 
     # const
@@ -17,10 +20,12 @@ class RequestStatus():
     FRIENDLY_MAP[COMPLETED] = COMPLETED_FRIENDLY
 
     @staticmethod
+    @Logging.func_logger
     def to_friendly(status):
         return RequestStatus.FRIENDLY_MAP[status]
 
     @staticmethod
+    @Logging.func_logger
     def to_formal(status_friendly):
         formal_map = {v: k for k, v in RequestStatus.FRIENDLY_MAP.items()}
         return formal_map[status_friendly]

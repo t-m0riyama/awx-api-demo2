@@ -3,6 +3,7 @@ import flet as ft
 from awx_demo.components.forms.base_activity_list_form import BaseActivityListForm
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.utils.event_helper import EventType
+from awx_demo.utils.logging import Logging
 
 
 class AllActivityListForm(BaseActivityListForm):
@@ -17,6 +18,7 @@ class AllActivityListForm(BaseActivityListForm):
         super().__init__(session, page)
         self.session.set('sort_target_column', self.DEFAULT_SORT_TARGET_COLUMN)
 
+    @Logging.func_logger
     def get_query_filters(self):
         filters = []
         filters.append(ActivityHelper.get_filter_summary(

@@ -99,6 +99,7 @@ class JobExecuteConfirmForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def generate_job_options(self):
         target_options = [
             'vsphere_cluster',
@@ -113,6 +114,7 @@ class JobExecuteConfirmForm(ft.UserControl):
         job_options = {key: str(self.session.get('job_options')[key]) for key in target_options}
         return job_options
 
+    @Logging.func_logger
     def add_request(self, job_options, request_status):
         document_id = DocIdUtils.generate_id(self.DUCUMENT_ID_LENGTH)
         self.session.set('document_id', document_id)
@@ -131,12 +133,15 @@ class JobExecuteConfirmForm(ft.UserControl):
         )
         db_session.close()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.step_change_cancel(e)
 
+    @Logging.func_logger
     def on_click_previous(self, e):
         self.step_change_previous(e)
 
+    @Logging.func_logger
     def on_click_send_request(self, e):
         self.session.get('job_options')['shutdown_before_change'] = self.checkShutdownBeforeChange.value
         self.session.get('job_options')['startup_after_change'] = self.checkStartupAfterChange.value

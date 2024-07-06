@@ -6,6 +6,7 @@ import yaml
 
 from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.event_helper import EventStatus
+from awx_demo.utils.logging import Logging
 
 
 class IaasRequestReportHelper:
@@ -61,6 +62,7 @@ class IaasRequestReportHelper:
     ]
     
     @classmethod
+    @Logging.func_logger
     def diff_request_change(cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old):
         diff_request = {}
         if request.request_text != request_text_old:
@@ -78,6 +80,7 @@ class IaasRequestReportHelper:
         return diff_request
 
     @classmethod
+    @Logging.func_logger
     def diff_job_options(cls, job_options, job_options_old):
         diff_job_options = {}
         job_options_dict = json.loads(job_options)
@@ -88,12 +91,14 @@ class IaasRequestReportHelper:
         return diff_job_options
 
     @classmethod
+    @Logging.func_logger
     def generate_request_detail(cls, request):
         request_report = copy.deepcopy(request)
         request_report.job_options = json.loads(request_report.job_options)
         return "\n== 申請内容の詳細一覧 =============\n" + cls.to_friendly_request(vars(request_report))
 
     @classmethod
+    @Logging.func_logger
     def generate_diff_request(cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old):
         diff_request = cls.diff_request_change(
             request=request,
@@ -110,6 +115,7 @@ class IaasRequestReportHelper:
             return None
 
     @classmethod
+    @Logging.func_logger
     def generate_common_fields(cls, request_id, event_type_friendly, is_succeeded, request_text=None, request_deadline=None, additional_info=None):
         ok_ng = 'OK' if is_succeeded else 'NG'
         status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
@@ -128,6 +134,7 @@ class IaasRequestReportHelper:
         return title, status, summary
 
     @classmethod
+    @Logging.func_logger
     def to_friendly_request(cls, request, default_value=None):
         request_friendry = {}
         for i, request_key in enumerate(cls.REQUEST_KEYS):
@@ -142,6 +149,7 @@ class IaasRequestReportHelper:
         return yaml_string
 
     @classmethod
+    @Logging.func_logger
     def to_friendly_job_options(cls, job_options_str, convert_to_yaml=True, default_value=None):
         job_options_dict = json.loads(job_options_str)
         for i, job_options_key in enumerate(cls.JOB_OPTIONS_KEYS):

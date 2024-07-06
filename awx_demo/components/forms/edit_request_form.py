@@ -159,6 +159,7 @@ class EditRequestForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def generate_confirm_text(self):
         confirm_text = '== 基本情報 ====================='
         confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
@@ -181,15 +182,19 @@ class EditRequestForm(ft.UserControl):
             confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
         return confirm_text
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.click_cancel_func(e)
 
+    @Logging.func_logger
     def on_click_duplicate(self, e):
         self.click_duplicate_func(e)
 
+    @Logging.func_logger
     def on_click_save(self, e):
         self.click_save_func(e)
 
+    @Logging.func_logger
     def on_click_execute(self, e):
         self.session.set('confirm_text', self.generate_confirm_text())
         Logging.info('JOB_OPTIONS: ' + str(self.session.get('job_options')))

@@ -10,6 +10,7 @@ from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.utils.event_helper import EventStatus, EventType
 from awx_demo.utils.event_manager import EventManager
+from awx_demo.utils.logging import Logging
 
 
 class LoginForm(ft.UserControl):
@@ -103,6 +104,7 @@ class LoginForm(ft.UserControl):
         )
         return self.contents
 
+    @Logging.func_logger
     def login_clicked(self, e):
         loginid = self.tfLoginid.value
         password = self.tfPassword.value
@@ -115,10 +117,12 @@ class LoginForm(ft.UserControl):
             self.session.set("awx_url", awx_url)
             e.page.go("/latest_requests")
 
+    @Logging.func_logger
     def close_dlg(self, e):
         self.dlgAuthFailed.open = False
         self.page.update()
 
+    @Logging.func_logger
     def show_login_failed_message(self):
         self.txtLoginMessage.value = (
             "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。"
@@ -126,11 +130,13 @@ class LoginForm(ft.UserControl):
         self.txtLoginMessage.visible = True
         self.contents.update()
 
+    @Logging.func_logger
     def show_lack_authority_message(self):
         self.txtLoginMessage.value = "ログイン失敗: 指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。"
         self.txtLoginMessage.visible = True
         self.contents.update()
 
+    @Logging.func_logger
     def login_auth(self, awx_url, loginid, password):
         login_result = AWXApiHelper.login(awx_url, loginid, password)
         if not login_result:
@@ -184,6 +190,7 @@ class LoginForm(ft.UserControl):
             )
             return login_result
 
+    @Logging.func_logger
     def check_role(self, teams):
         is_admin = False
         is_operator = False

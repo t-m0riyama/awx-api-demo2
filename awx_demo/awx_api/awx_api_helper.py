@@ -28,6 +28,7 @@ class AWXApiHelper:
     JOB_STATUS_CONNECTION_FAILED = -5
 
     @classmethod
+    @Logging.func_logger
     def login(cls, uri_base, loginid, password):
         reqest_url = uri_base + '/api/v2/me/'
         headers = {'Content-Type': 'application/json'}
@@ -45,6 +46,7 @@ class AWXApiHelper:
             return False
 
     @classmethod
+    @Logging.func_logger
     def get_teams_user_belong(cls, uri_base, loginid, password):
         reqest_url = uri_base + '/api/v2/me/'
         headers = {'Content-Type': 'application/json'}
@@ -74,6 +76,7 @@ class AWXApiHelper:
             return None
 
     @classmethod
+    @Logging.func_logger
     def get_users(cls, uri_base, loginid, password):
         reqest_url = uri_base + '/api/v2/users/'
         headers = {'Content-Type': 'application/json'}
@@ -89,6 +92,7 @@ class AWXApiHelper:
             return None
 
     @classmethod
+    @Logging.func_logger
     def start_job(cls, uri_base, loginid, password, job_template_name, request, job_options, session):
         headers = {'Content-Type': 'application/json'}
         vars_json = cls.generate_vars(job_options)
@@ -141,10 +145,12 @@ class AWXApiHelper:
             return cls.JOB_LAUNCH_CONNECTION_FAILED
 
     @classmethod
+    @Logging.func_logger
     def generate_vars(cls, job_options):
         return json.dumps({"extra_vars": job_options})
 
     @classmethod
+    @Logging.func_logger
     def get_job_template_id(cls, uri_base, loginid, password, job_template_name):
         job_templates_url = uri_base + '/api/v2/job_templates/{}/'.format(job_template_name)
         headers = {'Content-Type': 'application/json'}
@@ -161,6 +167,7 @@ class AWXApiHelper:
             return cls.JOB_TEMPLATE_ID_CONNECTION_FAILED
 
     @classmethod
+    @Logging.func_logger
     def get_job_status(cls, uri_base, loginid, password, request, job_id, session):
         job_status_url = uri_base + '/api/v2/jobs/{}/'.format(job_id)
         headers = {'Content-Type': 'application/json'}
@@ -271,6 +278,7 @@ class AWXApiHelper:
         )
 
     @classmethod
+    @Logging.func_logger
     def generate_common_fields(cls, request_id, event_type_friendly, is_succeeded, request_text=None, request_deadline=None, additional_info=None):
         ok_ng = 'OK' if is_succeeded else 'NG'
         status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED

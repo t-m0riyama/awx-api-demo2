@@ -3,6 +3,7 @@ import time
 
 from awx_demo.notification.notification_spec import NotificationSpec
 from awx_demo.notification.teams_notificator import TeamsNotificator
+from awx_demo.utils.logging import Logging
 
 
 class Notificator:
@@ -11,6 +12,7 @@ class Notificator:
     MAIL_NOTIFICATION = 1
 
     @classmethod
+    @Logging.func_logger
     def notify(cls, notification_spec: NotificationSpec):
         match notification_spec.notification_type:
             case Notificator.TEAMS_NOTIFICATION:

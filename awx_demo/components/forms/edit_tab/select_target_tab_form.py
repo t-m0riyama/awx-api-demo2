@@ -2,6 +2,7 @@ import flet as ft
 
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.utils.logging import Logging
 
 
 class SelectTargetTabForm(ft.UserControl):
@@ -66,8 +67,10 @@ class SelectTargetTabForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def on_change_cluster(self, e):
         self.session.get('job_options')['vsphere_cluster'] = e.control.value
 
+    @Logging.func_logger
     def on_change_vms(self, e):
         self.session.get('job_options')['target_vms'] = e.control.value

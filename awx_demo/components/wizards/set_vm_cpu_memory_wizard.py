@@ -26,11 +26,13 @@ class SetVmCpuMemoryWizard:
         self.parent_refresh_func = parent_refresh_func
         super().__init__()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.session.remove("job_options")
         self.wizard_dialog.open = False
         self.page.update()
 
+    @Logging.func_logger
     def on_click_next(self, e):
         match self.session.get("new_request_wizard_step"):
             case "create_request":
@@ -108,6 +110,7 @@ class SetVmCpuMemoryWizard:
 
         self.page.update()
 
+    @Logging.func_logger
     def on_click_previous(self, e):
         match self.session.get("new_request_wizard_step"):
             case "select_target":

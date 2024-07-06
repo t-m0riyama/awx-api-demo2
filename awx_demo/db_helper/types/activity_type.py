@@ -1,3 +1,6 @@
+from awx_demo.utils.logging import Logging
+
+
 class ActivityStatus():
 
     # const
@@ -59,10 +62,12 @@ class ActivityType():
     FRIENDLY_MAP[REQUEST_DELETED] = REQUEST_DELETED_FRIENDLY
 
     @staticmethod
+    @Logging.func_logger
     def to_friendly(activity_type):
         return ActivityType.FRIENDLY_MAP[activity_type]
 
     @staticmethod
+    @Logging.func_logger
     def to_formal(activity_type_friendly):
         formal_map = {v: k for k, v in ActivityType.FRIENDLY_MAP.items()}
         return formal_map[activity_type_friendly]

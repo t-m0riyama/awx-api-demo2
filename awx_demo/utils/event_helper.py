@@ -1,3 +1,6 @@
+from awx_demo.utils.logging import Logging
+
+
 class EventStatus:
 
     # const
@@ -65,10 +68,12 @@ class EventType:
     FRIENDLY_MAP[REQUEST_DELETED] = REQUEST_DELETED_FRIENDLY
 
     @staticmethod
+    @Logging.func_logger
     def to_friendly(event_type):
         return EventType.FRIENDLY_MAP[event_type]
 
     @staticmethod
+    @Logging.func_logger
     def to_formal(event_type_friendly):
         formal_map = {v: k for k, v in EventType.FRIENDLY_MAP.items()}
         return formal_map[event_type_friendly]

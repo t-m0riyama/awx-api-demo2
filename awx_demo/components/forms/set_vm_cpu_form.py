@@ -2,6 +2,7 @@ import flet as ft
 
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
+from awx_demo.utils.logging import Logging
 
 
 class SetVmCpuForm(ft.UserControl):
@@ -90,21 +91,26 @@ class SetVmCpuForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def on_change_vm_cpu_enabled(self, e):
         self.session.get('job_options')['change_vm_cpu_enabled'] = e.control.value
         self.sliderCpus.disabled = False if e.control.value else True
         self.sliderCpus.update()
 
+    @Logging.func_logger
     def on_chhange_slidercpus(self, e):
         self.textCpuslabel.value = 'CPUコア数: ' + str(int(e.control.value))
         self.textCpuslabel.update()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.step_change_cancel(e)
 
+    @Logging.func_logger
     def on_click_previous(self, e):
         self.step_change_previous(e)
 
+    @Logging.func_logger
     def on_click_next(self, e):
         self.session.get('job_options')['change_vm_cpu_enabled'] = self.checkChangeVmCpuEnabled.value
         self.session.get('job_options')['vcpus'] = int(self.sliderCpus.value)

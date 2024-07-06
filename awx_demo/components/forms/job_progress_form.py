@@ -7,6 +7,7 @@ from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.utils.logging import Logging
 
 
 class JobProgressForm(ft.UserControl):
@@ -96,6 +97,7 @@ class JobProgressForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def refresh_progress(self):
         db_session = db.get_db()
         request = IaasRequestHelper.get_request(db_session, self.request_id)
@@ -180,5 +182,6 @@ class JobProgressForm(ft.UserControl):
                 self.pbJob.value += 0.1
         self.pbJob.update()
 
+    @Logging.func_logger
     def exit_clicked(self, e):
         self.step_change_exit(e)

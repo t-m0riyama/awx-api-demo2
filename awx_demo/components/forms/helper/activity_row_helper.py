@@ -3,6 +3,7 @@ import flet as ft
 from awx_demo.db import db
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.utils.event_helper import EventStatus, EventType
+from awx_demo.utils.logging import Logging
 
 
 class ActivityRowData():
@@ -19,6 +20,7 @@ class ActivityRowData():
 class ActivityRowHelper():
 
     @staticmethod
+    @Logging.func_logger
     def generate_activity_row(activity_list_form, id, activity_data: ActivityRowData):
         return ft.DataRow(
             cells=[
@@ -44,6 +46,7 @@ class ActivityRowHelper():
                 return ft.Icon(name=ft.icons.QUESTION_MARK, color=ft.colors.PRIMARY, tooltip=EventStatus.UNKNOWN_FRIENDLY)
 
     @staticmethod
+    @Logging.func_logger
     def refresh_data_rows(activity_list_form):
         activities_data = ActivityRowHelper.query_activity_all(
             activity_list_form)
@@ -68,6 +71,7 @@ class ActivityRowHelper():
         activity_list_form.dtActivities.update()
 
     @staticmethod
+    @Logging.func_logger
     def refresh_page_indicator(activity_list_form):
         range_min, range_max, request_data_count = ActivityRowHelper.get_page_range(
             activity_list_form)
@@ -92,6 +96,7 @@ class ActivityRowHelper():
         activity_list_form.btnPreviousPage.update()
 
     @staticmethod
+    @Logging.func_logger
     def get_page_range(activity_list_form):
         record_count = ActivityRowHelper.count_activity_all(activity_list_form)
         range_min = 0 if record_count == 0 else (
@@ -103,6 +108,7 @@ class ActivityRowHelper():
         return range_min, range_max, record_count
 
     @staticmethod
+    @Logging.func_logger
     def query_activity_all(activity_list_form):
         db_session = db.get_db()
         activities_data = None
@@ -135,6 +141,7 @@ class ActivityRowHelper():
         return activities_data
 
     @staticmethod
+    @Logging.func_logger
     def count_activity_all(activity_list_form):
         db_session = db.get_db()
         filters = activity_list_form.get_query_filters()
@@ -143,6 +150,7 @@ class ActivityRowHelper():
         return activities_data
 
     @staticmethod
+    @Logging.func_logger
     def sort_column(activity_list_form, session, column_lubel):
         session.set('sort_target_column', column_lubel)
         # ソート対象が同じ列の場合、昇順と降順を逆転させる

@@ -4,6 +4,7 @@ from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.utils.logging import Logging
 
 
 class SelectTargetForm(ft.UserControl):
@@ -96,6 +97,7 @@ class SelectTargetForm(ft.UserControl):
             ),
         )
 
+    @Logging.func_logger
     def on_change_vms(self, e):
         if e.control.value == '':
             self.btnNext.disabled = True
@@ -103,12 +105,15 @@ class SelectTargetForm(ft.UserControl):
             self.btnNext.disabled = False
         self.btnNext.update()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.step_change_cancel(e)
 
+    @Logging.func_logger
     def on_click_previous(self, e):
         self.step_change_previous(e)
 
+    @Logging.func_logger
     def on_click_next(self, e):
         self.session.get('job_options')[
             'vsphere_cluster'] = self.dropCluster.value

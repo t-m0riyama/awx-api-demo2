@@ -18,6 +18,7 @@ class NewRequestWizard:
         self.parent_refresh_func = parent_refresh_func
         super().__init__()
 
+    @Logging.func_logger
     def open_wizard(self):
         self.session.set("new_request_wizard_step", "create_request")
         formStep = CreateRequestForm(
@@ -40,11 +41,13 @@ class NewRequestWizard:
         self.wizard_dialog.open = True
         self.page.update()
 
+    @Logging.func_logger
     def on_click_cancel(self, e):
         self.session.remove("job_options")
         self.wizard_dialog.open = False
         self.page.update()
 
+    @Logging.func_logger
     def on_click_next(self, e):
         match self.session.get("new_request_wizard_step"):
             case "create_request":
@@ -63,6 +66,7 @@ class NewRequestWizard:
                 Logging.error("undefined step!!!")
         self.page.update()
 
+    @Logging.func_logger
     def on_click_previous(self, e):
         match self.session.get("new_request_wizard_step"):
             case _:
