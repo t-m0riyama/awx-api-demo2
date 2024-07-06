@@ -16,9 +16,10 @@ ERROR_ICON_FILE = 'images/error-icon.png'
 
 class TeamsNotificator():
 
-    @staticmethod
-    def notify(notification_spec: NotificationSpec):
-        teams_webhook_url = os.getenv("TEAMS_WEB_HOOK_URL", None)
+    @classmethod
+    @Logging.func_logger
+    def notify(cls, notification_spec: NotificationSpec):
+        teams_webhook_url = os.getenv("RMX_TEAMS_WEB_HOOK_URL", None)
         if not teams_webhook_url: return None
 
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')

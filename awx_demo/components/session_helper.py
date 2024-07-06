@@ -6,10 +6,10 @@ from awx_demo.utils.logging import Logging
 
 class SessionHelper:
 
-    @staticmethod
-    def clean_session(session):
-        SessionHelper.clean_request_from_session(session)
-        SessionHelper.clean_wizard_steps(session)
+    @classmethod
+    def clean_session(cls, session):
+        cls.clean_request_from_session(session)
+        cls.clean_wizard_steps(session)
         session.remove("awx_loginid")
         session.remove("awx_password")
         session.remove("user_role")
@@ -24,7 +24,7 @@ class SessionHelper:
     @staticmethod
     def dump_session(session):
         for k in session.get_keys():
-            Logging.info("SESSION_DUMP {}: {}".format(k, session.get(k)))
+            Logging.info(f"SESSION_DUMP {k}: {session.get(k)}")
 
     @staticmethod
     def clean_request_from_session(session):
