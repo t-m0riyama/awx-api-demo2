@@ -11,6 +11,7 @@ class SelectTargetTabForm(ft.UserControl):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
+    VMS_LENGTH_MAX = 120
 
     def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT):
         self.session = session
@@ -37,6 +38,7 @@ class SelectTargetTabForm(ft.UserControl):
                 'target_vms'] if 'target_vms' in self.session.get('job_options') else '',
             label='仮想マシン',
             hint_text='仮想マシンを指定します。複数の仮想マシンは、「,」で区切ることで指定できます。',
+            max_length=self.VMS_LENGTH_MAX,
             on_change=self.on_change_vms,
         )
 
