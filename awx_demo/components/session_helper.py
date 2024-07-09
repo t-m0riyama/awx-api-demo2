@@ -27,7 +27,7 @@ class SessionHelper:
     @Logging.func_logger
     def dump_session(session):
         for k in session.get_keys():
-            Logging.info(f"SESSION_DUMP {k}: {session.get(k)}")
+            Logging.info(f"SESSION_DUMP / {k}: {session.get(k)}")
 
     @staticmethod
     @Logging.func_logger

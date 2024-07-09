@@ -40,12 +40,12 @@ class Logging(object):
                 # RMX_FUNC_LOGGER_ARGS_OUTPUTが'True'の場合は、引数を出力する
                 if strtobool(os.getenv('RMX_FUNC_LOGGER_ARGS_OUTPUT', 'False')):
                     args_dict = cls._args_to_str(args)
-                    cls.info(f"FUNC Called / {func_name_str}: start (args_id={id(args)}, args = \n{pprint.pformat(args_dict)})")
+                    cls.info(f"FUNC_CALLED / {func_name_str}: start (args_id={id(args)}, args = \n{pprint.pformat(args_dict)})")
                 else:
-                    cls.info(f"FUNC Called / {func_name_str}: start (args_id={id(args)})")
+                    cls.info(f"FUNC_CALLED / {func_name_str}: start (args_id={id(args)})")
 
                 v = func(*args, **kwargs)
-                cls.info(f"FUNC Called / {func_name_str}: end (args_id={id(args)})")
+                cls.info(f"FUNC_CALLED / {func_name_str}: end (args_id={id(args)})")
                 return v
             else:
                 return func(*args, **kwargs)
