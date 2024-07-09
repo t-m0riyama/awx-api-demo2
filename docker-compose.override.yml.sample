@@ -1,12 +1,35 @@
 services:
   awx-api-demo2:
     environment:
-      - RMX_AWX_URL=<YOUR AWX URL>
-      - RMX_FUNC_LOGGER_ENABLED=True
-      - RMX_FUNC_LOGGER_ARGS_OUTPUT=True
-      - RMX_FUNC_LOGGER_ARGS_LENGTH_MAX=20
-      - RMX_TEAMS_WEB_HOOK_URL=<YOUR TEAMS WEBHOOK URL>
-      - RMX_TEAMS_WEB_HOOK_MESSAGE_DELAY_MSEC=300
-      - RMX_LOG_LEVEL=INFO
-      - RMX_LOG_LEVEL_DB=WARN
+      # アプリケーションのタイトル
+      - RMX_APP_TITLE="申請マネージャ"
 
+      # AWXのURL(ex. https://awx.example.com)
+      - RMX_AWX_URL=<YOUR AWX URL>
+
+      # Function logger 有効/無効
+      - RMX_FUNC_LOGGER_ENABLED=True
+
+      # Function logger の出力に引数を含める
+      - RMX_FUNC_LOGGER_ARGS_OUTPUT=True
+
+      # Function logger の出力に引数を含める際、各引数の最大長を制限する
+      - RMX_FUNC_LOGGER_ARGS_LENGTH_MAX=20
+
+      # Teams Webhookを利用した通知を行う際のURL
+      - RMX_TEAMS_WEB_HOOK_URL=<YOUR TEAMS WEBHOOK URL>
+
+      # Teams Webhookを利用した通知を行う際、送信後の待ち時間（msec）
+      - RMX_TEAMS_WEB_HOOK_MESSAGE_DELAY_MSEC=300
+
+      # ログを出力するディレクトリ
+      - RMX_LOG_DIR=./log
+
+      # ログのファイル名
+      - RMX_LOG_FILE=awx_api_demo2.log
+
+      # ログレベル（DB関連以外）
+      - RMX_LOG_LEVEL=INFO
+
+      # ログレベル（DB関連）
+      - RMX_LOG_LEVEL_DB=WARN
