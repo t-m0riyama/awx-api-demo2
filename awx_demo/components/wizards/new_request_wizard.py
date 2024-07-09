@@ -37,8 +37,7 @@ class NewRequestWizard:
             content=formStep,
             actions_alignment=ft.MainAxisAlignment.END,
         )
-        self.page.dialog = self.wizard_dialog
-        # self.page.overlay.append(self.wizard_dialog)
+        self.page.open(self.wizard_dialog)
         self.wizard_dialog.open = True
         self.page.update()
 

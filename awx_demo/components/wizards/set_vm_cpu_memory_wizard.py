@@ -47,8 +47,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case "select_target":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
                 formStep = SetVmCpuForm(
@@ -61,8 +60,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "set_vm_memory")
                 formStep = SetVmMemoryForm(
@@ -75,8 +73,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "send_request_confirm")
                 formStep = SendRequestConfirmForm(
@@ -90,8 +87,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 if self.session.get("execute_job_immediately"):
                     self.session.set("new_request_wizard_step", "job_progress")
@@ -104,8 +100,7 @@ class SetVmCpuMemoryWizard:
                         step_change_exit=self.on_click_next,
                     )
                     self.wizard_dialog.content = formStep
-                    self.page.dialog = self.wizard_dialog
-                    # self.page.overlay.append(self.wizard_dialog)
+                    self.page.open(self.wizard_dialog)
                 else:
                     self.wizard_dialog.open = False
                     self.parent_refresh_func()
@@ -131,8 +126,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "select_target")
                 formStep = SelectTargetForm(
@@ -145,8 +139,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
                 formStep = SetVmCpuForm(
@@ -159,8 +152,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 self.session.set("new_request_wizard_step", "set_vm_memory")
                 formStep = SetVmMemoryForm(
@@ -173,8 +165,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
-                # self.page.overlay.append(self.wizard_dialog)
+                self.page.open(self.wizard_dialog)
             case _:
                 Logging.error("undefined step!!!")
         self.page.update()

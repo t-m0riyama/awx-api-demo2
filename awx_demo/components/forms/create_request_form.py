@@ -84,7 +84,9 @@ class CreateRequestForm(ft.UserControl):
         self.btnRequestDeadline = ft.FilledTonalButton(
             '希望日の指定',
             icon=ft.icons.CALENDAR_MONTH,
-            on_click=lambda _: self.dpRequestDeadline.pick_date(),
+            on_click=lambda _: self.page.open(
+                self.dpRequestDeadline
+            ),
         )
         self.btnNext = ft.FilledButton(
             '次へ',
