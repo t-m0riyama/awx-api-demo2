@@ -410,7 +410,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_edit_request_execute(self, e):
-        Logging.info(self.session.get("job_options"))
+        Logging.info('JOB_OPTIONS: ' + self.session.get("job_options"))
         self.dlgEditRequest.open = False
         self.page.update()
 

@@ -22,6 +22,7 @@ class TeamsNotificator():
         teams_webhook_url = os.getenv("RMX_TEAMS_WEB_HOOK_URL", None)
         if not teams_webhook_url: return None
 
+        Logging.info('TEAMS_WEB_HOOK_URL: ' + teams_webhook_url)
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
         icon_base64_byte: bytes = None
 
@@ -83,7 +84,7 @@ class TeamsNotificator():
         # teams_message.printme()
         try:
             asyncio.new_event_loop().run_in_executor(None, teams_message.send)
-            Logging.info("Teams message sent: {}".format(notification_spec.title))
+            Logging.info('TEAMS_MESSAGE_SENT_SUCCESS: ' + notification_spec.title)
         except Exception as e:
-            Logging.error("Notification failed: Teamsメッセージの通知に失敗しました。")
+            Logging.error('TEAMS_MESSAGE_SENT_FAILED: Teamsメッセージの通知に失敗しました。')
             Logging.error(e)
