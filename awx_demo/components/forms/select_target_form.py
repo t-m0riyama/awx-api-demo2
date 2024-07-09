@@ -13,6 +13,7 @@ class SelectTargetForm(ft.UserControl):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
+    VMS_LENGTH_MAX = 120
 
     def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
@@ -48,6 +49,7 @@ class SelectTargetForm(ft.UserControl):
                 'target_vms'] if 'target_vms' in self.session.get('job_options') else '',
             label='仮想マシン',
             hint_text='仮想マシンを指定します。複数の仮想マシンは、「,」で区切ることで指定できます。',
+            text_size=self.VMS_LENGTH_MAX,
             on_change=self.on_change_vms,
         )
         self.btnNext = ft.FilledButton(
