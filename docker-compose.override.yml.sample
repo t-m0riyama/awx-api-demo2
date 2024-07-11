@@ -32,4 +32,4 @@ services:
       - RMX_LOG_LEVEL=INFO
 
       # ログレベル（DB関連）
-      - RMX_LOG_LEVEL_DB=WARN
+      - RMX_LOG_LEVEL_DB=WARNING
