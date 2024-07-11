@@ -24,6 +24,7 @@ class LoginForm(ft.UserControl):
     ADMIN_TEAM_NAME = "requestmanager-admins"
     OPERATOR_TEAM_NAME = "requestmanager-operators"
     USER_TEAM_NAME = "requestmanager-users"
+    APP_TITLE_DEFAULT = "AWX API Demo"
 
     def __init__(self, session, page: ft.Page, default_awx_url=DEFAULT_AWX_URL):
         self.session = session
@@ -33,6 +34,7 @@ class LoginForm(ft.UserControl):
 
     def build(self):
         default_awx_url = re.sub('/$', '', os.getenv("RMX_AWX_URL", self.DEFAULT_AWX_URL))
+        app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT)
         self.tfLoginid = ParameterInputText(
             label="Login ID",
             value=(
@@ -69,7 +71,7 @@ class LoginForm(ft.UserControl):
         )
         self.btnLogin = ft.FilledButton("ログイン", on_click=self.login_clicked)
 
-        header = AppTitle(title="AWX API Demo", width=self.CONTENT_WIDTH)
+        header = AppTitle(title=app_title, width=self.CONTENT_WIDTH)
         body = ft.Column(
             [
                 self.tfLoginid,
