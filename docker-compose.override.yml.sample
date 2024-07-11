@@ -2,7 +2,7 @@ services:
   awx-api-demo2:
     environment:
       # アプリケーションのタイトル
-      - RMX_APP_TITLE=申請マネージャ
+      - RMX_APP_TITLE="申請マネージャ"
 
       # AWXのURL(ex. https://awx.example.com)
       - RMX_AWX_URL=<YOUR AWX URL>
