@@ -23,7 +23,7 @@ services:
       - RMX_TEAMS_WEB_HOOK_MESSAGE_DELAY_MSEC=300
 
       # ログを出力するディレクトリ
-      - RMX_LOG_DIR=./log
+      - RMX_LOG_DIR=/app/log
 
       # ログのファイル名
       - RMX_LOG_FILE=awx_api_demo2.log
