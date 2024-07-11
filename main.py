@@ -19,7 +19,7 @@ def main(page: ft.Page):
         router = NavigationRouter(page.session, page, app_title, dlgLogin)
         router.route_change()
 
-    app_title = os.getenv("RMX_APP_TITLE", APP_TITLE_DEFAULT)
+    app_title = os.getenv("RMX_APP_TITLE", APP_TITLE_DEFAULT).strip('"')
     formLogin = LoginForm(session=page.session, page=page)
     dlgLogin = ft.AlertDialog(
         modal=True,

@@ -34,7 +34,7 @@ class LoginForm(ft.UserControl):
 
     def build(self):
         default_awx_url = re.sub('/$', '', os.getenv("RMX_AWX_URL", self.DEFAULT_AWX_URL))
-        app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT)
+        app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
         self.tfLoginid = ParameterInputText(
             label="Login ID",
             value=(
