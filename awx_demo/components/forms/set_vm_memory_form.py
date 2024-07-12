@@ -132,5 +132,5 @@ class SetVmMemoryForm(ft.UserControl):
         self.session.get('job_options')['change_vm_memory_enabled'] = self.checkChangeVmMemoryEnabled.value
         self.session.get('job_options')['memory_gb'] = int(self.dropMemorySize.value)
         self.session.set('confirm_text', self.generate_confirm_text())
-        Logging.info('JOB_OPTIONS: ' + self.session.get('job_options'))
+        Logging.info('JOB_OPTIONS: ' + str(self.session.get('job_options')))
         self.step_change_next(e)
