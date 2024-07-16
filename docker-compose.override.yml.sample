@@ -33,3 +33,6 @@ services:
 
       # ログレベル（DB関連）
       - RMX_LOG_LEVEL_DB=WARNING
+
+      # ログの保存期間（日数）
+      - RMX_LOG_BACKUP_DAYS=14

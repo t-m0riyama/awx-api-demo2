@@ -1,5 +1,6 @@
 import functools
 import logging
+import logging.handlers
 import os
 import pprint
 from distutils.util import strtobool
@@ -14,19 +15,37 @@ class Logging(object):
     def init(cls, log_dir, log_file):
         log_level = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL', 'INFO'))
         log_level_db = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL_DB', 'WARNING'))
+        log_backup_days = int(os.getenv('RMX_LOG_BACKUP_DAYS', 14))
         logging.basicConfig(
             filename='{}/{}'.format(log_dir, log_file),
-            format="\"%(asctime)s\"\t%(levelname)s\t%(message)s",
+            format="\"%(asctime)s.%(msecs)d\"\t%(levelname)s\t%(message)s",
             datefmt='%Y/%m/%d %H:%M:%S',
             level=log_level,
         )
+
+        # ログローテーション用のhandlerを作成
+        handler = logging.handlers.TimedRotatingFileHandler(
+            filename='{}/{}'.format(log_dir, log_file),
+            when='midnight',
+            backupCount=log_backup_days,
+            interval=1,
+            encoding='utf-8'
+        )
+        formatter = logging.Formatter(
+            "\"%(asctime)s.%(msecs)d\"\t%(levelname)s\t%(message)s",
+            datefmt='%Y/%m/%d %H:%M:%S'
+        )
+        handler.setFormatter(formatter)
+        cls.get_logger().addHandler(handler)
+
+        # SQLAlchemy用のログレベルを設定
         logging.getLogger('sqlalchemy').setLevel(log_level_db)
 
     @classmethod
     def get_logger(cls):
         logger = logging.getLogger(cls.FLET_LOGGER_NAME)
         return logger
-    
+
     @classmethod
     def func_logger(cls, func):
         @functools.wraps(func)
