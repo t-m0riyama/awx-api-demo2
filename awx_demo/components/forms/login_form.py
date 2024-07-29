@@ -20,19 +20,19 @@ class LoginForm(ft.Card):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
-    DEFAULT_AWX_URL = "https://awx.example.com"
-    ADMIN_TEAM_NAME = "requestmanager-admins"
-    OPERATOR_TEAM_NAME = "requestmanager-operators"
-    USER_TEAM_NAME = "requestmanager-users"
+    AWX_URL_DEFAULT = "https://awx.example.com"
+    ADMIN_TEAM_DEFAULT = "requestmanager-admins"
+    OPERATOR_TEAM_DEFAULT = "requestmanager-operators"
+    USER_TEAM_DEFAULT = "requestmanager-users"
     APP_TITLE_DEFAULT = "AWX API Demo"
 
-    def __init__(self, session, page: ft.Page, default_awx_url=DEFAULT_AWX_URL):
+    def __init__(self, session, page: ft.Page, default_awx_url=AWX_URL_DEFAULT):
         self.session = session
         self.page = page
         self.default_awx_url = default_awx_url
 
         # controls
-        default_awx_url = re.sub('/$', '', os.getenv("RMX_AWX_URL", self.DEFAULT_AWX_URL))
+        default_awx_url = re.sub('/$', '', os.getenv("RMX_AWX_URL", self.AWX_URL_DEFAULT))
         app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
         self.tfLoginid = ParameterInputText(
             label="Login ID",
@@ -195,12 +195,17 @@ class LoginForm(ft.Card):
         is_operator = False
         is_user = False
 
+        # AWX/AAPのチーム名を環境変数で指定している場合、変更する
+        admin_team_name = os.getenv("RMX_ADMIN_TEAM_NAME", self.ADMIN_TEAM_DEFAULT)
+        operator_team_name = os.getenv("RMX_OPERATOR_TEAM_NAME", self.OPERATOR_TEAM_DEFAULT)
+        user_team_name = os.getenv("RMX_USER_TEAM_NAME", self.USER_TEAM_DEFAULT)
+
         for team in teams:
-            if team == self.ADMIN_TEAM_NAME:
+            if team == admin_team_name:
                 is_admin = True
-            elif team == self.OPERATOR_TEAM_NAME:
+            elif team == operator_team_name:
                 is_operator = True
-            elif team == self.USER_TEAM_NAME:
+            elif team == user_team_name:
                 is_user = True
 
         # より高い権限を持つロールに合致した場合、優先的に返す
