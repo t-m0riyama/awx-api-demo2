@@ -28,7 +28,8 @@ class SetVmCpuMemoryWizard:
 
     @Logging.func_logger
     def on_click_cancel(self, e):
-        self.session.remove("job_options")
+        if self.session.contains_key("job_options"):
+            self.session.remove("job_options")
         self.wizard_dialog.open = False
         self.page.update()
 
