@@ -5,7 +5,7 @@ import flet as ft
 from awx_demo.components.forms.login_form import LoginForm
 
 
-class LoginDialog(ft.UserControl):
+class LoginDialog(ft.AlertDialog):
     """Login Dialog"""
 
     # const
@@ -15,22 +15,11 @@ class LoginDialog(ft.UserControl):
         self.session = session
         self.page = page
         self.default_awx_url = os.getenv('RMX_AWX_URL', self.DEFAULT_AWX_URL)
-        # formLogin = LoginForm(session=session, page=page, default_awx_url=default_awx_url)
-        # controls = [
-        #                 formLogin,
-        #            ]
-        # super().__init__(
-        #     route='/login',
-        #     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        #     vertical_alignment=ft.MainAxisAlignment.CENTER,
-        #     controls=controls
-        # )
-        super().__init__()
 
-    def build(self):
+        # controls
         formLogin = LoginForm(
             session=self.session, page=self.page, default_awx_url=self.default_awx_url)
-        return ft.AlertDialog(
+        super().__init__(
             modal=True,
             # title=ft.Text("Login"),
             content=formLogin,
