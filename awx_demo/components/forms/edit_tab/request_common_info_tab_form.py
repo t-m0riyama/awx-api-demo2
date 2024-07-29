@@ -7,7 +7,7 @@ from awx_demo.components.types.user_role import UserRole
 from awx_demo.utils.logging import Logging
 
 
-class RequestCommonInfoTabForm(ft.UserControl):
+class RequestCommonInfoTabForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 550
@@ -41,9 +41,8 @@ class RequestCommonInfoTabForm(ft.UserControl):
             current_date=current_date,
         )
         self.page.overlay.append(self.dpRequestDeadline)
-        super().__init__()
 
-    def build(self):
+        # controls
         self.textRequestDate = ft.Text(
             value=('申請日: ' + self.session.get('request_date').strftime('%Y/%m/%d %H:%M')
                    ) if self.session.contains_key('request_date') else '申請日:(未指定)',
@@ -92,7 +91,9 @@ class RequestCommonInfoTabForm(ft.UserControl):
         self.btnRequestDeadline = ft.FilledTonalButton(
             '希望日の指定',
             icon=ft.icons.CALENDAR_MONTH,
-            on_click=lambda _: self.dpRequestDeadline.pick_date(),
+            on_click=lambda _: self.page.open(
+                self.dpRequestDeadline
+            ),
         )
 
         # 申請者ロールの場合は、変更できないようにする
@@ -124,19 +125,18 @@ class RequestCommonInfoTabForm(ft.UserControl):
             disabled=change_disabled,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        body,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    body,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def on_change_request_text(self, e):

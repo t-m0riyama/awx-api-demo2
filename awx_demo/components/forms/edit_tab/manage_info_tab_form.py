@@ -6,7 +6,7 @@ from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
 
-class ManageInfoTabForm(ft.UserControl):
+class ManageInfoTabForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 500
@@ -24,9 +24,8 @@ class ManageInfoTabForm(ft.UserControl):
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
-        super().__init__()
 
-    def build(self):
+        # controls
         iaas_users = AWXApiHelper.get_users(
             self.session.get("awx_url"),
             self.session.get("awx_loginid"),
@@ -104,19 +103,18 @@ class ManageInfoTabForm(ft.UserControl):
             disabled=change_disabled,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        body,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    body,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def on_change_iaas_user(self, e):

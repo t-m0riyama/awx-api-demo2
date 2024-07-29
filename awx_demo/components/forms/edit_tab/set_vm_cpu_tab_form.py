@@ -4,7 +4,7 @@ from awx_demo.components.types.user_role import UserRole
 from awx_demo.utils.logging import Logging
 
 
-class SetVmCpuTabForm(ft.UserControl):
+class SetVmCpuTabForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 500
@@ -16,9 +16,8 @@ class SetVmCpuTabForm(ft.UserControl):
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
-        super().__init__()
 
-    def build(self):
+        # controls
         self.checkChangeVmCpuEnabled = ft.Checkbox(
             label='CPUコア数を変更する',
             value=self.session.get('job_options')['change_vm_cpu_enabled'] if 'change_vm_cpu_enabled' in self.session.get('job_options') else True,
@@ -55,19 +54,18 @@ class SetVmCpuTabForm(ft.UserControl):
             disabled=change_disabled,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        body,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    body,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def on_change_vm_cpu_enabled(self, e):

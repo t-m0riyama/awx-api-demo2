@@ -5,7 +5,7 @@ from awx_demo.components.types.user_role import UserRole
 from awx_demo.utils.logging import Logging
 
 
-class SelectTargetTabForm(ft.UserControl):
+class SelectTargetTabForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 500
@@ -18,9 +18,8 @@ class SelectTargetTabForm(ft.UserControl):
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
-        super().__init__()
 
-    def build(self):
+        # controls
         self.dropCluster = ft.Dropdown(
             label='クラスタ',
             value=self.session.get('job_options')[
@@ -55,19 +54,18 @@ class SelectTargetTabForm(ft.UserControl):
             disabled=change_disabled,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        body,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    body,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def on_change_cluster(self, e):

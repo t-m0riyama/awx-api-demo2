@@ -8,7 +8,7 @@ from awx_demo.components.compounds.parameter_input_text import ParameterInputTex
 from awx_demo.utils.logging import Logging
 
 
-class CreateRequestForm(ft.UserControl):
+class CreateRequestForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 550
@@ -46,9 +46,8 @@ class CreateRequestForm(ft.UserControl):
             current_date=current_date,
         )
         self.page.overlay.append(self.dpRequestDeadline)
-        super().__init__()
 
-    def build(self):
+        # Controls
         formTitle = FormTitle('申請の追加', '申請項目の種類を選択', self.content_width)
         formDescription = FormDescription('新しく申請を作成します。')
         self.tfRequestText = ParameterInputText(
@@ -91,7 +90,7 @@ class CreateRequestForm(ft.UserControl):
         self.btnNext = ft.FilledButton(
             '次へ',
             on_click=self.on_click_next,
-            disabled=False if self.dpRequestDeadline.value else True,
+            disabled=False if self.session.contains_key('request_deadline') else True,
         )
         self.btnCancel = ft.ElevatedButton(
             'キャンセル', on_click=self.on_click_cancel)
@@ -125,22 +124,21 @@ class CreateRequestForm(ft.UserControl):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                        ft.Divider(),
-                        footer,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                    ft.Divider(),
+                    footer,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def on_change_request_deadline(self, e):

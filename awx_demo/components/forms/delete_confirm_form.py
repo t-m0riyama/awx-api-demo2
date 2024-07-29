@@ -4,7 +4,7 @@ from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 
 
-class DeleteConfirmForm(ft.UserControl):
+class DeleteConfirmForm(ft.Card):
     """Login フォーム"""
 
     # const
@@ -15,9 +15,8 @@ class DeleteConfirmForm(ft.UserControl):
     def __init__(self, session, page: ft.Page):
         self.session = session
         self.page = page
-        super().__init__()
 
-    def build(self):
+        # controls
         formTitle = FormTitle('削除の確認', None, self.CONTENT_WIDTH)
         formDescription = FormDescription(
             '選択した申請の削除を行います。削除処理を続ける場合は「はい」、中止する場合は「キャンセル」を選択して下さい。')
@@ -33,18 +32,17 @@ class DeleteConfirmForm(ft.UserControl):
             height=self.BODY_HEIGHT,
         )
 
-        self.contents = ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.CONTENT_WIDTH,
-                height=self.CONTENT_HEIGHT,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.CONTENT_WIDTH,
+            height=self.CONTENT_HEIGHT,
+            padding=30,
         )
-        return self.contents
+
+        super().__init__(controls)

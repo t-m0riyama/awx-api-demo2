@@ -7,7 +7,7 @@ from awx_demo.components.types.user_role import UserRole
 from awx_demo.utils.logging import Logging
 
 
-class SelectTargetForm(ft.UserControl):
+class SelectTargetForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 500
@@ -23,9 +23,8 @@ class SelectTargetForm(ft.UserControl):
         self.step_change_next = step_change_next
         self.step_change_previous = step_change_previous
         self.step_change_cancel = step_change_cancel
-        super().__init__()
 
-    def build(self):
+        # controls
         formTitle = FormTitle('変更対象の選択', 'クラスタと仮想マシンの指定', self.content_width)
         formDescription = FormDescription('変更対象の仮想マシンと稼働するクラスタを指定します。クラスタは作業時に担当者が指定します。')
 
@@ -82,22 +81,21 @@ class SelectTargetForm(ft.UserControl):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                        ft.Divider(),
-                        footer,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                    ft.Divider(),
+                    footer,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def on_change_vms(self, e):

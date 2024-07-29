@@ -13,7 +13,7 @@ from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
 
-class EditRequestForm(ft.UserControl):
+class EditRequestForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 540
@@ -73,9 +73,8 @@ class EditRequestForm(ft.UserControl):
             self.tab_content_width,
             self.tab_body_height,
         )
-        super().__init__()
 
-    def build(self):
+        # controls
         if self.session.get('user_role') == UserRole.USER_ROLE:
             formTitle = FormTitle('申請の詳細', '', self.content_width)
         else:
@@ -143,21 +142,20 @@ class EditRequestForm(ft.UserControl):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                        footer,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                    footer,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def generate_confirm_text(self):

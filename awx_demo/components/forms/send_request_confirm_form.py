@@ -13,7 +13,7 @@ from awx_demo.utils.doc_id_utils import DocIdUtils
 from awx_demo.utils.logging import Logging
 
 
-class SendRequestConfirmForm(ft.UserControl):
+class SendRequestConfirmForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 600
@@ -33,9 +33,8 @@ class SendRequestConfirmForm(ft.UserControl):
         self.step_change_next = step_change_next
         self.step_change_previous = step_change_previous
         self.step_change_cancel = step_change_cancel
-        super().__init__()
 
-    def build(self):
+        # controls
         formTitle = FormTitle(self.title, '変更内容の確認', self.content_width)
         formDescription = FormDescription('以下の内容で、変更を適用します。')
         self.tfConfirmText = ft.TextField(
@@ -88,22 +87,21 @@ class SendRequestConfirmForm(ft.UserControl):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                        ft.Divider(),
-                        footer,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                    ft.Divider(),
+                    footer,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def generate_job_options(self):
@@ -161,7 +159,7 @@ class SendRequestConfirmForm(ft.UserControl):
             except Exception as ex:
                 Logging.error('failed to insert record ')
                 Logging.error(ex)
-            
+
             db_session = db.get_db()
             request = IaasRequestHelper.get_request(db_session, self.session.get('document_id'))
             job_id = AWXApiHelper.start_job(

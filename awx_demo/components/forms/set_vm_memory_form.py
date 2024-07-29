@@ -5,7 +5,7 @@ from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.utils.logging import Logging
 
 
-class SetVmMemoryForm(ft.UserControl):
+class SetVmMemoryForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 500
@@ -20,9 +20,9 @@ class SetVmMemoryForm(ft.UserControl):
         self.step_change_next = step_change_next
         self.step_change_previous = step_change_previous
         self.step_change_cancel = step_change_cancel
-        super().__init__()
 
-    def build(self):
+        # controls
+
         formTitle = FormTitle('メモリの割り当て変更', '変更内容', self.content_width)
         formDescription = FormDescription('仮想マシンに割り当てるメモリ容量を変更します。')
         self.checkChangeVmMemoryEnabled = ft.Checkbox(
@@ -73,22 +73,21 @@ class SetVmMemoryForm(ft.UserControl):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                        ft.Divider(),
-                        footer,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                    ft.Divider(),
+                    footer,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def generate_confirm_text(self):

@@ -47,7 +47,7 @@ class EditRequestWizard:
             content=formStep,
             actions_alignment=ft.MainAxisAlignment.END,
         )
-        self.page.overlay.append(self.wizard_dialog)
+        self.page.open(self.wizard_dialog)
         self.wizard_dialog.open = True
         self.page.update()
 
@@ -92,7 +92,7 @@ class EditRequestWizard:
                 )
                 self._update_request()
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
+                self.page.open(self.wizard_dialog)
             case "job_execute_confirm":
                 self.session.set("edit_request_wizard_step", "job_progress")
                 formStep = JobProgressForm(
@@ -104,9 +104,9 @@ class EditRequestWizard:
                     step_change_exit=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
+                self.page.open(self.wizard_dialog)
             case _:
-                Logging.error("undefined step!!!")
+                Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
         self.page.update()
 
     @Logging.func_logger
@@ -127,9 +127,9 @@ class EditRequestWizard:
                     click_cancel_func=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
-                self.page.dialog = self.wizard_dialog
+                self.page.open(self.wizard_dialog)
             case _:
-                Logging.error("undefined step!!!")
+                Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
         self.page.update()
 
     @Logging.func_logger
@@ -148,7 +148,8 @@ class EditRequestWizard:
 
     @Logging.func_logger
     def on_click_cancel(self, e):
-        self.session.remove("job_options")
+        if self.session.contains_key("job_options"):
+            self.session.remove("job_options")
         self.wizard_dialog.open = False
         self.page.update()
         self.parent_refresh_func()
