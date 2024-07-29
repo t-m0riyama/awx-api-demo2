@@ -103,7 +103,7 @@ class NavigationRouter:
                               controls=[formRequests]),
                 ],
                 spacing=30,
-                vertical_alignment="start",  # 画面上部から表示。ほかに"center"や"end"などの値がある。
+                vertical_alignment=ft.VerticalAlignment.START,  # 画面上部から表示
             )
 
             AppHeader(self.session, self.page, self.app_title)

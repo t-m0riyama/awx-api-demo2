@@ -54,7 +54,7 @@ class AppHeader(ft.Row):
                                 tooltip="アカウント設定",
                             ),
                         ],
-                        alignment="spaceBetween",
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     ),
                     margin=ft.margin.only(left=50, right=25),
                 )
