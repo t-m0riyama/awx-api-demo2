@@ -62,7 +62,7 @@ class RequestRowHelper():
                 request_id = row.cells[1].content.value
                 IaasRequestHelper.delete_request(
                     db_session, request_id, request_list_form.session)
-        db_session.close
+        db_session.close()
         request_list_form.refresh()
         request_list_form.btnActions.disabled = True
         request_list_form.btnActions.update()
@@ -92,7 +92,7 @@ class RequestRowHelper():
                 request_id = row.cells[1].content.value
                 IaasRequestHelper.update_request_status(
                     db_session, request_id, request_status, request_list_form.session)
-        db_session.close
+        db_session.close()
         RequestRowHelper.refresh_data_rows(request_list_form)
         request_list_form.btnActions.disabled = True
         request_list_form.btnActions.update()
@@ -106,7 +106,7 @@ class RequestRowHelper():
                 request_id = row.cells[1].content.value
                 IaasRequestHelper.update_request_iaas_user(
                     db_session, request_id, iaas_user, request_list_form.session)
-        db_session.close
+        db_session.close()
         RequestRowHelper.refresh_data_rows(request_list_form)
         request_list_form.btnActions.disabled = True
         request_list_form.btnActions.update()
@@ -177,7 +177,6 @@ class RequestRowHelper():
     @Logging.func_logger
     def query_request_all(request_list_form):
         db_session = db.get_db()
-        requests_data = None
         orderspec = None
         filters = request_list_form.get_query_filters()
         match request_list_form.session.get('sort_target_column'):
@@ -210,7 +209,7 @@ class RequestRowHelper():
             offset_row=request_list_form.data_row_offset,
             limit_rows=request_list_form.DATA_ROW_MAX
         )
-        db_session.close
+        db_session.close()
         return requests_data
 
     @staticmethod
@@ -219,7 +218,7 @@ class RequestRowHelper():
         db_session = db.get_db()
         filters = request_list_form.get_query_filters()
         requests_data = IaasRequestHelper.count_requests(db_session, filters)
-        db_session.close
+        db_session.close()
         return requests_data
 
     @staticmethod

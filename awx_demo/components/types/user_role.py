@@ -1,4 +1,4 @@
-class UserRole():
+class UserRole:
 
     # const
     ADMIN_ROLE = 'admin'

@@ -117,11 +117,6 @@ class LoginForm(ft.Card):
             e.page.go("/latest_requests")
 
     @Logging.func_logger
-    def close_dlg(self, e):
-        self.dlgAuthFailed.open = False
-        self.page.update()
-
-    @Logging.func_logger
     def show_login_failed_message(self):
         self.txtLoginMessage.value = (
             "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。"

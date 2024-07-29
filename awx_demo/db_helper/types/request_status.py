@@ -1,7 +1,7 @@
 from awx_demo.utils.logging import Logging
 
 
-class RequestStatus():
+class RequestStatus:
 
     # const
     START = 'request start'
@@ -13,11 +13,12 @@ class RequestStatus():
     APPLYING_FRIENDLY = '作業中'
     COMPLETED_FRIENDLY = '作業完了'
 
-    FRIENDLY_MAP = {}
-    FRIENDLY_MAP[START] = START_FRIENDLY
-    FRIENDLY_MAP[APPROVED] = APPROVED_FRIENDLY
-    FRIENDLY_MAP[APPLYING] = APPLYING_FRIENDLY
-    FRIENDLY_MAP[COMPLETED] = COMPLETED_FRIENDLY
+    FRIENDLY_MAP = {
+        START: START_FRIENDLY,
+        APPROVED: APPROVED_FRIENDLY,
+        APPLYING: APPLYING_FRIENDLY,
+        COMPLETED: COMPLETED_FRIENDLY,
+    }
 
     @staticmethod
     @Logging.func_logger

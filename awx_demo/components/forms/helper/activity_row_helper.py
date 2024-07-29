@@ -6,7 +6,7 @@ from awx_demo.utils.event_helper import EventStatus, EventType
 from awx_demo.utils.logging import Logging
 
 
-class ActivityRowData():
+class ActivityRowData:
 
     def __init__(self,  user, created, activity_type, status, summary, detail):
         self.user = user
@@ -17,7 +17,7 @@ class ActivityRowData():
         self.detail = detail
 
 
-class ActivityRowHelper():
+class ActivityRowHelper:
 
     @staticmethod
     @Logging.func_logger
@@ -138,7 +138,7 @@ class ActivityRowHelper():
             offset_row=activity_list_form.data_row_offset,
             limit_rows=activity_list_form.DATA_ROW_MAX
         )
-        db_session.close
+        db_session.close()
         return activities_data
 
     @staticmethod
@@ -147,7 +147,7 @@ class ActivityRowHelper():
         db_session = db.get_db()
         filters = activity_list_form.get_query_filters()
         activities_data = ActivityHelper.count_activities(db_session, filters)
-        db_session.close
+        db_session.close()
         return activities_data
 
     @staticmethod

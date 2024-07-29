@@ -6,15 +6,15 @@ from awx_demo.utils.logging import Logging
 
 class ActivityHelper:
 
-    class ActivitySpec():
+    class ActivitySpec:
         def __init__(self, db_session=None, user=None, request_id=None, event_type=None, status=None, summary=None, detail=None):
-            self.db_session=db_session
-            self.user=user
-            self.request_id=request_id
-            self.event_type=event_type
-            self.status=status
-            self.summary=summary
-            self.detail=detail
+            self.db_session = db_session
+            self.user = user
+            self.request_id = request_id
+            self.event_type = event_type
+            self.status = status
+            self.summary = summary
+            self.detail = detail
 
     @classmethod
     @Logging.func_logger

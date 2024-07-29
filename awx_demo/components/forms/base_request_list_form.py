@@ -156,7 +156,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
                 ft.Column(
                     col={"sm": 12},
                     controls=[self.dtRequests],
-                    scroll=True,
+                    scroll=ft.ScrollMode.AUTO,
                 )
             ],
             expand=1,
@@ -394,24 +394,6 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_delete_request_cancel(self, e):
         self.dlgDeleteConfirm.open = False
-        self.page.update()
-
-    @Logging.func_logger
-    def on_click_delete_request_yes(self, e):
-        RequestRowHelper.delete_selected_requests(self)
-        self.dlgDeleteConfirm.open = False
-        self.page.update()
-        self.refresh()
-
-    @Logging.func_logger
-    def on_click_edit_request_cancel(self, e):
-        self.dlgEditRequest.open = False
-        self.page.update()
-
-    @Logging.func_logger
-    def on_click_edit_request_execute(self, e):
-        Logging.info('JOB_OPTIONS: ' + str(self.session.get("job_options")))
-        self.dlgEditRequest.open = False
         self.page.update()
 
     @Logging.func_logger

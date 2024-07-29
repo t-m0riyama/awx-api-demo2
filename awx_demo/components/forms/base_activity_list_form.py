@@ -93,7 +93,7 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
                 ft.Column(
                     col={"sm": 12},
                     controls=[self.dtActivities],
-                    scroll=True,
+                    scroll=ft.ScrollMode.AUTO,
                 )
             ],
             expand=1,
@@ -248,7 +248,8 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_request_edit_open(self, e):
         self.session.set("request_id", e.control.content.value)
-        self.open_edit_request_dialog()
+        # TODO: アクティビティの詳細をダイアログで表示する場合は別途実装する
+        # self.open_edit_request_dialog()
 
     @Logging.func_logger
     def on_change_filter_activity_user(self, e):

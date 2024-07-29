@@ -48,7 +48,7 @@ class IaasRequestReportHelper:
         "change_vm_cpu_enabled",
         "change_vm_memory_enabled",
         "shutdown_before_change",
-        "startup_after_change",        
+        "startup_after_change",
     ]
     JOB_OPTIONS_FRIENDLY_KEYS = [
         "クラスタ名",
@@ -60,7 +60,7 @@ class IaasRequestReportHelper:
         "設定変更前に、仮想マシンを停止する",
         "設定変更後に、仮想マシンを起動する",
     ]
-    
+
     @classmethod
     @Logging.func_logger
     def diff_request_change(cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old):
@@ -108,7 +108,7 @@ class IaasRequestReportHelper:
             request_status_old=request_status_old,
             iaas_user_old=iaas_user_old,
         )
-        print(diff_request)
+        Logging.info("DIFF: " + str(diff_request))
         if diff_request != {}:
             return "\n== 変更内容の詳細 =============\n" + cls.to_friendly_request(diff_request)
         else:
@@ -120,7 +120,7 @@ class IaasRequestReportHelper:
         ok_ng = 'OK' if is_succeeded else 'NG'
         status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
         title = "[Teams申請通知 / {}({}) / {}]".format(event_type_friendly, request_id, ok_ng)
-        summary = summary = '{}に{}しました。'.format(
+        summary = '{}に{}しました。'.format(
                 event_type_friendly, EventStatus.to_friendly(status))
         if request_text:
             title += ' {}'.format(request_text)

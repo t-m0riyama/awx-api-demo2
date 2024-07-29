@@ -14,7 +14,7 @@ WARNING_ICON_FILE = 'images/warning-icon.png'
 ERROR_ICON_FILE = 'images/error-icon.png'
 
 
-class TeamsNotificator():
+class TeamsNotificator:
 
     @classmethod
     @Logging.func_logger
