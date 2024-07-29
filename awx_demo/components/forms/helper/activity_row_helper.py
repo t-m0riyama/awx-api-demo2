@@ -112,6 +112,7 @@ class ActivityRowHelper():
     def query_activity_all(activity_list_form):
         db_session = db.get_db()
         activities_data = None
+        orderspec = None
         filters = activity_list_form.get_query_filters()
         match activity_list_form.session.get('sort_target_column'):
             case '時刻':

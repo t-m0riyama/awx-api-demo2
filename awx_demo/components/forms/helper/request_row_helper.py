@@ -178,6 +178,7 @@ class RequestRowHelper():
     def query_request_all(request_list_form):
         db_session = db.get_db()
         requests_data = None
+        orderspec = None
         filters = request_list_form.get_query_filters()
         match request_list_form.session.get('sort_target_column'):
             case '依頼ID':

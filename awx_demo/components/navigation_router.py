@@ -28,6 +28,7 @@ class NavigationRouter:
     def route_change(self):
         troute = ft.TemplateRoute(self.page.route)
         self.page.controls.clear()
+        formRequests = None
 
         if troute.match('/login'):
             self.page.dialog = self.dlgLogin
