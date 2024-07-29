@@ -16,12 +16,6 @@ class Logging(object):
         log_level = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL', 'INFO'))
         log_level_db = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL_DB', 'WARNING'))
         log_backup_days = int(os.getenv('RMX_LOG_BACKUP_DAYS', 14))
-        logging.basicConfig(
-            filename='{}/{}'.format(log_dir, log_file),
-            format="\"%(asctime)s.%(msecs)d\"\t%(levelname)s\t%(message)s",
-            datefmt='%Y/%m/%d %H:%M:%S',
-            level=log_level,
-        )
 
         # ログローテーション用のhandlerを作成
         handler = logging.handlers.TimedRotatingFileHandler(
@@ -29,7 +23,7 @@ class Logging(object):
             when='midnight',
             backupCount=log_backup_days,
             interval=1,
-            encoding='utf-8'
+            encoding='utf-8',
         )
         formatter = logging.Formatter(
             "\"%(asctime)s.%(msecs)d\"\t%(levelname)s\t%(message)s",
@@ -37,6 +31,9 @@ class Logging(object):
         )
         handler.setFormatter(formatter)
         cls.get_logger().addHandler(handler)
+
+        # アプリケーション共通のログレベルを設定
+        cls.get_logger().setLevel(log_level)
 
         # SQLAlchemy用のログレベルを設定
         logging.getLogger('sqlalchemy').setLevel(log_level_db)
