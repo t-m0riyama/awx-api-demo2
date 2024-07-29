@@ -13,7 +13,7 @@ from awx_demo.utils.event_manager import EventManager
 from awx_demo.utils.logging import Logging
 
 
-class LoginForm(ft.UserControl):
+class LoginForm(ft.Card):
     """Login フォーム"""
 
     # const
@@ -30,9 +30,8 @@ class LoginForm(ft.UserControl):
         self.session = session
         self.page = page
         self.default_awx_url = default_awx_url
-        super().__init__()
 
-    def build(self):
+        # controls
         default_awx_url = re.sub('/$', '', os.getenv("RMX_AWX_URL", self.DEFAULT_AWX_URL))
         app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
         self.tfLoginid = ParameterInputText(
@@ -88,23 +87,21 @@ class LoginForm(ft.UserControl):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        self.contents = ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                        ft.Divider(),
-                        footer,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.CONTENT_WIDTH,
-                height=self.CONTENT_HEIGHT,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                    ft.Divider(),
+                    footer,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.CONTENT_WIDTH,
+            height=self.CONTENT_HEIGHT,
+            padding=30,
         )
-        return self.contents
+        super().__init__(controls)
 
     @Logging.func_logger
     def login_clicked(self, e):

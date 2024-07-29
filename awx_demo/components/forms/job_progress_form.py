@@ -10,7 +10,7 @@ from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
 
-class JobProgressForm(ft.UserControl):
+class JobProgressForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 500
@@ -25,9 +25,8 @@ class JobProgressForm(ft.UserControl):
         self.content_width = width
         self.body_height = body_height
         self.step_change_exit = step_change_exit
-        super().__init__()
 
-    def build(self):
+        # controls
         formTitle = FormTitle('処理の進捗', 'ジョブの進捗状況', self.content_width)
         formDescription = FormDescription('ジョブの進捗状況を表示します。')
         self.pbJob = ft.ProgressBar(value=0, width=self.CONTENT_WIDTH)
@@ -80,22 +79,21 @@ class JobProgressForm(ft.UserControl):
         except (KeyboardInterrupt, SystemExit):
             pass
 
-        return ft.Card(
-            ft.Container(
-                ft.Column(
-                    [
-                        header,
-                        body,
-                        ft.Divider(),
-                        footer,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                ),
-                width=self.content_width,
-                height=self.content_height,
-                padding=30,
+        controls = ft.Container(
+            ft.Column(
+                [
+                    header,
+                    body,
+                    ft.Divider(),
+                    footer,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
             ),
+            width=self.content_width,
+            height=self.content_height,
+            padding=30,
         )
+        super().__init__(controls)
 
     @Logging.func_logger
     def refresh_progress(self):
