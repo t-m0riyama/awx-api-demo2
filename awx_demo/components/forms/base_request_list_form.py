@@ -87,6 +87,8 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
     def refresh(self):
         RequestRowHelper.refresh_data_rows(self)
         RequestRowHelper.refresh_page_indicator(self)
+        self.btnActions.disabled = True
+        self.btnActions.update()
 
     def build(self):
         formTitle = FormTitle(self.FORM_TITLE, None, self.CONTENT_WIDTH)
