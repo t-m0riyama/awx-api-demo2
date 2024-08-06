@@ -22,7 +22,7 @@ class SendRequestConfirmForm(ft.Card):
     DEFAULT_FORM_TITLE = '確認'
     JOB_TEMPLATE_NAME = 'vm-config-utils_set_vm_cpu'
     VARS_TEMPLATE_NAME = 'aap_demo_extra_vars'
-    DUCUMENT_ID_LENGTH = 7
+    DOCUMENT_ID_LENGTH = 7
 
     def __init__(self, session, title=DEFAULT_FORM_TITLE, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
@@ -120,7 +120,7 @@ class SendRequestConfirmForm(ft.Card):
 
     @Logging.func_logger
     def add_request(self, job_options, request_status):
-        document_id = DocIdUtils.generate_id(self.DUCUMENT_ID_LENGTH)
+        document_id = DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH)
         self.session.set('document_id', document_id)
         db_session = db.get_db()
         IaasRequestHelper.add_request(

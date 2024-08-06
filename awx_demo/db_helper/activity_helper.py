@@ -42,7 +42,7 @@ class ActivityHelper:
         if db_session is None:
             db_session = db.get_db()
             is_fallback = True
-        return (db_session, is_fallback)
+        return db_session, is_fallback
 
     @staticmethod
     @Logging.func_logger

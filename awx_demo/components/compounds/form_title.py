@@ -9,7 +9,7 @@ class FormTitle(ft.Column):
         self.title_width = width
         controls = None
         if self.sub_title:
-            controls=[
+            controls =[
                 ft.Container(
                     ft.Text(
                         value=self.title,
@@ -33,7 +33,7 @@ class FormTitle(ft.Column):
                 ),
             ]
         else:
-            controls=[
+            controls = [
                 ft.Container(
                     ft.Text(
                         value=self.title,

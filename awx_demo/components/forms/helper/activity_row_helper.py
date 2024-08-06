@@ -152,14 +152,14 @@ class ActivityRowHelper:
 
     @staticmethod
     @Logging.func_logger
-    def sort_column(activity_list_form, session, column_lubel):
-        session.set('sort_target_column', column_lubel)
+    def sort_column(activity_list_form, session, column_label):
+        session.set('sort_target_column', column_label)
         # ソート対象が同じ列の場合、昇順と降順を逆転させる
         if session.get('sort_target_column') == session.get('sort_target_column_old') \
                 or not session.get('sort_target_column_old'):
             activity_list_form.dtActivities.sort_ascending = not activity_list_form.dtActivities.sort_ascending
 
-        match column_lubel:
+        match column_label:
             case '時刻':
                 activity_list_form.dtActivities.sort_column_index = 1
             case 'ユーザ名':
@@ -170,5 +170,5 @@ class ActivityRowHelper:
                 activity_list_form.dtActivities.sort_column_index = 4
             case '概要':
                 activity_list_form.dtActivities.sort_column_index = 5
-        session.set('sort_target_column_old', column_lubel)
+        session.set('sort_target_column_old', column_label)
         ActivityRowHelper.refresh_data_rows(activity_list_form)

@@ -18,7 +18,7 @@ class EditRequestWizard:
     CONTENT_WIDTH = 800
     BODY_HEIGHT = 370
     CONFIRM_FORM_TITLE = "ジョブ実行の確認"
-    DUCUMENT_ID_LENGTH = 7
+    DOCUMENT_ID_LENGTH = 7
 
     def __init__(self, session, page: ft.Page, parent_refresh_func):
         self.session = session
@@ -56,7 +56,7 @@ class EditRequestWizard:
         IaasRequestHelper.duplicate_request(
             db_session=db_session,
             request_id=self.session.get("request_id"),
-            new_request_id=DocIdUtils.generate_id(self.DUCUMENT_ID_LENGTH),
+            new_request_id=DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH),
             session=self.session,
         )
         db_session.close()

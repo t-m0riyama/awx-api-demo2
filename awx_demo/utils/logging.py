@@ -7,6 +7,7 @@ from distutils.util import strtobool
 
 
 class Logging(object):
+
     # const
     FLET_LOGGER_NAME = 'flet_core'
     FUNC_LOGGER_ARGS_LENGTH_MAX_DEFAULT = 20

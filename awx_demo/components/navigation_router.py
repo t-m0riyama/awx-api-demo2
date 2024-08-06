@@ -26,18 +26,18 @@ class NavigationRouter:
         self.dlgLogin = dlgLogin
 
     def route_change(self):
-        troute = ft.TemplateRoute(self.page.route)
+        template_route = ft.TemplateRoute(self.page.route)
         self.page.controls.clear()
         formRequests = None
 
-        if troute.match('/login'):
+        if template_route.match('/login'):
             self.page.dialog = self.dlgLogin
             self.dlgLogin.open = True
             self.page.update()
         else:
             self.dlgLogin.open = False
             if self.session.get('user_role') == UserRole.USER_ROLE:
-                match troute.route:
+                match template_route.route:
                     case '/latest_requests':
                         formRequests = LatestRequestListForm(
                             self.session, self.page)
@@ -62,7 +62,7 @@ class NavigationRouter:
                         Logging.error("error undefined route")
                         navigation_selected_index = 0
             else:
-                match troute.route:
+                match template_route.route:
                     case '/latest_requests':
                         formRequests = LatestRequestListForm(
                             self.session, self.page)
@@ -103,7 +103,7 @@ class NavigationRouter:
                               controls=[formRequests]),
                 ],
                 spacing=30,
-                vertical_alignment=ft.VerticalAlignment.START,  # 画面上部から表示
+                vertical_alignment=ft.CrossAxisAlignment.START,  # 画面上部から表示
             )
 
             AppHeader(self.session, self.page, self.app_title)

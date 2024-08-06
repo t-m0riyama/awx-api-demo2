@@ -18,8 +18,9 @@ class NotificationSpec:
         self.request_deadline = request_deadline
         self.icon = icon
 
+
 class NotificationMethod(IntEnum):
     NOTIFY_NONE = auto()
-    NOTIFY_TEMAS_ONLY = auto()
+    NOTIFY_TEAMS_ONLY = auto()
     NOTIFY_MAIL_ONLY = auto()
-    NOTIFY_TEMAS_AND_MAIL = auto()
+    NOTIFY_TEAMS_AND_MAIL = auto()

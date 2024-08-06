@@ -136,16 +136,16 @@ class IaasRequestReportHelper:
     @classmethod
     @Logging.func_logger
     def to_friendly_request(cls, request, default_value=None):
-        request_friendry = {}
+        request_friendly = {}
         for i, request_key in enumerate(cls.REQUEST_KEYS):
             if request.get(request_key):
                 if isinstance(request[request_key], datetime.datetime):
-                    request_friendry[cls.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value).strftime('%Y/%m/%d')
+                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value).strftime('%Y/%m/%d')
                 else:
-                    request_friendry[cls.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value)
-        if request_friendry.get("ジョブ設定"):
-            request_friendry["ジョブ設定"] = cls.to_friendly_job_options(job_options_str=json.dumps(request_friendry["ジョブ設定"]), convert_to_yaml=False)
-        yaml_string = yaml.safe_dump(data=request_friendry, allow_unicode=True, sort_keys=False)
+                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value)
+        if request_friendly.get("ジョブ設定"):
+            request_friendly["ジョブ設定"] = cls.to_friendly_job_options(job_options_str=json.dumps(request_friendly["ジョブ設定"]), convert_to_yaml=False)
+        yaml_string = yaml.safe_dump(data=request_friendly, allow_unicode=True, sort_keys=False)
         return yaml_string
 
     @classmethod

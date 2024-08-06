@@ -8,7 +8,7 @@ from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
 
-class RequestRowData():
+class RequestRowData:
 
     def __init__(self, request_status, request_deadline, updated, request_user, iaas_user, request_operation, request_text):
         self.request_status = request_status
@@ -20,7 +20,7 @@ class RequestRowData():
         self.request_text = request_text
 
 
-class RequestRowHelper():
+class RequestRowHelper:
 
     @staticmethod
     @Logging.func_logger
@@ -223,14 +223,14 @@ class RequestRowHelper():
 
     @staticmethod
     @Logging.func_logger
-    def sort_column(request_list_form, session, column_lubel):
-        session.set('sort_target_column', column_lubel)
+    def sort_column(request_list_form, session, column_label):
+        session.set('sort_target_column', column_label)
         # ソート対象が同じ列の場合、昇順と降順を逆転させる
         if session.get('sort_target_column') == session.get('sort_target_column_old') \
                 or not session.get('sort_target_column_old'):
             request_list_form.dtRequests.sort_ascending = not request_list_form.dtRequests.sort_ascending
 
-        match column_lubel:
+        match column_label:
             case '依頼ID':
                 request_list_form.dtRequests.sort_column_index = 1
             case 'リリース希望日':
@@ -245,5 +245,5 @@ class RequestRowHelper():
                 request_list_form.dtRequests.sort_column_index = 6
             case '依頼内容':
                 request_list_form.dtRequests.sort_column_index = 7
-        session.set('sort_target_column_old', column_lubel)
+        session.set('sort_target_column_old', column_label)
         RequestRowHelper.refresh_data_rows(request_list_form)

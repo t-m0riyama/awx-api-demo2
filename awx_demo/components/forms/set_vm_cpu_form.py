@@ -40,7 +40,7 @@ class SetVmCpuForm(ft.Card):
             max=8,
             divisions=7,
             label='CPUコア数: {value}',
-            on_change=self.on_chhange_slidercpus,
+            on_change=self.on_change_slidercpus,
             disabled=(not self.session.get('job_options')['change_vm_cpu_enabled']) if 'change_vm_cpu_enabled' in self.session.get('job_options') else False,
         )
         self.btnNext = ft.FilledButton(
@@ -96,7 +96,7 @@ class SetVmCpuForm(ft.Card):
         self.sliderCpus.update()
 
     @Logging.func_logger
-    def on_chhange_slidercpus(self, e):
+    def on_change_slidercpus(self, e):
         self.textCpuslabel.value = 'CPUコア数: ' + str(int(e.control.value))
         self.textCpuslabel.update()
 
