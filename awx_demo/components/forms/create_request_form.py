@@ -57,6 +57,7 @@ class CreateRequestForm(ft.Card):
             value=self.session.get('request_text') if self.session.contains_key(
                 'request_text') else '',
             label='依頼内容',
+            max_length=80,
             hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバ構築')
         self.dropCategory = ft.Dropdown(
             label='依頼区分',

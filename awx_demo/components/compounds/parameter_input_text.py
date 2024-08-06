@@ -3,7 +3,7 @@ import flet as ft
 
 class ParameterInputText(ft.TextField):
 
-    def __init__(self, value=None, label='', hint_text='', is_password=False, text_size=16, max_length=80, width=0, disabled=False, on_change=None, on_submit=None):
+    def __init__(self, value=None, label='', hint_text='', is_password=False, text_size=16, max_length=None, width=0, disabled=False, on_change=None, on_submit=None):
         if width:
             super().__init__(
                 value=value,
@@ -33,3 +33,4 @@ class ParameterInputText(ft.TextField):
                 on_change=on_change,
                 on_submit=on_submit,
             )
+
