@@ -3,7 +3,7 @@ import flet as ft
 from awx_demo.components.types.user_role import UserRole
 
 
-class Sidebar(ft.Column):
+class Sidebar(ft.Container):
 
     # const
     CONTENT_HEIGHT = 640
@@ -16,7 +16,6 @@ class Sidebar(ft.Column):
 
     def __init__(self, session, default_selected_index=0):
         self.session = session
-        super().__init__()
         self.nav_rail_visible = True
         if self.session.get('user_role') == UserRole.USER_ROLE:
             self.main_nav_rail_items = [
@@ -145,6 +144,40 @@ class Sidebar(ft.Column):
             tooltip="サイドバーを非表示",
         )
 
+        # controls
+        controls = ft.Container(
+            content=ft.Column([
+                ft.Row([
+                    ft.Text("申請メニュー"),
+                ]),
+                # divider
+                ft.Container(
+                    bgcolor=ft.colors.BLACK26,
+                    border_radius=ft.border_radius.all(30),
+                    height=1,
+                    alignment=ft.alignment.center_right,
+                    # width=self.RAIL_MAX_WIDTH + 30
+                ),
+                self.main_nav_rail,
+                # divider
+                ft.Container(
+                    bgcolor=ft.colors.BLACK26,
+                    border_radius=ft.border_radius.all(30),
+                    height=1,
+                    alignment=ft.alignment.center_right,
+                    # width=self.RAIL_MAX_WIDTH + 30
+                ),
+                self.option_nav_rail,
+            ], tight=True),
+            padding=ft.padding.all(15),
+            margin=ft.margin.all(0),
+            # width=self.CONTENT_WIDTH,
+            bgcolor=ft.colors.SURFACE_VARIANT,
+            border_radius=ft.border_radius.all(5),
+        )
+
+        super().__init__(controls)
+
     def on_click_main_navigation_item(self, e):
         if self.session.get('user_role') == UserRole.USER_ROLE:
             match e.control.selected_index:
@@ -180,39 +213,6 @@ class Sidebar(ft.Column):
                     e.page.go('/all_activities')
                 case 1:
                     e.page.go('/configurations')
-
-    def build(self):
-        self.view = ft.Container(
-            content=ft.Column([
-                ft.Row([
-                    ft.Text("申請メニュー"),
-                ]),
-                # divider
-                ft.Container(
-                    bgcolor=ft.colors.BLACK26,
-                    border_radius=ft.border_radius.all(30),
-                    height=1,
-                    alignment=ft.alignment.center_right,
-                    # width=self.RAIL_MAX_WIDTH + 30
-                ),
-                self.main_nav_rail,
-                # divider
-                ft.Container(
-                    bgcolor=ft.colors.BLACK26,
-                    border_radius=ft.border_radius.all(30),
-                    height=1,
-                    alignment=ft.alignment.center_right,
-                    # width=self.RAIL_MAX_WIDTH + 30
-                ),
-                self.option_nav_rail,
-            ], tight=True),
-            padding=ft.padding.all(15),
-            margin=ft.margin.all(0),
-            # width=self.CONTENT_WIDTH,
-            bgcolor=ft.colors.SURFACE_VARIANT,
-            border_radius=ft.border_radius.all(5),
-        )
-        return self.view
 
     def toggle_nav_rail(self, e):
         self.main_nav_rail.visible = not self.main_nav_rail.visible

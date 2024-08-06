@@ -38,7 +38,7 @@ class AppHeader(ft.Row):
                 value=self.app_title,
                 color=ft.colors.PRIMARY,
                 size=28,
-                text_align="center",
+                text_align=ft.TextAlign.CENTER,
             ),
             center_title=False,
             toolbar_height=46,
@@ -60,9 +60,6 @@ class AppHeader(ft.Row):
                 )
             ],
         )
-
-    def build(self):
-        return self.page.appbar
 
     @Logging.func_logger
     def toggle_icon(self, e):
