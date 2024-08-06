@@ -7,16 +7,16 @@ from awx_demo.db import base
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.db_helper.iaas_request_report_helper import IaasRequestReportHelper
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.notification.message_icon_helper import MessageIconHelper
 from awx_demo.notification.notification_spec import NotificationMethod, NotificationSpec
 from awx_demo.notification.notificator import Notificator
-from awx_demo.notification.teams_notificator import WARNING_ICON_FILE
 from awx_demo.utils.event_helper import EventType
 from awx_demo.utils.event_manager import EventManager
 from awx_demo.utils.logging import Logging
 
 
 class IaasRequestHelper:
-    
+
     @classmethod
     @Logging.func_logger
     def add_request(cls, db_session, request_id, request_deadline, request_user, request_category, request_operation, request_text, job_options, request_status, session):
@@ -62,7 +62,7 @@ class IaasRequestHelper:
         db_session.add(new_request)
         detail = IaasRequestReportHelper.generate_request_detail(new_request)
         db_session.commit()
-        
+
         cls._emit_event_on_duplicate(
             db_session=db_session,
             user=session.get('awx_loginid'),
@@ -131,7 +131,7 @@ class IaasRequestHelper:
                 )
             if request_status != request_status_old:
                 # ステータスが完了の場合、Teamsに加えてメールでも通知を行う
-                notification_method = NotificationMethod.NOTIFY_TEMAS_AND_MAIL if request_report.request_status == RequestStatus.COMPLETED else NotificationMethod.NOTIFY_TEMAS_ONLY
+                notification_method = NotificationMethod.NOTIFY_TEAMS_AND_MAIL if request_report.request_status == RequestStatus.COMPLETED else NotificationMethod.NOTIFY_TEAMS_ONLY
                 cls._emit_event_on_update_request_status(
                     db_session=db_session,
                     user=session.get('awx_loginid'),
@@ -157,7 +157,7 @@ class IaasRequestHelper:
             base.IaasRequest.request_id == request_id).first()
         # 更新前のステータスを取得
         request_status_current = request.request_status
-    
+
         if request_status_current != request_status:
             request.request_status = request_status
             detail = IaasRequestReportHelper.generate_request_detail(request)
@@ -165,7 +165,7 @@ class IaasRequestHelper:
             db_session.commit()
 
             # ステータスが完了の場合、Teamsに加えてメールでも通知を行う
-            notification_method = NotificationMethod.NOTIFY_TEMAS_AND_MAIL if request_report.request_status == RequestStatus.COMPLETED else NotificationMethod.NOTIFY_TEMAS_ONLY
+            notification_method = NotificationMethod.NOTIFY_TEAMS_AND_MAIL if request_report.request_status == RequestStatus.COMPLETED else NotificationMethod.NOTIFY_TEAMS_ONLY
 
             cls._emit_event_on_update_request_status(
                 db_session=db_session,
@@ -344,7 +344,7 @@ class IaasRequestHelper:
 
         notification_specs = []
         # Teams通知を指定された場合
-        if notification_method == NotificationMethod.NOTIFY_TEMAS_ONLY or notification_method == NotificationMethod.NOTIFY_TEMAS_AND_MAIL:
+        if notification_method == NotificationMethod.NOTIFY_TEAMS_ONLY or notification_method == NotificationMethod.NOTIFY_TEAMS_AND_MAIL:
             notification_specs.append(
                 NotificationSpec(
                     notification_type=Notificator.TEAMS_NOTIFICATION,
@@ -363,7 +363,7 @@ class IaasRequestHelper:
                 )
             )
         # メール通知を指定された場合
-        if notification_method == NotificationMethod.NOTIFY_MAIL_ONLY or notification_method == NotificationMethod.NOTIFY_TEMAS_AND_MAIL:
+        if notification_method == NotificationMethod.NOTIFY_MAIL_ONLY or notification_method == NotificationMethod.NOTIFY_TEAMS_AND_MAIL:
             notification_specs.append(
                 NotificationSpec(
                     notification_type=Notificator.MAIL_NOTIFICATION,
@@ -392,7 +392,7 @@ class IaasRequestHelper:
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
-            notification_method=NotificationMethod.NOTIFY_TEMAS_AND_MAIL,
+            notification_method=NotificationMethod.NOTIFY_TEAMS_AND_MAIL,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
@@ -413,7 +413,7 @@ class IaasRequestHelper:
         sub_title2 = "複製した申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id_new)
         cls._emit_event(
             db_session=db_session, 
-            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
@@ -445,7 +445,7 @@ class IaasRequestHelper:
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
-            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
@@ -460,7 +460,7 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_update_request_status(cls, db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded, notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY):
+    def _emit_event_on_update_request_status(cls, db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded, notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_STATUS_CHANGED_FRIENDLY, is_succeeded, request_text, request_deadline, additional_info)
         sub_title = "申請({} / {})の状態が変更されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
@@ -487,7 +487,7 @@ class IaasRequestHelper:
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
-            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
@@ -508,7 +508,7 @@ class IaasRequestHelper:
         sub_title2 = "申請 {} が削除されました。".format(request_id)
         cls._emit_event(
             db_session=db_session,
-            notification_method=NotificationMethod.NOTIFY_TEMAS_ONLY,
+            notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
@@ -520,5 +520,5 @@ class IaasRequestHelper:
             detail=detail,
             request_text=request_text,
             request_deadline=request_deadline,
-            icon=WARNING_ICON_FILE,
+            icon=MessageIconHelper.WARNING_ICON_FILE,
         )
