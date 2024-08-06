@@ -1,20 +1,19 @@
 import asyncio
-import base64
 import datetime
 import os
 
 import pymsteams
 
+from awx_demo.notification.message_icon_helper import MessageIconHelper
 from awx_demo.notification.notification_spec import NotificationSpec
 from awx_demo.utils.event_helper import EventStatus, EventType
 from awx_demo.utils.logging import Logging
 
-INFORMATION_ICON_FILE = 'images/information-icon.png'
-WARNING_ICON_FILE = 'images/warning-icon.png'
-ERROR_ICON_FILE = 'images/error-icon.png'
 
+class TeamsMessageCardNotificator:
 
-class TeamsNotificator:
+    # const
+    APP_TITLE_DEFAULT = "AWX API Demo"
 
     @classmethod
     @Logging.func_logger
@@ -24,25 +23,7 @@ class TeamsNotificator:
 
         Logging.info('TEAMS_WEB_HOOK_URL: ' + teams_webhook_url)
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-        icon_base64_byte: bytes = None
-
-        if notification_spec.icon:
-            # 明示的にアイコンのPNGファイルを指定した場合
-            with open(notification_spec.icon, mode="rb") as f:
-                icon_base64_byte = base64.b64encode(f.read())
-        else:
-            # 明示的にアイコンのPNGファイルを指定しなかった場合、ステータスをもとにアイコンを決定
-            match notification_spec.status:
-                case EventStatus.SUCCEED:
-                    with open(INFORMATION_ICON_FILE, mode="rb") as f:
-                        icon_base64_byte = base64.b64encode(f.read())
-                case EventStatus.WARNING:
-                    with open(WARNING_ICON_FILE, mode="rb") as f:
-                        icon_base64_byte = base64.b64encode(f.read())
-                case EventStatus.FAILED:
-                    with open(ERROR_ICON_FILE, mode="rb") as f:
-                        icon_base64_byte = base64.b64encode(f.read())
-        icon_base64: str = icon_base64_byte.decode('ascii')
+        icon_base64 = MessageIconHelper.load_icon_to_base64(notification_spec)
 
         teams_message = pymsteams.connectorcard(teams_webhook_url)
         teams_message.title(notification_spec.title)
@@ -55,7 +36,8 @@ class TeamsNotificator:
 
         # Create Section
         section_guide = pymsteams.cardsection()
-        section_guide.title("Posted by **AWX API Demo2**")
+        app_title = os.getenv("RMX_APP_TITLE", cls.APP_TITLE_DEFAULT).strip('"')
+        section_guide.title(f'Posted by **{app_title}**')
 
         # Create Section
         section_attributes = pymsteams.cardsection()
@@ -74,7 +56,7 @@ class TeamsNotificator:
         # Create Section
         section_detail = pymsteams.cardsection()
         section_detail.title("詳細:")
-        section_detail.text("```\n{}\n```".format(notification_spec.detail))
+        section_detail.text(f"```\n{notification_spec.detail}\n```".replace("\n", "\n\n"))
 
         teams_message.addSection(section_summary)
         teams_message.addSection(section_guide)
