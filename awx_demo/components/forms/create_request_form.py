@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import flet as ft
 
@@ -14,8 +15,8 @@ class CreateRequestForm(ft.Card):
     CONTENT_HEIGHT = 550
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 300
-    START_DATE_DAYS = 7
-    END_DATE_DAYS = 30
+    START_DATE_DAYS_DEFAULT = 7
+    END_DATE_DAYS_DEFAULT = 30
 
     def __init__(self, session, page: ft.Page, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
@@ -32,8 +33,10 @@ class CreateRequestForm(ft.Card):
             self.session.set('job_options', {})
 
         # overlay settings
-        start_date = datetime.datetime.now() + datetime.timedelta(days=self.START_DATE_DAYS)
-        end_date = datetime.datetime.now() + datetime.timedelta(days=self.END_DATE_DAYS)
+        start_date_days = int(os.getenv("RMX_DEADLINE_START_DATE_DAYS", self.START_DATE_DAYS_DEFAULT))
+        end_date_days = int(os.getenv("RMX_DEADLINE_END_DATE_DAYS", self.END_DATE_DAYS_DEFAULT))
+        start_date = datetime.datetime.now() + datetime.timedelta(days=start_date_days)
+        end_date = datetime.datetime.now() + datetime.timedelta(days=end_date_days)
         current_date = self.session.get('request_deadline') if self.session.contains_key(
             'request_deadline') else start_date
         self.dpRequestDeadline = ft.DatePicker(
@@ -74,7 +77,7 @@ class CreateRequestForm(ft.Card):
                 ft.dropdown.Option('CPUコア/メモリ割り当て変更'),
             ],
         )
-        self.lblReleseDeadline = ft.Text(
+        self.lblRequestDeadline = ft.Text(
             value=('リリース希望日: ' + self.session.get('request_deadline').strftime('%Y/%m/%d')
                    ) if self.session.contains_key('request_deadline') else 'リリース希望日:(未指定)',
             theme_style=ft.TextThemeStyle.BODY_LARGE,
@@ -108,7 +111,7 @@ class CreateRequestForm(ft.Card):
                 self.dropOperation,
                 ft.Row(
                     [
-                        self.lblReleseDeadline,
+                        self.lblRequestDeadline,
                         self.btnRequestDeadline,
                     ],
                     alignment=ft.MainAxisAlignment.START,
@@ -142,13 +145,13 @@ class CreateRequestForm(ft.Card):
 
     @Logging.func_logger
     def on_change_request_deadline(self, e):
-        self.lblReleseDeadline.value = 'リリース希望日: ' + \
+        self.lblRequestDeadline.value = 'リリース希望日: ' + \
             self.dpRequestDeadline.value.strftime('%Y/%m/%d')
         if self.dpRequestDeadline.value:
             self.btnNext.disabled = False
         else:
             self.btnNext.disabled = True
-        self.lblReleseDeadline.update()
+        self.lblRequestDeadline.update()
         self.btnNext.update()
 
     @Logging.func_logger

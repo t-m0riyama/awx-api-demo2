@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import flet as ft
 
@@ -13,8 +14,8 @@ class RequestCommonInfoTabForm(ft.Card):
     CONTENT_HEIGHT = 550
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 300
-    START_DATE_DAYS = 7
-    END_DATE_DAYS = 30
+    START_DATE_DAYS_DEFAULT = 7
+    END_DATE_DAYS_DEFAULT = 30
 
     def __init__(self, session, page: ft.Page, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT):
         self.session = session
@@ -28,8 +29,10 @@ class RequestCommonInfoTabForm(ft.Card):
             self.session.set('job_options', {})
 
         # overlay settings
-        start_date = datetime.datetime.now() + datetime.timedelta(days=self.START_DATE_DAYS)
-        end_date = datetime.datetime.now() + datetime.timedelta(days=self.END_DATE_DAYS)
+        start_date_days = int(os.getenv("RMX_DEADLINE_START_DATE_DAYS", self.START_DATE_DAYS_DEFAULT))
+        end_date_days = int(os.getenv("RMX_DEADLINE_END_DATE_DAYS", self.END_DATE_DAYS_DEFAULT))
+        start_date = datetime.datetime.now() + datetime.timedelta(days=start_date_days)
+        end_date = datetime.datetime.now() + datetime.timedelta(days=end_date_days)
         current_date = self.session.get('request_deadline') if self.session.contains_key('request_deadline') else start_date
         self.dpRequestDeadline = ft.DatePicker(
             on_change=self.on_change_request_deadline,
@@ -82,7 +85,7 @@ class RequestCommonInfoTabForm(ft.Card):
             ],
             disabled=True,
         )
-        self.textReleseDeadline = ft.Text(
+        self.textRequestDeadline = ft.Text(
             value=('リリース希望日: ' + self.session.get('request_deadline').strftime('%Y/%m/%d')
                    ) if self.session.contains_key('request_deadline') else 'リリース希望日:(未指定)',
             theme_style=ft.TextThemeStyle.BODY_LARGE,
@@ -115,7 +118,7 @@ class RequestCommonInfoTabForm(ft.Card):
                 self.dropOperation,
                 ft.Row(
                     [
-                        self.textReleseDeadline,
+                        self.textRequestDeadline,
                         self.btnRequestDeadline,
                     ],
                     alignment=ft.MainAxisAlignment.START,
@@ -145,6 +148,6 @@ class RequestCommonInfoTabForm(ft.Card):
     @Logging.func_logger
     def on_change_request_deadline(self, e):
         self.session.set('request_deadline', self.dpRequestDeadline.value)
-        self.textReleseDeadline.value = 'リリース希望日: ' + \
+        self.textRequestDeadline.value = 'リリース希望日: ' + \
             self.session.get('request_deadline').strftime('%Y/%m/%d')
-        self.textReleseDeadline.update()
+        self.textRequestDeadline.update()
