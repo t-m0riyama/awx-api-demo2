@@ -110,7 +110,7 @@ class LoginForm(ft.Card):
         awx_url = self.tfAWXUrl.value
         if self.login_auth(awx_url, loginid, password):
             self.txtLoginMessage.visible = False
-            self.contents.update()
+            self.txtLoginMessage.update()
             self.session.set("awx_loginid", loginid)
             self.session.set("awx_password", password)
             self.session.set("awx_url", awx_url)
@@ -122,13 +122,13 @@ class LoginForm(ft.Card):
             "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。"
         )
         self.txtLoginMessage.visible = True
-        self.contents.update()
+        self.txtLoginMessage.update()
 
     @Logging.func_logger
     def show_lack_authority_message(self):
         self.txtLoginMessage.value = "ログイン失敗: 指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。"
         self.txtLoginMessage.visible = True
-        self.contents.update()
+        self.txtLoginMessage.update()
 
     @Logging.func_logger
     def login_auth(self, awx_url, loginid, password):
