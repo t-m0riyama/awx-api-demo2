@@ -1,3 +1,5 @@
+import os
+
 import flet as ft
 
 from awx_demo.awx_api.awx_api_helper import AWXApiHelper
@@ -12,6 +14,7 @@ class ManageInfoTabForm(ft.Card):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
+    FILTERED_IAAS_USERS_DEFAULT = "root,admin,awxcli"
 
     def __init__(
         self,
@@ -26,10 +29,13 @@ class ManageInfoTabForm(ft.Card):
         self.body_height = body_height
 
         # controls
+        filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).split(",")
+        filtered_users = list(map(lambda s: s.strip(), filtered_users))
         iaas_users = AWXApiHelper.get_users(
             self.session.get("awx_url"),
             self.session.get("awx_loginid"),
             self.session.get("awx_password"),
+            filtered_users,
         )
         # iaas_users = []  # for DEBUG
         iaas_user_options = []

@@ -30,12 +30,12 @@ class AWXApiHelper:
     @classmethod
     @Logging.func_logger
     def login(cls, uri_base, loginid, password):
-        reqest_url = uri_base + '/api/v2/me/'
+        request_url = uri_base + '/api/v2/me/'
         headers = {'Content-Type': 'application/json'}
         try:
-            response = requests.get(reqest_url, headers=headers, auth=HTTPBasicAuth(
+            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
-            Logging.info('AWX_LOGIN_URL: ' + reqest_url)
+            Logging.info('AWX_LOGIN_URL: ' + request_url)
             Logging.info('AWX_LOGIN_STATUS: ' + str(response.status_code))
             if response.status_code == 200:
                 return True
@@ -48,17 +48,17 @@ class AWXApiHelper:
     @classmethod
     @Logging.func_logger
     def get_teams_user_belong(cls, uri_base, loginid, password):
-        reqest_url = uri_base + '/api/v2/me/'
+        request_url = uri_base + '/api/v2/me/'
         headers = {'Content-Type': 'application/json'}
         try:
-            response_me = requests.get(reqest_url, headers=headers, auth=HTTPBasicAuth(
+            response_me = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
             if response_me.status_code != 200:
                 Logging.error("Failed to retrieve information for user")
                 return False
 
             Logging.info('AWX_TEAMS_URL: ' +
-                  jmespath.search("results[0].related.teams", response_me.json()))
+                jmespath.search("results[0].related.teams", response_me.json()))
             teams_url = uri_base + \
                 jmespath.search("results[0].related.teams", response_me.json())
             response_teams = requests.get(
@@ -77,14 +77,22 @@ class AWXApiHelper:
 
     @classmethod
     @Logging.func_logger
-    def get_users(cls, uri_base, loginid, password):
-        reqest_url = uri_base + '/api/v2/users/'
+    def get_users(cls, uri_base, loginid, password, filtered_users=None):
+        request_url = uri_base + '/api/v2/users/'
         headers = {'Content-Type': 'application/json'}
+        if not filtered_users:
+            filtered_users = []
+
         try:
-            response = requests.get(reqest_url, headers=headers, auth=HTTPBasicAuth(
+            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
             if response.status_code == 200:
-                return jmespath.search('results', response.json())
+                users = []
+                result_users = jmespath.search('results', response.json())
+                for user in result_users:
+                    if user['username'] not in filtered_users:
+                        users.append(user)
+                return users
             else:
                 return None
         except Exception as e:
@@ -104,8 +112,8 @@ class AWXApiHelper:
             # ジョブテンプレートが見つからない場合は、エラー終了
             if job_template_id == cls.JOB_TEMPLATE_ID_NOT_FOUND:
                 Logging.error('AWX_TEMPLATE_NOT_FOUND: ' + job_template_name)
-                return cls.JOB_LAUNCH_FAILE
-            
+                return cls.JOB_LAUNCH_FAILED
+
             Logging.info('AWX_LAUNCH_URL: ' + launch_url)
             Logging.info('AWX_LAUNCH_VARS: ' + vars_json)
             detail = IaasRequestReportHelper.generate_request_detail(request)
@@ -236,7 +244,7 @@ class AWXApiHelper:
 
         notification_specs = []
         # Teams通知を指定された場合
-        if notification_method == NotificationMethod.NOTIFY_TEMAS_ONLY or notification_method == NotificationMethod.NOTIFY_TEMAS_AND_MAIL:
+        if notification_method == NotificationMethod.NOTIFY_TEAMS_ONLY or notification_method == NotificationMethod.NOTIFY_TEAMS_AND_MAIL:
             notification_specs.append(
                 NotificationSpec(
                     notification_type=Notificator.TEAMS_NOTIFICATION,
@@ -255,7 +263,7 @@ class AWXApiHelper:
                 )
             )
         # メール通知を指定された場合
-        if notification_method == NotificationMethod.NOTIFY_MAIL_ONLY or notification_method == NotificationMethod.NOTIFY_TEMAS_AND_MAIL:
+        if notification_method == NotificationMethod.NOTIFY_MAIL_ONLY or notification_method == NotificationMethod.NOTIFY_TEAMS_AND_MAIL:
             notification_specs.append(
                 NotificationSpec(
                     notification_type=Notificator.MAIL_NOTIFICATION,
@@ -283,7 +291,7 @@ class AWXApiHelper:
         ok_ng = 'OK' if is_succeeded else 'NG'
         status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
         title = "[Teams申請通知 / {}({}) / {}]".format(event_type_friendly, request_id, ok_ng)
-        summary = summary = '{}に{}しました。'.format(
+        summary = '{}に{}しました。'.format(
                 event_type_friendly, EventStatus.to_friendly(status))
         if request_text:
             title += ' {}'.format(request_text)
@@ -303,7 +311,7 @@ class AWXApiHelper:
         sub_title2 = "申請 {} の実行が完了後、意図した変更が反映されたことをしてください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
-            notification_method=NotificationMethod.NOTIFY_TEMAS_AND_MAIL,
+            notification_method=NotificationMethod.NOTIFY_TEAMS_AND_MAIL,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
@@ -324,7 +332,7 @@ class AWXApiHelper:
         sub_title2 = "申請 {} の意図した変更が反映されたことを確認してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
-            notification_method=NotificationMethod.NOTIFY_TEMAS_AND_MAIL,
+            notification_method=NotificationMethod.NOTIFY_TEAMS_AND_MAIL,
             title=title,
             sub_title=sub_title,
             sub_title2=sub_title2,
@@ -337,4 +345,3 @@ class AWXApiHelper:
             request_text=request_text,
             request_deadline=request_deadline,
         )
-        

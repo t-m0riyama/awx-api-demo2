@@ -1,4 +1,5 @@
 import abc
+import os
 
 import flet as ft
 
@@ -22,6 +23,7 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
     DEFAULT_SORT_COLUMN_INDEX = 1
     DEFAULT_SORT_ASCENDING = False
     FORM_TITLE = "操作履歴"
+    FILTERED_IAAS_USERS_DEFAULT = "root,admin,awxcli"
 
     def __init__(self, session, page: ft.Page):
         self.session = session
@@ -102,10 +104,13 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
 
         iaas_user_options = []
         if self.session.get("user_role") != UserRole.USER_ROLE:
+            filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).split(",")
+            filtered_users = list(map(lambda s: s.strip(), filtered_users))
             iaas_users = AWXApiHelper.get_users(
                 self.session.get("awx_url"),
                 self.session.get("awx_loginid"),
                 self.session.get("awx_password"),
+                filtered_users,
             )
         else:
             iaas_users = []
