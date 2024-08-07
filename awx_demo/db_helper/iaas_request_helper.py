@@ -237,12 +237,12 @@ class IaasRequestHelper:
         cls._emit_event_on_delete(
             db_session=db_session,
             user=session.get('awx_loginid'),
-            request_id=request_id, 
+            request_id=request_id,
             request_category=request.request_category,
             request_operation=request.request_operation,
             request_text=request.request_text,
             request_deadline=request.request_deadline,
-            detail=detail, 
+            detail=detail,
             is_succeeded=True,
         )
 
@@ -418,7 +418,7 @@ class IaasRequestHelper:
         sub_title = "申請({} / {})が複製されました。({} -> {})".format(request_category, request_operation, request_id, request_id_new)
         sub_title2 = "複製した申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id_new)
         cls._emit_event(
-            db_session=db_session, 
+            db_session=db_session,
             notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
@@ -426,7 +426,7 @@ class IaasRequestHelper:
             user=user,
             request_id=request_id,
             event_type=EventType.REQUEST_DUPLICATE,
-            status=status, 
+            status=status,
             summary=summary,
             detail=detail,
             request_text=request_text,
