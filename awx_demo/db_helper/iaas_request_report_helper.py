@@ -110,9 +110,17 @@ class IaasRequestReportHelper:
         )
         Logging.info("DIFF: " + str(diff_request))
         if diff_request != {}:
-            return "\n== 変更内容の詳細 =============\n" + cls.to_friendly_request(diff_request)
+            return diff_request
         else:
             return None
+
+    @classmethod
+    @Logging.func_logger
+    def except_request_status_and_iaas_user(cls, diff_request):
+        diff_request_except = diff_request.copy()
+        diff_request_except.pop('request_status', None)
+        diff_request_except.pop('iaas_user', None)
+        return diff_request_except
 
     @classmethod
     @Logging.func_logger
@@ -140,9 +148,9 @@ class IaasRequestReportHelper:
         for i, request_key in enumerate(cls.REQUEST_KEYS):
             if request.get(request_key):
                 if isinstance(request[request_key], datetime.datetime):
-                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value).strftime('%Y/%m/%d')
+                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value).strftime('%Y/%m/%d')
                 else:
-                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.pop(request_key, default_value)
+                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value)
         if request_friendly.get("ジョブ設定"):
             request_friendly["ジョブ設定"] = cls.to_friendly_job_options(job_options_str=json.dumps(request_friendly["ジョブ設定"]), convert_to_yaml=False)
         yaml_string = yaml.safe_dump(data=request_friendly, allow_unicode=True, sort_keys=False)

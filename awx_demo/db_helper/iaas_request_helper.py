@@ -98,23 +98,29 @@ class IaasRequestHelper:
         detail = ''
         diff_changed = IaasRequestReportHelper.generate_diff_request(request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old)
         if diff_changed:
-            detail = diff_changed + IaasRequestReportHelper.generate_request_detail(request)
+            diff_changed_friendly = "\n== 変更内容の詳細 =============\n" + IaasRequestReportHelper.to_friendly_request(diff_changed)
+            detail = diff_changed_friendly + IaasRequestReportHelper.generate_request_detail(request)
         else:
             detail = IaasRequestReportHelper.generate_request_detail(request)
         db_session.commit()
 
         if diff_changed:
-            cls._emit_event_on_update(
-                db_session=db_session,
-                user=session.get('awx_loginid'),
-                request_id=request_report.request_id,
-                request_category=request_report.request_category,
-                request_operation=request_report.request_operation,
-                request_text=request_report.request_text,
-                request_deadline=request_report.request_deadline,
-                detail=detail,
-                is_succeeded=True
-            )
+            # 申請ステータスとIaaS作業担当者以外が変更された場合、通知を行う
+            diff_changed_except_request_status_and_iaas_user = IaasRequestReportHelper.except_request_status_and_iaas_user(diff_changed)
+            Logging.info("DIFF_EXCEPT_STATUS_AND_IAAS_USER: " + str(diff_changed_except_request_status_and_iaas_user))
+            if diff_changed_except_request_status_and_iaas_user:
+                cls._emit_event_on_update(
+                    db_session=db_session,
+                    user=session.get('awx_loginid'),
+                    request_id=request_report.request_id,
+                    request_category=request_report.request_category,
+                    request_operation=request_report.request_operation,
+                    request_text=request_report.request_text,
+                    request_deadline=request_report.request_deadline,
+                    detail=detail,
+                    is_succeeded=True
+                )
+
             if iaas_user != iaas_user_old:
                 cls._emit_event_on_update_iaas_user(
                     db_session=db_session,
