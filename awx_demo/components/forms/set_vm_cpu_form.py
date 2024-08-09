@@ -110,6 +110,6 @@ class SetVmCpuForm(ft.Card):
 
     @Logging.func_logger
     def on_click_next(self, e):
-        self.session.get('job_options')['change_vm_cpu_enabled'] = self.checkChangeVmCpuEnabled.value
+        self.session.get('job_options')['change_vm_cpu_enabled'] = str(self.checkChangeVmCpuEnabled.value)
         self.session.get('job_options')['vcpus'] = int(self.sliderCpus.value)
         self.step_change_next(e)

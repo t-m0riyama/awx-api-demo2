@@ -67,7 +67,7 @@ class SetVmMemoryTabForm(ft.Card):
 
     @Logging.func_logger
     def on_change_vm_memory_enabled(self, e):
-        self.session.get('job_options')['change_vm_memory_enabled'] = e.control.value
+        self.session.get('job_options')['change_vm_memory_enabled'] = str(e.control.value)
         self.dropMemorySize.disabled = False if e.control.value else True
         self.dropMemorySize.update()
 

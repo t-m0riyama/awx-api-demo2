@@ -128,7 +128,7 @@ class SetVmMemoryForm(ft.Card):
 
     @Logging.func_logger
     def on_click_next(self, e):
-        self.session.get('job_options')['change_vm_memory_enabled'] = self.checkChangeVmMemoryEnabled.value
+        self.session.get('job_options')['change_vm_memory_enabled'] = str(self.checkChangeVmMemoryEnabled.value)
         self.session.get('job_options')['memory_gb'] = int(self.dropMemorySize.value)
         self.session.set('confirm_text', self.generate_confirm_text())
         Logging.info('JOB_OPTIONS: ' + str(self.session.get('job_options')))
