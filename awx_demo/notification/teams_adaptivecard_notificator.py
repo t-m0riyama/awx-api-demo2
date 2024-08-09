@@ -29,8 +29,8 @@ class TeamsAdaptiveCardNotificator:
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
         icon_base64 = MessageIconHelper.load_icon_to_base64(notification_spec)
 
-        title = TextBlock(text=notification_spec.title, font_type='Default', size='Medium', wrap=True)
-        sub_title = TextBlock(text="```{}```".format(notification_spec.sub_title), font_type='Default', size='Small', wrap=True)
+        title = TextBlock(text=notification_spec.title, font_type='Default', size='Medium', weight='Bolder', wrap=True)
+        sub_title = TextBlock(text=f'{notification_spec.sub_title}', font_type='Default', size='Small', style='accent', wrap=True)
         icon = Image(
             url="data:image/png;base64,{}".format(icon_base64),
             size="medium"
@@ -52,22 +52,37 @@ class TeamsAdaptiveCardNotificator:
         fact_list = FactSet(facts=facts)
 
         # Create Section
+        detail_text = notification_spec.detail.replace('\n', '\n\n')
         detail = Container(items=[
             TextBlock(text="詳細:", weight="bolder"),
-            TextBlock(text=f'```\n{notification_spec.detail}\n```'.replace('\n', '  \n'), wrap=True, maxLines=120),
+            #TextBlock(text=f'```\n{detail_text}\n```', wrap=True, maxLines=120),
+            #TextBlock(text=f'\n{detail_text}\n', wrap=True, maxLines=120),
+            TextBlock(text=f'\n{detail_text}\n', size='Small'),
         ])
 
         card = AdaptiveCard()
         card.body = [
             Container(
                 items=[
-                    icon,
                     title,
-                    sub_title,
-                    posted_by,
                     ColumnSet(columns=[
                         Column(
-                            # width='stretch',
+                            width="auto",
+                            items=[
+                                icon,
+                            ],
+                        ),
+                        Column(
+                            width="stretch",
+                            items=[
+                                sub_title,
+                                posted_by,
+                            ],
+                        ),
+                    ]),
+                    ColumnSet(columns=[
+                        Column(
+                            width='stretch',
                             items=[
                                 fact_list,
                                 detail,
@@ -75,7 +90,9 @@ class TeamsAdaptiveCardNotificator:
                         ),
                     ])
                 ],
-                width='stretch',
+                bleed=True,
+                targetWidth='wide',
+                #width='stretch',
             ),
         ]
 
@@ -86,7 +103,10 @@ class TeamsAdaptiveCardNotificator:
                     "contentType": "application/vnd.microsoft.card.adaptive",
                     "content": json.loads(str(card))
                 }
-            ]
+            ],
+            "msteams": {
+                "width": "Full"
+            },
         }
 
         # Logging.warning(str(card))

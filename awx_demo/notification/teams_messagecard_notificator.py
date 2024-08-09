@@ -56,7 +56,7 @@ class TeamsMessageCardNotificator:
         # Create Section
         section_detail = pymsteams.cardsection()
         section_detail.title("詳細:")
-        section_detail.text(f"```\n{notification_spec.detail}\n```".replace("\n", "\n\n"))
+        section_detail.text(f"```\n{notification_spec.detail}\n```")
 
         teams_message.addSection(section_summary)
         teams_message.addSection(section_guide)
