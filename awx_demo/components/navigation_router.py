@@ -31,7 +31,7 @@ class NavigationRouter:
         formRequests = None
 
         if template_route.match('/login'):
-            self.page.dialog = self.dlgLogin
+            self.page.open(self.dlgLogin)
             self.dlgLogin.open = True
             self.page.update()
         else:
