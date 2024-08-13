@@ -1,3 +1,5 @@
+import os
+
 import flet as ft
 
 from awx_demo.components.compounds.form_description import FormDescription
@@ -11,6 +13,7 @@ class SetVmCpuForm(ft.Card):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
+    VM_CPUS_DEFAULT = '1,2,4,6,8'
 
     def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
@@ -22,25 +25,24 @@ class SetVmCpuForm(ft.Card):
         self.step_change_cancel = step_change_cancel
 
         # controls
-        formTitle = FormTitle('CPUの割り当て変更', '変更内容', self.content_width)
+        formTitle = FormTitle('CPUの割り当て変更', '変更内容')
         formDescription = FormDescription('仮想マシンに割り当てるCPUコア数を変更します。')
         self.checkChangeVmCpuEnabled = ft.Checkbox(
             label='CPUコア数を変更する',
             value=self.session.get('job_options')['change_vm_cpu_enabled'] if 'change_vm_cpu_enabled' in self.session.get('job_options') else True,
             on_change=self.on_change_vm_cpu_enabled,
         )
-        self.textCpuslabel = ft.Text(
-            value='CPUコア数: ' + str(self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else 2),
-            theme_style=ft.TextThemeStyle.BODY_SMALL,
-            text_align=ft.TextAlign.LEFT,
-        )
-        self.sliderCpus = ft.Slider(
-            value=self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else 2,
-            min=1,
-            max=8,
-            divisions=7,
-            label='CPUコア数: {value}',
-            on_change=self.on_change_slidercpus,
+
+        # 選択可能なCPUコア数の決定
+        vm_cpus = os.getenv('RMX_VM_CPUS', self.VM_CPUS_DEFAULT).strip('"')
+        vm_cpu_options = []
+        for vm_cpu_option in vm_cpus.split(","):
+            vm_cpu_options.append(ft.dropdown.Option(vm_cpu_option.strip()))
+
+        self.dropCpus = ft.Dropdown(
+            label='CPUコア数',
+            value=self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else '2',
+            options=vm_cpu_options,
             disabled=(not self.session.get('job_options')['change_vm_cpu_enabled']) if 'change_vm_cpu_enabled' in self.session.get('job_options') else False,
         )
         self.btnNext = ft.FilledButton(
@@ -59,8 +61,7 @@ class SetVmCpuForm(ft.Card):
             [
                 formDescription,
                 self.checkChangeVmCpuEnabled,
-                self.textCpuslabel,
-                self.sliderCpus,
+                self.dropCpus,
             ],
             height=self.body_height,
         )
@@ -92,13 +93,8 @@ class SetVmCpuForm(ft.Card):
     @Logging.func_logger
     def on_change_vm_cpu_enabled(self, e):
         self.session.get('job_options')['change_vm_cpu_enabled'] = e.control.value
-        self.sliderCpus.disabled = False if e.control.value else True
-        self.sliderCpus.update()
-
-    @Logging.func_logger
-    def on_change_slidercpus(self, e):
-        self.textCpuslabel.value = 'CPUコア数: ' + str(int(e.control.value))
-        self.textCpuslabel.update()
+        self.dropCpus.disabled = False if e.control.value else True
+        self.dropCpus.update()
 
     @Logging.func_logger
     def on_click_cancel(self, e):
@@ -111,5 +107,5 @@ class SetVmCpuForm(ft.Card):
     @Logging.func_logger
     def on_click_next(self, e):
         self.session.get('job_options')['change_vm_cpu_enabled'] = str(self.checkChangeVmCpuEnabled.value)
-        self.session.get('job_options')['vcpus'] = int(self.sliderCpus.value)
+        self.session.get('job_options')['vcpus'] = int(self.dropCpus.value)
         self.step_change_next(e)
