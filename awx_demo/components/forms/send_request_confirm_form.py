@@ -35,7 +35,7 @@ class SendRequestConfirmForm(ft.Card):
         self.step_change_cancel = step_change_cancel
 
         # controls
-        formTitle = FormTitle(self.title, '変更内容の確認', self.content_width)
+        formTitle = FormTitle(self.title, '変更内容の確認')
         formDescription = FormDescription('以下の内容で、変更を適用します。')
         self.tfConfirmText = ft.TextField(
             value=self.session.get('confirm_text'),

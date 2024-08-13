@@ -41,7 +41,7 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
         ActivityRowHelper.refresh_page_indicator(self)
 
     def build(self):
-        formTitle = FormTitle(self.FORM_TITLE, None, self.CONTENT_WIDTH)
+        formTitle = FormTitle(self.FORM_TITLE, None)
         self.dtActivities = ft.DataTable(
             columns=[
                 ft.DataColumn(ft.Text("")),

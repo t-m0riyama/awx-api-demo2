@@ -66,7 +66,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
-        self.page.dialog = self.dlgDeleteConfirm
+        self.page.open(self.dlgDeleteConfirm)
         self.dlgDeleteConfirm.open = True
         self.page.update()
 
@@ -93,7 +93,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
         self.btnActions.update()
 
     def build(self):
-        formTitle = FormTitle(self.FORM_TITLE, None, self.CONTENT_WIDTH)
+        formTitle = FormTitle(self.FORM_TITLE, None)
         self.dtRequests = ft.DataTable(
             columns=[
                 ft.DataColumn(ft.Text("")),
@@ -300,8 +300,14 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
         )
 
         # Content
-        header = ft.Container(
-            formTitle,
+        header = ft.Column(
+            [
+                ft.ResponsiveRow(
+                    [
+                        formTitle,
+                    ],
+                ),
+            ],
         )
         body = ft.Column(
             [
@@ -397,6 +403,13 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_add_request(self, e):
         self.open_add_request_dialog()
+
+    @Logging.func_logger
+    def on_click_delete_request_yes(self, e):
+        RequestRowHelper.delete_selected_requests(self)
+        self.dlgDeleteConfirm.open = False
+        self.page.update()
+        self.refresh()
 
     @Logging.func_logger
     def on_click_delete_request_cancel(self, e):

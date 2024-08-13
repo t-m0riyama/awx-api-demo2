@@ -51,7 +51,7 @@ class CreateRequestForm(ft.Card):
         self.page.overlay.append(self.dpRequestDeadline)
 
         # Controls
-        formTitle = FormTitle('申請の追加', '申請項目の種類を選択', self.content_width)
+        formTitle = FormTitle('申請の追加', '申請項目の種類を選択')
         formDescription = FormDescription('新しく申請を作成します。')
         self.tfRequestText = ParameterInputText(
             value=self.session.get('request_text') if self.session.contains_key(

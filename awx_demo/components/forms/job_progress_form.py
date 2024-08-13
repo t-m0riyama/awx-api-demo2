@@ -27,7 +27,7 @@ class JobProgressForm(ft.Card):
         self.step_change_exit = step_change_exit
 
         # controls
-        formTitle = FormTitle('処理の進捗', 'ジョブの進捗状況', self.content_width)
+        formTitle = FormTitle('処理の進捗', 'ジョブの進捗状況')
         formDescription = FormDescription('ジョブの進捗状況を表示します。')
         self.pbJob = ft.ProgressBar(value=0, width=self.CONTENT_WIDTH)
         self.lvProgressLog = ft.ListView(

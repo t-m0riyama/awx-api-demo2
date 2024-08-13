@@ -76,9 +76,9 @@ class EditRequestForm(ft.Card):
 
         # controls
         if self.session.get('user_role') == UserRole.USER_ROLE:
-            formTitle = FormTitle('申請の詳細', '', self.content_width)
+            formTitle = FormTitle('申請の詳細', '')
         else:
-            formTitle = FormTitle('申請の編集', '', self.content_width)
+            formTitle = FormTitle('申請の編集', '')
 
         self.tabRequest = ft.Tabs(
             selected_index=0,
