@@ -162,11 +162,11 @@ class IaasRequestReportHelper:
         job_options_dict = json.loads(job_options_str)
         for i, job_options_key in enumerate(cls.JOB_OPTIONS_KEYS):
             if job_options_dict.get(job_options_key):
-                job_options_dict[cls.JOB_OPTIONS_FRIENDLY_KEYS[i]] = job_options_dict.pop(job_options_key, default_value)
+                job_options_dict[f'--{cls.JOB_OPTIONS_FRIENDLY_KEYS[i]}'] = job_options_dict.pop(job_options_key, default_value)
 
         if convert_to_yaml:
             # YAML文字列として返却
-            yaml_string = yaml.safe_dump(data=job_options_dict, allow_unicode=True, sort_keys=False)
+            yaml_string = yaml.safe_dump(data=job_options_dict, allow_unicode=True, sort_keys=False, indent=4)
             return yaml_string
         else:
             # ディクショナリとして返却
