@@ -19,7 +19,10 @@ class TeamsMessageCardNotificator:
     @Logging.func_logger
     def notify(cls, notification_spec: NotificationSpec):
         teams_webhook_url = os.getenv("RMX_TEAMS_WEB_HOOK_URL", None)
-        if not teams_webhook_url: return None
+        if not teams_webhook_url:
+            Logging.error('環境変数 RMX_TEAMS_WEB_HOOK_URL が設定されていないため、メッセージ通知が行えませんでした。')
+            Logging.error('環境変数 RMX_TEAMS_WEB_HOOK_URL にTeams Webhook URLを設定してください。')
+            return None
 
         Logging.info('TEAMS_WEB_HOOK_URL: ' + teams_webhook_url)
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
