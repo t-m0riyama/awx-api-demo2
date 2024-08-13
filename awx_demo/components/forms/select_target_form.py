@@ -1,3 +1,5 @@
+import os
+
 import flet as ft
 
 from awx_demo.components.compounds.form_description import FormDescription
@@ -14,6 +16,7 @@ class SelectTargetForm(ft.Card):
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
     VMS_LENGTH_MAX = 120
+    VSPHERE_CLUSTERS_DEFAULT = 'cluster-1'
 
     def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
@@ -25,21 +28,25 @@ class SelectTargetForm(ft.Card):
         self.step_change_cancel = step_change_cancel
 
         # controls
-        formTitle = FormTitle('変更対象の選択', 'クラスタと仮想マシンの指定', self.content_width)
+        formTitle = FormTitle('変更対象の選択', 'クラスタと仮想マシンの指定')
         formDescription = FormDescription('変更対象の仮想マシンと稼働するクラスタを指定します。クラスタは作業時に担当者が指定します。')
 
         # 申請者ロールの場合は、変更できないようにする
         change_disabled = (
             True if self.session.get("user_role") == UserRole.USER_ROLE else False
         )
+
+        # 選択可能なクラスタの決定
+        vsphere_clusters = os.getenv('RMX_VSPHERE_CLUSTERS', self.VSPHERE_CLUSTERS_DEFAULT).strip('"')
+        cluster_options = [ft.dropdown.Option("指定なし")]
+        for vsphere_cluster in vsphere_clusters.split(","):
+            cluster_options.append(ft.dropdown.Option(vsphere_cluster.strip()))
+
+        # 仮想マシンの指定
         self.dropCluster = ft.Dropdown(
             label='クラスタ',
             value=self.session.get('job_options')['vsphere_cluster'] if 'vsphere_cluster' in self.session.get('job_options') else '指定なし',
-            options=[
-                ft.dropdown.Option("指定なし"),
-                ft.dropdown.Option("cluster-1"),
-                ft.dropdown.Option("cluster-99"),
-            ],
+            options=cluster_options,
             hint_text='仮想マシンの稼働するクラスタ名を指定します。',
             disabled=change_disabled,
         )
