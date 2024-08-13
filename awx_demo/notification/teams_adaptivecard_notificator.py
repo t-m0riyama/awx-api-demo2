@@ -2,11 +2,14 @@ import asyncio
 import datetime
 import json
 import os
+from functools import partial
 
+import adaptive_cards.card_types as types
 import requests
-from adaptivecards.adaptivecard import AdaptiveCard
-from adaptivecards.containers import Column, ColumnSet, Container, Fact, FactSet
-from adaptivecards.elements import Image, TextBlock
+from adaptive_cards.actions import ActionToggleVisibility, TargetElement
+from adaptive_cards.card import AdaptiveCard
+from adaptive_cards.containers import Column, ColumnSet, Container, ContainerTypes, Fact, FactSet
+from adaptive_cards.elements import Image, TextBlock
 
 from awx_demo.notification.message_icon_helper import MessageIconHelper
 from awx_demo.notification.notification_spec import NotificationSpec
@@ -18,25 +21,29 @@ class TeamsAdaptiveCardNotificator:
 
     # const
     APP_TITLE_DEFAULT = "AWX API Demo"
+    ADAPTIVECARD_VERSION = "1.3"
 
     @classmethod
     @Logging.func_logger
     def notify(cls, notification_spec: NotificationSpec):
         teams_webhook_url = os.getenv("RMX_TEAMS_WEB_HOOK_URL", None)
-        if not teams_webhook_url: return None
+        if not teams_webhook_url:
+            Logging.error('環境変数 RMX_TEAMS_WEB_HOOK_URL が設定されていないため、メッセージ通知が行えませんでした。')
+            Logging.error('環境変数 RMX_TEAMS_WEB_HOOK_URL にTeams Webhook URLを設定してください。')
+            return None
 
         Logging.info('TEAMS_WEB_HOOK_URL: ' + teams_webhook_url)
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
         icon_base64 = MessageIconHelper.load_icon_to_base64(notification_spec)
 
-        title = TextBlock(text=notification_spec.title, font_type='Default', size='Medium', weight='Bolder', wrap=True)
-        sub_title = TextBlock(text=f'{notification_spec.sub_title}', font_type='Default', size='Small', style='accent', wrap=True)
+        title = TextBlock(text=notification_spec.title, size=types.FontSize.MEDIUM, weight=types.FontWeight.BOLDER, wrap=True)
+        sub_title = TextBlock(text=f'{notification_spec.sub_title}', size=types.FontSize.SMALL, color=types.Colors.ACCENT, wrap=True)
         icon = Image(
             url="data:image/png;base64,{}".format(icon_base64),
-            size="medium"
+            size="small"
         )
         app_title = os.getenv("RMX_APP_TITLE", cls.APP_TITLE_DEFAULT).strip('"')
-        posted_by = TextBlock(text=f'Posted by **{app_title}**', font_type='Default', size='Small')
+        posted_by = TextBlock(text=f'Posted by **{app_title}**', size=types.FontSize.SMALL)
 
         facts = []
         facts.append(Fact(title="時刻:", value=timestamp))
@@ -51,74 +58,98 @@ class TeamsAdaptiveCardNotificator:
         if notification_spec.summary: facts.append(Fact(title="概要:", value=notification_spec.summary))
         fact_list = FactSet(facts=facts)
 
-        # Create Section
         detail_text = notification_spec.detail.replace('\n', '\n\n')
         detail = Container(items=[
-            TextBlock(text="詳細:", weight="bolder"),
-            #TextBlock(text=f'```\n{detail_text}\n```', wrap=True, maxLines=120),
-            #TextBlock(text=f'\n{detail_text}\n', wrap=True, maxLines=120),
-            TextBlock(text=f'\n{detail_text}\n', size='Small'),
-        ])
-
-        card = AdaptiveCard()
-        card.body = [
-            Container(
-                items=[
-                    title,
-                    ColumnSet(columns=[
-                        Column(
-                            width="auto",
-                            items=[
-                                icon,
-                            ],
-                        ),
-                        Column(
-                            width="stretch",
-                            items=[
-                                sub_title,
-                                posted_by,
-                            ],
-                        ),
-                    ]),
-                    ColumnSet(columns=[
-                        Column(
-                            width='stretch',
-                            items=[
-                                fact_list,
-                                detail,
-                            ],
-                        ),
-                    ])
+                TextBlock(text="詳細表示    🔽", weight=types.FontWeight.BOLDER, id='collapse', is_visible=True),
+                TextBlock(text="簡易表示    🔼", weight=types.FontWeight.BOLDER, id='expand', is_visible=False),
+                TextBlock(text=f'\n{detail_text}\n', size=types.FontSize.SMALL, id='expand_items', is_visible=False),
+            ],
+            select_action=ActionToggleVisibility(
+                title="展開/省略",
+                target_elements=[
+                    TargetElement(
+                        element_id="collapse",
+                    ),
+                    TargetElement(
+                        element_id="expand",
+                    ),
+                    TargetElement(
+                        element_id="expand_items",
+                    ),
                 ],
-                bleed=True,
-                targetWidth='wide',
-                #width='stretch',
             ),
+        )
+
+        body = [
+            ColumnSet(columns=[
+                Column(
+                    # width=800,
+                    items=[
+                        title,
+                    ],
+                )
+            ]),
+            ColumnSet(columns=[
+                Column(
+                    width="auto",
+                    items=[
+                        icon,
+                    ],
+                ),
+                Column(
+                    width="stretch",
+                    items=[
+                        sub_title,
+                        posted_by,
+                    ],
+                ),
+            ]),
+            ColumnSet(columns=[
+                    Column(
+                        # width=800,
+                        items=[
+                            fact_list,
+                            detail,
+                        ],
+                    ),
+                ],
+                separator=True,
+            )
         ]
 
+        card = AdaptiveCard.new() \
+                            .version(cls.ADAPTIVECARD_VERSION) \
+                            .add_items(body) \
+                            .create()
+        # Teamsメッセージの横幅を最大限利用する設定を付加する
+        content =  {
+            "msteams": {
+                    "width": "Full"
+            }
+        }
+        content |= dict(json.loads(card.to_json()))
         payload = {
             "type": "message",
             "attachments" : [
                 {
                     "contentType": "application/vnd.microsoft.card.adaptive",
-                    "content": json.loads(str(card))
+                    "content": content
                 }
             ],
-            "msteams": {
-                "width": "Full"
-            },
         }
 
-        # Logging.warning(str(card))
+        Logging.warning(card.to_json())
         try:
             headers = {'content-type': 'application/json'}
             data_json = json.dumps(payload)
-            response = requests.post(teams_webhook_url,
-                                     data=data_json,
-                                     headers=headers)
-            # print(response.status_code)
-            # print(response.content)
-            # asyncio.new_event_loop().run_in_executor(None, teams_message.send)
+            asyncio.new_event_loop().run_in_executor(
+                                        None,
+                                        partial(requests.post,
+                                                teams_webhook_url,
+                                                data=data_json,
+                                                headers=headers
+                                        )
+            )
             Logging.info('TEAMS_MESSAGE_SENT_SUCCESS: ' + notification_spec.title)
         except Exception as e:
             Logging.error('TEAMS_MESSAGE_SENT_FAILED: Teamsメッセージの通知に失敗しました。')
