@@ -138,7 +138,7 @@ class TeamsAdaptiveCardNotificator:
             ],
         }
 
-        Logging.warning(card.to_json())
+        # Logging.warning(card.to_json())
         try:
             headers = {'content-type': 'application/json'}
             data_json = json.dumps(payload)
