@@ -17,7 +17,7 @@ services:
       - RMX_VSPHERE_CLUSTERS='cluster-1,cluster-99'
 
       # 仮想マシンに割り当てる、選択可能なCPUコア数
-      - VM_CPUS_DEFAULT='1,2,4,6,8'
+      - RMX_VM_CPUS_DEFAULT='1,2,4,6,8'
 
       # 仮想マシンに割り当てる、選択可能なメモリ容量（GB）
       - RMX_VM_MEMORY_SIZES_GB='4,8,12,16,24,32'
