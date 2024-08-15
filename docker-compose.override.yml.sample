@@ -8,22 +8,31 @@ services:
       - RMX_AWX_URL=<YOUR AWX URL>
 
       # リリース希望日として指定可能な開始日（7を指定した場合、1週間後以降の日を指定可能とする）
-      - RMX_DEADLINE_START_DATE_DAYS = 7
+      - RMX_DEADLINE_START_DATE_DAYS=7
 
       # リリース希望日として指定可能な終了日（30を指定した場合、30日後以前の日を指定可能とする）
-      - RMX_DEADLINE_END_DATE_DAYS = 30
+      - RMX_DEADLINE_END_DATE_DAYS=30
+
+      # 選択可能なクラスタ（','で区切ることで、複数のクラスタを指定可能とする）
+      - RMX_VSPHERE_CLUSTERS='cluster-1,cluster-99'
+
+      # 仮想マシンに割り当てる、選択可能なCPUコア数
+      - VM_CPUS_DEFAULT='1,2,4,6,8'
+
+      # 仮想マシンに割り当てる、選択可能なメモリ容量（GB）
+      - RMX_VM_MEMORY_SIZES_GB='4,8,12,16,24,32'
 
       # 割り当て可能な、IaaS作業担当者から除外するユーザ（システムユーザなどを除外する）
-      - RMX_FILTERED_IAAS_USERS = "root,admin,awxcli,job-runner"
+      - RMX_FILTERED_IAAS_USERS="root,admin,awxcli,job-runner"
 
       # 管理者ロールを割り当てる、AWX/AAPのチーム名
-      - RMX_ADMIN_TEAM_NAME = requestmanager-admins
+      - RMX_ADMIN_TEAM_NAME=requestmanager-admins
 
       # 作業担当者ロールを割り当てる、AWX/AAPのチーム名
-      - RMX_OPERATOR_TEAM_NAME = requestmanager-operators
+      - RMX_OPERATOR_TEAM_NAME=requestmanager-operators
 
       # 申請者ロールを割り当てる、AWX/AAPのチーム名
-      - RMX_USER_TEAM_NAME = requestmanager-users
+      - RMX_USER_TEAM_NAME=requestmanager-users
 
       # Function logger 有効/無効
       - RMX_FUNC_LOGGER_ENABLED=True
@@ -41,7 +50,7 @@ services:
       - RMX_TEAMS_WEB_HOOK_MESSAGE_DELAY_MSEC=300
 
       # Teams Webhookを利用した通知を行う際のメッセージ形式 (adaptive_card, message_card)
-      - RMX_TEAMS_MESSAGE_FORMAT = message_card
+      - RMX_TEAMS_MESSAGE_FORMAT=message_card
 
       # ログを出力するディレクトリ
       - RMX_LOG_DIR=/app/log
