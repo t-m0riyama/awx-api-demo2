@@ -37,7 +37,7 @@ class SelectTargetForm(ft.Card):
         )
 
         # 選択可能なクラスタの決定
-        vsphere_clusters = os.getenv('RMX_VSPHERE_CLUSTERS', self.VSPHERE_CLUSTERS_DEFAULT).strip('"')
+        vsphere_clusters = os.getenv('RMX_VSPHERE_CLUSTERS', self.VSPHERE_CLUSTERS_DEFAULT).strip('"').strip('\'')
         cluster_options = [ft.dropdown.Option("指定なし")]
         for vsphere_cluster in vsphere_clusters.split(","):
             cluster_options.append(ft.dropdown.Option(vsphere_cluster.strip()))

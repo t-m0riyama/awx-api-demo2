@@ -28,7 +28,7 @@ class SetVmMemoryTabForm(ft.Card):
         )
 
         # 選択可能なメモリ容量の決定
-        vm_memory_sizes = os.getenv('RMX_VM_MEMORY_SIZES_GB', self.VM_MEMORY_SIZES_GB_DEFAULT).strip('"')
+        vm_memory_sizes = os.getenv('RMX_VM_MEMORY_SIZES_GB', self.VM_MEMORY_SIZES_GB_DEFAULT).strip('"').strip('\'')
         vm_memory_options = []
         for vm_memory_option in vm_memory_sizes.split(","):
             vm_memory_options.append(ft.dropdown.Option(vm_memory_option.strip()))

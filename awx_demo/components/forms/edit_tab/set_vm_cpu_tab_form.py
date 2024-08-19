@@ -28,7 +28,7 @@ class SetVmCpuTabForm(ft.Card):
         )
 
         # 選択可能なCPUコア数の決定
-        vm_cpus = os.getenv('RMX_VM_CPUS', self.VM_CPUS_DEFAULT).strip('"')
+        vm_cpus = os.getenv('RMX_VM_CPUS', self.VM_CPUS_DEFAULT).strip('"').strip('\'')
         vm_cpu_options = []
         for vm_cpu_option in vm_cpus.split(","):
             vm_cpu_options.append(ft.dropdown.Option(vm_cpu_option.strip()))
