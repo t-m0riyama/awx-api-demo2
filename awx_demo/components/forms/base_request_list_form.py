@@ -52,6 +52,11 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
         self.btnActions.update()
 
     @Logging.func_logger
+    def deactivate_action_button(self):
+        self.btnActions.disabled = True
+        self.btnActions.update()
+
+    @Logging.func_logger
     def open_delete_confirm_dialog(self):
         formDeleteConfirm = DeleteConfirmForm(self.session, self.page)
         self.dlgDeleteConfirm = ft.AlertDialog(
@@ -395,6 +400,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_heading_column(self, e):
         RequestRowHelper.sort_column(self, self.session, e.control.label.value)
+        self.deactivate_action_button()
 
     @Logging.func_logger
     def on_selected_delete(self, e):
