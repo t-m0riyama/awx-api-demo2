@@ -16,13 +16,13 @@ class Logging(object):
     def init(cls, log_dir, log_file):
         log_level = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL', 'INFO'))
         log_level_db = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL_DB', 'WARNING'))
-        log_backup_days = int(os.getenv('RMX_LOG_BACKUP_DAYS', 14))
+        log_backup_files = int(os.getenv('RMX_LOG_BACKUP_FILES', 14))
 
         # ログローテーション用のhandlerを作成
         handler = logging.handlers.TimedRotatingFileHandler(
             filename='{}/{}'.format(log_dir, log_file),
             when='midnight',
-            backupCount=log_backup_days,
+            backupCount=log_backup_files,
             interval=1,
             encoding='utf-8',
         )

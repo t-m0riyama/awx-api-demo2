@@ -14,13 +14,13 @@ services:
       - RMX_DEADLINE_END_DATE_DAYS=30
 
       # 選択可能なクラスタ（','で区切ることで、複数のクラスタを指定可能とする）
-      - RMX_VSPHERE_CLUSTERS='cluster-1,cluster-99'
+      - RMX_VSPHERE_CLUSTERS="cluster-1,cluster-99"
 
       # 仮想マシンに割り当てる、選択可能なCPUコア数
-      - RMX_VM_CPUS_DEFAULT='1,2,4,6,8'
+      - RMX_VM_CPUS=”1,2,4,6,8”
 
       # 仮想マシンに割り当てる、選択可能なメモリ容量（GB）
-      - RMX_VM_MEMORY_SIZES_GB='4,8,12,16,24,32'
+      - RMX_VM_MEMORY_SIZES_GB=”4,8,12,16,24,32”
 
       # 割り当て可能な、IaaS作業担当者から除外するユーザ（システムユーザなどを除外する）
       - RMX_FILTERED_IAAS_USERS="root,admin,awxcli,job-runner"
@@ -64,5 +64,5 @@ services:
       # ログレベル（DB関連）
       - RMX_LOG_LEVEL_DB=WARNING
 
-      # ログの保存期間（日数）
-      - RMX_LOG_BACKUP_DAYS=14
+      # ログの保存世代数
+      - RMX_LOG_BACKUP_FILES=14
