@@ -64,5 +64,3 @@ services:
       # ログレベル（DB関連）
       - RMX_LOG_LEVEL_DB=WARNING
 
-      # ログの保存世代数
-      - RMX_LOG_BACKUP_FILES=14
