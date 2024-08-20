@@ -1,0 +1,14 @@
+# Logrotate file for awx-api-demo2
+
+/container/config/awx-api-demo2/log/*.log {
+    missingok
+    sharedscripts
+    nocreate
+    compress
+    daily
+    rotate 14
+    ifempty
+    dateext
+    dateformat _%Y%m
+}
+
