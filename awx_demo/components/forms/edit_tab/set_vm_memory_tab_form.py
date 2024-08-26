@@ -1,4 +1,5 @@
 import os
+from distutils.util import strtobool
 
 import flet as ft
 
@@ -38,7 +39,7 @@ class SetVmMemoryTabForm(ft.Card):
                 'memory_gb'] if 'memory_gb' in self.session.get('job_options') else 8,
             options=vm_memory_options,
             on_change=self.on_change_memory_size,
-            disabled=(not self.session.get('job_options')['change_vm_memory_enabled']) if 'change_vm_memory_enabled' in self.session.get('job_options') else False,
+            disabled=(not bool(strtobool(self.session.get('job_options')['change_vm_memory_enabled']))) if 'change_vm_memory_enabled' in self.session.get('job_options') else False,
         )
 
         # 申請者ロールの場合は、変更できないようにする

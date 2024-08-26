@@ -1,4 +1,5 @@
 import os
+from distutils.util import strtobool
 
 import flet as ft
 
@@ -45,7 +46,7 @@ class SetVmMemoryForm(ft.Card):
             value=self.session.get('job_options')[
                 'memory_gb'] if 'memory_gb' in self.session.get('job_options') else '8',
             options=vm_memory_options,
-            disabled=(not self.session.get('job_options')['change_vm_memory_enabled']) if 'change_vm_memory_enabled' in self.session.get('job_options') else False,
+            disabled=(not bool(strtobool(self.session.get('job_options')['change_vm_memory_enabled']))) if 'change_vm_memory_enabled' in self.session.get('job_options') else False,
         )
         self.btnNext = ft.FilledButton(
             '次へ', on_click=self.on_click_next)
@@ -117,7 +118,7 @@ class SetVmMemoryForm(ft.Card):
 
     @Logging.func_logger
     def on_change_vm_memory_enabled(self, e):
-        self.session.get('job_options')['change_vm_memory_enabled'] = e.control.value
+        self.session.get('job_options')['change_vm_memory_enabled'] = str(e.control.value)
         self.dropMemorySize.disabled = False if e.control.value else True
         self.dropMemorySize.update()
 

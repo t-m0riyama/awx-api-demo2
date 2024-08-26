@@ -1,4 +1,5 @@
 import os
+from distutils.util import strtobool
 
 import flet as ft
 
@@ -43,7 +44,7 @@ class SetVmCpuForm(ft.Card):
             label='CPUコア数',
             value=self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else '2',
             options=vm_cpu_options,
-            disabled=(not self.session.get('job_options')['change_vm_cpu_enabled']) if 'change_vm_cpu_enabled' in self.session.get('job_options') else False,
+            disabled=(not bool(strtobool(self.session.get('job_options')['change_vm_cpu_enabled']))) if 'change_vm_cpu_enabled' in self.session.get('job_options') else False,
         )
         self.btnNext = ft.FilledButton(
             '次へ', on_click=self.on_click_next)
