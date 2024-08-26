@@ -1,5 +1,6 @@
 import functools
 import logging
+import logging.handlers
 import os
 import pprint
 from distutils.util import strtobool
@@ -15,12 +16,22 @@ class Logging(object):
     def init(cls, log_dir, log_file):
         log_level = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL', 'INFO'))
         log_level_db = cls.get_loglevel_from_string(os.getenv('RMX_LOG_LEVEL_DB', 'WARNING'))
+        log_path = '{}/{}'.format(log_dir, log_file)
         logging.basicConfig(
-            filename='{}/{}'.format(log_dir, log_file),
+            filename=log_path,
             format="\"%(asctime)s.%(msecs)d\"\t%(levelname)s\t%(message)s",
             datefmt='%Y/%m/%d %H:%M:%S',
             level=log_level,
         )
+
+        # ログファイルの変更を検出するハンドラの作成
+        handler = logging.handlers.WatchedFileHandler(filename=log_path)
+        formatter = logging.Formatter(
+            "\"%(asctime)s.%(msecs)d\"\t%(levelname)s\t%(message)s",
+            datefmt='%Y/%m/%d %H:%M:%S'
+         )
+        handler.setFormatter(formatter)
+        cls.get_logger().addHandler(handler)
 
         # アプリケーション共通のログレベルを設定
         cls.get_logger().setLevel(log_level)
