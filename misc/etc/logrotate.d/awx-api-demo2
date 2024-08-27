@@ -3,12 +3,12 @@
 /container/config/awx-api-demo2/log/*.log {
     missingok
     sharedscripts
-    nocreate
+    create 644 root root
     compress
     daily
     rotate 14
     ifempty
     dateext
-    dateformat _%Y%m
+    dateformat _%Y%m%d
 }
 
