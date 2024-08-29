@@ -104,7 +104,7 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
 
         iaas_user_options = []
         if self.session.get("user_role") != UserRole.USER_ROLE:
-            filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).split(",")
+            filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip('\'').split(",")
             filtered_users = list(map(lambda s: s.strip(), filtered_users))
             iaas_users = AWXApiHelper.get_users(
                 self.session.get("awx_url"),

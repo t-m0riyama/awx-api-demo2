@@ -177,7 +177,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
             on_click=self.on_click_add_request,
         )
 
-        filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).split(",")
+        filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip('\'').split(",")
         filtered_users = list(map(lambda s: s.strip(), filtered_users))
         iaas_users = AWXApiHelper.get_users(
             self.session.get("awx_url"),
