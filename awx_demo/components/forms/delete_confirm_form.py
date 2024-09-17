@@ -5,7 +5,7 @@ from awx_demo.components.compounds.form_title import FormTitle
 
 
 class DeleteConfirmForm(ft.Card):
-    """Login フォーム"""
+    """申請の削除 フォーム"""
 
     # const
     CONTENT_HEIGHT = 200
