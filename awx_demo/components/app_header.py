@@ -82,5 +82,4 @@ class AppHeader(ft.Row):
             notification_specs=[],
         )
         SessionHelper.clean_session(self.session)
-        SessionHelper.dump_session(self.session)
         self.page.go("/login")
