@@ -133,6 +133,8 @@ class AWXApiHelper:
                     detail=detail,
                     is_succeeded=True,
                 )
+                Logging.info('AWX_LAUNCH_STATUS: {}'.format(response.status_code))
+                Logging.info('AWX_LAUNCH_RESPONSE: {}'.format(response.text))
                 return response_results
             else:
                 cls._emit_event_on_start_job(
@@ -155,7 +157,7 @@ class AWXApiHelper:
     @classmethod
     @Logging.func_logger
     def generate_vars(cls, job_options):
-        return json.dumps({"AWX_EXTRA_VARS": job_options})
+        return json.dumps({"extra_vars": job_options})
 
     @classmethod
     @Logging.func_logger
