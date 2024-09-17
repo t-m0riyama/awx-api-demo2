@@ -47,7 +47,7 @@ class JobProgressForm(ft.Card):
                 [
                     ft.Icon(ft.icons.INFO_OUTLINED, color=ft.colors.BLUE_500),
                     ft.Text(
-                        value='処理を開始しました。',
+                        value=f'{JobProgressForm._get_timestamp()} 処理を開始しました。',
                         theme_style=ft.TextThemeStyle.BODY_LARGE,
                         color=ft.colors.SECONDARY
                     ),
@@ -155,7 +155,7 @@ class JobProgressForm(ft.Card):
                         ft.Icon(ft.icons.THUMB_UP_OUTLINED,
                                 color=ft.colors.BLUE_500),
                         ft.Text(
-                            value='処理は正常終了しました。',
+                            value=f'{JobProgressForm._get_timestamp()} 処理は正常終了しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
                             color=ft.colors.SECONDARY
                         ),
@@ -188,7 +188,7 @@ class JobProgressForm(ft.Card):
                         ft.Icon(ft.icons.ERROR_OUTLINED,
                                 color=ft.colors.ERROR),
                         ft.Text(
-                            value='処理に失敗しました。',
+                            value=f'{JobProgressForm._get_timestamp()} 処理に失敗しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
                             color=ft.colors.SECONDARY
                         ),
@@ -216,7 +216,7 @@ class JobProgressForm(ft.Card):
                         ft.Icon(ft.icons.ERROR_OUTLINED,
                                 color=ft.colors.ERROR),
                         ft.Text(
-                            value='ジョブの実行要求に失敗しました。',
+                            value=f'{JobProgressForm._get_timestamp()} ジョブの実行要求に失敗しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
                             color=ft.colors.SECONDARY
                         ),
@@ -232,6 +232,13 @@ class JobProgressForm(ft.Card):
         self.btnExit.disabled = False
         self.lvProgressLog.update()
         self.btnExit.update()
+
+    @staticmethod
+    @Logging.func_logger
+    def _get_timestamp():
+        dt_now = datetime.now()
+        timestamp = dt_now.strftime('%Y-%m-%d %H:%M:%S')
+        return timestamp
 
     @Logging.func_logger
     def exit_clicked(self, e):
