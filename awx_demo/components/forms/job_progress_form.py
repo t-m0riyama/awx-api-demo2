@@ -1,3 +1,6 @@
+import os
+from datetime import datetime, timedelta
+
 import flet as ft
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -16,7 +19,9 @@ class JobProgressForm(ft.Card):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
-    JOB_STATUS_CHECK_ID = 'job_status_check'
+    JOB_STATUS_CHECK_ID_PREFIX = 'job_status_check'
+    JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT=3600
+    JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT=3
 
     def __init__(self, session, request_id, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
         self.session = session
@@ -25,6 +30,7 @@ class JobProgressForm(ft.Card):
         self.content_width = width
         self.body_height = body_height
         self.step_change_exit = step_change_exit
+        self.scheduler_job_id = ''
 
         # controls
         formTitle = FormTitle('処理の進捗', 'ジョブの進捗状況')
@@ -71,9 +77,19 @@ class JobProgressForm(ft.Card):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
+        self.scheduler_job_id = f'{self.JOB_STATUS_CHECK_ID_PREFIX}_{self.session.get("job_id")}'
+        check_timeout = int(os.getenv('RMX_JOB_STATUS_CHECK_TIMEOUT_SECS', self.JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT))
+        check_internal = int(os.getenv('RMX_JOB_STATUS_CHECK_INTERVAL_SECS', self.JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT))
+
+        # ジョブがタイムアウトし、終了する時間を求める
+        dt_now = datetime.now()
+        dt_delta = timedelta(seconds=check_timeout)
+        job_end_date = (dt_now + dt_delta).strftime('%Y-%m-%d %H:%M:%S')
+        Logging.info(f'JOB_TIMEOUT_DATE({self.scheduler_job_id}): {job_end_date}')
+
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_job(
-            self.refresh_progress, 'interval', seconds=3, id=self.JOB_STATUS_CHECK_ID)
+            self.refresh_progress, 'interval', seconds=check_internal, end_date=job_end_date, id=self.scheduler_job_id)
         try:
             self.scheduler.start()
         except (KeyboardInterrupt, SystemExit):
@@ -97,6 +113,10 @@ class JobProgressForm(ft.Card):
 
     @Logging.func_logger
     def refresh_progress(self):
+        if self.session.get('job_id') is None:
+            self._on_job_request_failed()
+            return
+
         db_session = db.get_db()
         request = IaasRequestHelper.get_request(db_session, self.request_id)
         job_status = AWXApiHelper.get_job_status(
@@ -109,14 +129,27 @@ class JobProgressForm(ft.Card):
         )
         db_session.close()
         if job_status == AWXApiHelper.JOB_STATUS_SUCCEEDED:
-            self.pbJob.value = 1.0
-            try:
-                self.scheduler.remove_job(self.JOB_STATUS_CHECK_ID)
-                self.scheduler.pause()
-            except (KeyboardInterrupt, SystemExit):
-                pass
+            self._on_job_status_completed()
+            IaasRequestHelper.update_request_status(db.get_db(), self.session.get(
+                'document_id'), RequestStatus.COMPLETED, self.session)
+        elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
+            self._on_job_status_request_failed()
 
-            self.lvProgressLog.controls.append(
+        if job_status == AWXApiHelper.JOB_STATUS_RUNNING:
+            if self.pbJob.value < 0.9:
+                self.pbJob.value += 0.1
+        self.pbJob.update()
+
+    @Logging.func_logger
+    def _on_job_status_completed(self):
+        self.pbJob.value = 1.0
+        try:
+            self.scheduler.remove_job(self.scheduler_job_id)
+            self.scheduler.pause()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+
+        self.lvProgressLog.controls.append(
                 ft.Row(
                     [
                         ft.Icon(ft.icons.THUMB_UP_OUTLINED,
@@ -129,7 +162,7 @@ class JobProgressForm(ft.Card):
                     ]
                 )
             )
-            self.lvProgressLog.controls.append(
+        self.lvProgressLog.controls.append(
                 ft.TextButton(
                     'ジョブ出力の参照: ' +
                     self.session.get(
@@ -138,18 +171,18 @@ class JobProgressForm(ft.Card):
                         'awx_url') + '/#/jobs/playbook/{}/output'.format(self.session.get('job_id')),
                 ),
             )
-            self.btnExit.disabled = False
-            self.lvProgressLog.update()
-            self.btnExit.update()
-            IaasRequestHelper.update_request_status(db.get_db(), self.session.get(
-                'document_id'), RequestStatus.COMPLETED, self.session)
-        elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
-            try:
-                self.scheduler.remove_job(self.JOB_STATUS_CHECK_ID)
-                self.scheduler.pause()
-            except (KeyboardInterrupt, SystemExit):
-                pass
-            self.lvProgressLog.controls.append(
+        self.btnExit.disabled = False
+        self.lvProgressLog.update()
+        self.btnExit.update()
+
+    @Logging.func_logger
+    def _on_job_status_request_failed(self):
+        try:
+            self.scheduler.remove_job(self.scheduler_job_id)
+            self.scheduler.pause()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        self.lvProgressLog.controls.append(
                 ft.Row(
                     [
                         ft.Icon(ft.icons.ERROR_OUTLINED,
@@ -162,7 +195,7 @@ class JobProgressForm(ft.Card):
                     ]
                 )
             )
-            self.lvProgressLog.controls.append(
+        self.lvProgressLog.controls.append(
                 ft.TextButton(
                     'ジョブ出力の参照: ' +
                     self.session.get(
@@ -171,14 +204,34 @@ class JobProgressForm(ft.Card):
                         'awx_url') + '/#/jobs/playbook/{}/output'.format(self.session.get('job_id')),
                 ),
             )
-            self.btnExit.disabled = False
-            self.lvProgressLog.update()
-            self.btnExit.update()
+        self.btnExit.disabled = False
+        self.lvProgressLog.update()
+        self.btnExit.update()
 
-        if job_status == AWXApiHelper.JOB_STATUS_RUNNING:
-            if self.pbJob.value < 0.9:
-                self.pbJob.value += 0.1
-        self.pbJob.update()
+    @Logging.func_logger
+    def _on_job_request_failed(self):
+        self.lvProgressLog.controls.append(
+                ft.Row(
+                    [
+                        ft.Icon(ft.icons.ERROR_OUTLINED,
+                                color=ft.colors.ERROR),
+                        ft.Text(
+                            value='ジョブの実行要求に失敗しました。',
+                            theme_style=ft.TextThemeStyle.BODY_LARGE,
+                            color=ft.colors.SECONDARY
+                        ),
+                    ]
+                )
+            )
+
+        try:
+            self.scheduler.remove_job(self.scheduler_job_id)
+            self.scheduler.pause()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        self.btnExit.disabled = False
+        self.lvProgressLog.update()
+        self.btnExit.update()
 
     @Logging.func_logger
     def exit_clicked(self, e):

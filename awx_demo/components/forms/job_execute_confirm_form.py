@@ -170,7 +170,6 @@ class JobExecuteConfirmForm(ft.Card):
             self.session.set('job_id', job_id)
             IaasRequestHelper.update_job_id(
                 db_session, self.session.get('document_id'), job_id)
-        else:
-            pass
-        db_session.close()
+            db_session.close()
+
         self.step_change_next(e)

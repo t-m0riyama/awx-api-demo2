@@ -179,8 +179,7 @@ class SendRequestConfirmForm(ft.Card):
                 self.session.set('job_id', job_id)
                 IaasRequestHelper.update_job_id(
                     db_session, self.session.get('document_id'), job_id)
-            else:
-                pass
+            db_session.close()
         else:
             try:
                 self.add_request(job_options, RequestStatus.START)
