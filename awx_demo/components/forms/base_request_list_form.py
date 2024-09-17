@@ -377,11 +377,13 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_request_edit_open(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self.session.set("request_id", e.control.content.value)
         self.open_edit_request_dialog()
 
     @Logging.func_logger
     def on_change_request_status(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         match e.control.text:
             case RequestStatus.START_FRIENDLY:
                 request_status = RequestStatus.START
@@ -395,23 +397,28 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_change_request_iaas_user(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         RequestRowHelper.update_selected_request_iaas_user(self, e.control.text)
 
     @Logging.func_logger
     def on_click_heading_column(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         RequestRowHelper.sort_column(self, self.session, e.control.label.value)
         self.deactivate_action_button()
 
     @Logging.func_logger
     def on_selected_delete(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self.open_delete_confirm_dialog()
 
     @Logging.func_logger
     def on_click_add_request(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self.open_add_request_dialog()
 
     @Logging.func_logger
     def on_click_delete_request_yes(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm): return
         RequestRowHelper.delete_selected_requests(self)
         self.dlgDeleteConfirm.open = False
         self.page.update()
@@ -419,11 +426,13 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_delete_request_cancel(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm): return
         self.dlgDeleteConfirm.open = False
         self.page.update()
 
     @Logging.func_logger
     def on_click_edit_request_save(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgEditRequest): return
         RequestRowHelper.update_request(self.session)
         self.dlgEditRequest.open = False
         self.page.update()
@@ -431,6 +440,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_next_page(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         request_data_count = RequestRowHelper.count_request_all(self)
         if (self.data_row_offset + 1) < request_data_count:
             self.data_row_offset += self.DATA_ROW_MAX
@@ -438,12 +448,14 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_previous_page(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         if (self.data_row_offset + 1) > self.DATA_ROW_MAX:
             self.data_row_offset -= self.DATA_ROW_MAX
             self.refresh()
 
     @Logging.func_logger
     def on_click_search_request_text(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchRequestText.value)
         self.refresh()

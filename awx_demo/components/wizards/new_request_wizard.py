@@ -1,6 +1,7 @@
 import flet as ft
 
 from awx_demo.components.forms.create_request_form import CreateRequestForm
+from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.wizards.set_vm_cpu_memory_wizard import SetVmCpuMemoryWizard
 from awx_demo.utils.logging import Logging
 
@@ -43,6 +44,7 @@ class NewRequestWizard:
 
     @Logging.func_logger
     def on_click_cancel(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         if self.session.contains_key("job_options"):
             self.session.remove("job_options")
         self.wizard_dialog.open = False
@@ -50,6 +52,7 @@ class NewRequestWizard:
 
     @Logging.func_logger
     def on_click_next(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("new_request_wizard_step"):
             case "create_request":
                 match self.session.get("request_operation"):
@@ -69,6 +72,7 @@ class NewRequestWizard:
 
     @Logging.func_logger
     def on_click_previous(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("new_request_wizard_step"):
             case _:
                 Logging.error("undefined step!!!")

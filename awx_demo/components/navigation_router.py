@@ -8,6 +8,7 @@ from awx_demo.components.forms.deadline_request_list_form import DeadlineRequest
 from awx_demo.components.forms.latest_request_list_form import LatestRequestListForm
 from awx_demo.components.forms.my_activity_list_form import MyActivityListForm
 from awx_demo.components.forms.my_request_list_form import MyRequestListForm
+from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.sidebar import Sidebar
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.utils.logging import Logging
@@ -35,6 +36,7 @@ class NavigationRouter:
             self.dlgLogin.open = True
             self.page.update()
         else:
+            if SessionHelper.logout_if_session_expired(self.page, self.session): return
             self.dlgLogin.open = False
             if self.session.get('user_role') == UserRole.USER_ROLE:
                 match template_route.route:

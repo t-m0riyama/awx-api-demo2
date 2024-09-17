@@ -5,6 +5,7 @@ import flet as ft
 from awx_demo.components.forms.edit_request_form import EditRequestForm
 from awx_demo.components.forms.job_execute_confirm_form import JobExecuteConfirmForm
 from awx_demo.components.forms.job_progress_form import JobProgressForm
+from awx_demo.components.session_helper import SessionHelper
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.utils.doc_id_utils import DocIdUtils
@@ -77,6 +78,7 @@ class EditRequestWizard:
 
     @Logging.func_logger
     def on_click_next(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("edit_request_wizard_step"):
             case "edit_request":
                 self.session.set("edit_request_wizard_step", "job_execute_confirm")
@@ -111,6 +113,7 @@ class EditRequestWizard:
 
     @Logging.func_logger
     def on_click_previous(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("edit_request_wizard_step"):
             case "job_execute_confirm":
                 self.session.set("edit_request_wizard_step", "edit_request")
@@ -134,6 +137,7 @@ class EditRequestWizard:
 
     @Logging.func_logger
     def on_click_save(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         self._update_request()
         self.wizard_dialog.open = False
         self.page.update()
@@ -141,6 +145,7 @@ class EditRequestWizard:
 
     @Logging.func_logger
     def on_click_duplicate(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         self._duplicate_request()
         self.wizard_dialog.open = False
         self.page.update()
@@ -148,6 +153,7 @@ class EditRequestWizard:
 
     @Logging.func_logger
     def on_click_cancel(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         if self.session.contains_key("job_options"):
             self.session.remove("job_options")
         self.wizard_dialog.open = False

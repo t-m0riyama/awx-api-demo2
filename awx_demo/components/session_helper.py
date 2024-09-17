@@ -1,5 +1,8 @@
 import json
 
+import flet as ft
+
+from awx_demo.components.forms.session_timeout_confirm_form import SessionTimeoutConfirmForm
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.utils.logging import Logging
 
@@ -11,53 +14,39 @@ class SessionHelper:
     def clean_session(cls, session):
         cls.clean_request_from_session(session)
         cls.clean_wizard_steps(session)
-        session.remove("awx_loginid")
-        session.remove("awx_password")
-        session.remove("user_role")
+        cls._remove_session_key(session, "awx_loginid")
+        cls._remove_session_key(session, "awx_password")
+        cls._remove_session_key(session, "user_role")
+        cls._remove_session_key(session, "request_text_search_string")
 
     @staticmethod
     @Logging.func_logger
     def clean_wizard_steps(session):
-        if session.contains_key("edit_request_wizard_step"):
-            session.remove("edit_request_wizard_step")
-        if session.contains_key("new_request_wizard_step"):
-            session.remove("new_request_wizard_step")
+        SessionHelper._remove_session_key(session, "edit_request_wizard_step")
+        SessionHelper._remove_session_key(session, "new_request_wizard_step")
 
     @staticmethod
     @Logging.func_logger
     def dump_session(session):
-        for k in session.get_keys():
-            Logging.info(f"SESSION_DUMP / {k}: {session.get(k)}")
+        for session_key_name in session.get_keys():
+            Logging.info(f"SESSION_DUMP / {session_key_name}: {session.get(session_key_name)}")
 
     @staticmethod
     @Logging.func_logger
     def clean_request_from_session(session):
-        if session.contains_key("request_id"):
-            session.remove("request_id")
-        if session.contains_key("request_date"):
-            session.remove("request_date")
-        if session.contains_key("request_text"):
-            session.remove("request_text")
-        if session.contains_key("request_category"):
-            session.remove("request_category")
-        if session.contains_key("request_operation"):
-            session.remove("request_operation")
-        if session.contains_key("request_deadline"):
-            session.remove("request_deadline")
-        if session.contains_key("request_status"):
-            session.remove("request_status")
-        if session.contains_key("iaas_user"):
-            session.remove("iaas_user")
-        if session.contains_key("job_id"):
-            session.remove("job_id")
-        if session.contains_key("job_options"):
-            session.remove("job_options")
-        if session.contains_key("updated"):
-            session.remove("updated")
-        if session.contains_key("document_id"):
-            session.remove("document_id")
-        if session.contains_key("confirm_text"):
-            session.remove("confirm_text")
+        SessionHelper._remove_session_key(session, "request_date")
+        SessionHelper._remove_session_key(session, "request_text")
+        SessionHelper._remove_session_key(session, "request_category")
+        SessionHelper._remove_session_key(session, "request_operation")
+        SessionHelper._remove_session_key(session, "request_deadline")
+        SessionHelper._remove_session_key(session, "request_status")
+        SessionHelper._remove_session_key(session, "iaas_user")
+        SessionHelper._remove_session_key(session, "job_id")
+        SessionHelper._remove_session_key(session, "job_options")
+        SessionHelper._remove_session_key(session, "updated")
+        SessionHelper._remove_session_key(session, "document_id")
+        SessionHelper._remove_session_key(session, "confirm_text")
+
 
     @staticmethod
     @Logging.func_logger
@@ -76,3 +65,48 @@ class SessionHelper:
             session.set("job_id", request.job_id)
         session.set("job_options", json.loads(request.job_options))
         session.set("updated", request.updated)
+
+    @staticmethod
+    @Logging.func_logger
+    def is_valid_session(session):
+        if session.contains_key("awx_loginid"):
+            return True
+        else:
+            Logging.warning("SESSION_EXPIRED: awx_loginid is not set")
+            return False
+
+    @classmethod
+    @Logging.func_logger
+    def logout_if_session_expired(cls, page, session, old_dialog=None):
+        def _logout(cls):
+            page.close(dlgSessionTimeoutConfirm)
+            page.go("/login")
+            page.update()
+
+        formSessionTimeoutConfirm = SessionTimeoutConfirmForm(session, page)
+        dlgSessionTimeoutConfirm = ft.AlertDialog(
+            modal=True,
+            # title=ft.Text("セッションのタイムアウト"),
+            content=formSessionTimeoutConfirm,
+            actions=[
+                ft.FilledButton("はい", on_click=_logout)
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+
+        if not SessionHelper.is_valid_session(session):
+            SessionHelper.clean_session(session)
+            if old_dialog:
+                old_dialog.open = False
+            page.open(dlgSessionTimeoutConfirm)
+            dlgSessionTimeoutConfirm.open = True
+            page.update()
+            return True
+        else:
+            return False
+
+    @staticmethod
+    @Logging.func_logger
+    def _remove_session_key(session, key):
+        if session.contains_key(key):
+            session.remove(key)
