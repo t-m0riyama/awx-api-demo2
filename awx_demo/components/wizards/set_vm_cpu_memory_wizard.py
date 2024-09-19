@@ -6,6 +6,7 @@ from awx_demo.components.forms.select_target_form import SelectTargetForm
 from awx_demo.components.forms.send_request_confirm_form import SendRequestConfirmForm
 from awx_demo.components.forms.set_vm_cpu_form import SetVmCpuForm
 from awx_demo.components.forms.set_vm_memory_form import SetVmMemoryForm
+from awx_demo.components.session_helper import SessionHelper
 from awx_demo.utils.logging import Logging
 
 
@@ -28,6 +29,7 @@ class SetVmCpuMemoryWizard:
 
     @Logging.func_logger
     def on_click_cancel(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         if self.session.contains_key("job_options"):
             self.session.remove("job_options")
         self.wizard_dialog.open = False
@@ -35,6 +37,7 @@ class SetVmCpuMemoryWizard:
 
     @Logging.func_logger
     def on_click_next(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("new_request_wizard_step"):
             case "create_request":
                 self.session.set("new_request_wizard_step", "select_target")
@@ -113,6 +116,7 @@ class SetVmCpuMemoryWizard:
 
     @Logging.func_logger
     def on_click_previous(self, e):
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("new_request_wizard_step"):
             case "select_target":
                 self.session.set("new_request_wizard_step", "create_request")
