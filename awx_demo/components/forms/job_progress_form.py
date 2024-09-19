@@ -1,7 +1,9 @@
 import os
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import flet as ft
+from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from awx_demo.awx_api.awx_api_helper import AWXApiHelper
@@ -21,7 +23,11 @@ class JobProgressForm(ft.Card):
     BODY_HEIGHT = 250
     JOB_STATUS_CHECK_ID_PREFIX = 'job_status_check'
     JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT=3600
-    JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT=3
+    JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT=5
+    JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE = 0
+    JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE = 1
+    JOB_STATUS_CHECK_RESULT_EXECUABLE_TIMEOUT = 2
+
 
     def __init__(self, session, request_id, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
         self.session = session
@@ -78,18 +84,19 @@ class JobProgressForm(ft.Card):
         )
 
         self.scheduler_job_id = f'{self.JOB_STATUS_CHECK_ID_PREFIX}_{self.session.get("job_id")}'
-        check_timeout = int(os.getenv('RMX_JOB_STATUS_CHECK_TIMEOUT_SECS', self.JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT))
-        check_internal = int(os.getenv('RMX_JOB_STATUS_CHECK_INTERVAL_SECS', self.JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT))
+        self.check_timeout = int(os.getenv('RMX_JOB_STATUS_CHECK_TIMEOUT_SECS', self.JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT))
+        self.check_interval = int(os.getenv('RMX_JOB_STATUS_CHECK_INTERVAL_SECS', self.JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT))
 
         # ジョブがタイムアウトし、終了する時間を求める
         dt_now = datetime.now()
-        dt_delta = timedelta(seconds=check_timeout)
-        job_end_date = (dt_now + dt_delta).strftime('%Y-%m-%d %H:%M:%S')
-        Logging.info(f'JOB_TIMEOUT_DATE({self.scheduler_job_id}): {job_end_date}')
+        dt_delta = timedelta(seconds=self.check_timeout)
+        self.job_end_date = dt_now + dt_delta
+        job_end_date_str = (self.job_end_date).strftime('%Y-%m-%d %H:%M:%S')
+        Logging.info(f'JOB_TIMEOUT_DATE({self.scheduler_job_id}): {job_end_date_str}')
 
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_job(
-            self.refresh_progress, 'interval', seconds=check_internal, end_date=job_end_date, id=self.scheduler_job_id)
+            self.refresh_progress, 'interval', seconds=self.check_interval, end_date=job_end_date_str, id=self.scheduler_job_id)
         try:
             self.scheduler.start()
         except (KeyboardInterrupt, SystemExit):
@@ -140,16 +147,52 @@ class JobProgressForm(ft.Card):
                 self.pbJob.value += 0.1
         self.pbJob.update()
 
+        # ジョブの進捗状況の次回の確認が可能かどうかを判定
+        next_runnable = self._job_next_runnable()
+        if next_runnable == self.JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE:
+            return
+        elif next_runnable == self.JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE:
+            self._on_job_execution_failed()
+            return
+        elif next_runnable == self.JOB_STATUS_CHECK_RESULT_EXECUABLE_TIMEOUT:
+            self._on_job_status_timeout()
+            return
+
+    @Logging.func_logger
+    def _job_next_runnable(self):
+        jst  = ZoneInfo("Asia/Tokyo")
+        job = self.scheduler.get_job(self.scheduler_job_id)
+        if "next_run_time" not in dir(job):
+            return self.JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE
+
+        dt_next_check = job.next_run_time.replace(tzinfo=jst)
+        dt_end_time = self.job_end_date.replace(tzinfo=jst)
+        diff_date = (dt_end_time - dt_next_check).seconds - float(self.check_interval)
+
+        Logging.warning(f'NEXT: {dt_next_check}')
+        Logging.warning(f'END: {dt_end_time}')
+        Logging.warning(f'DIFF: {diff_date}')
+        if diff_date > 0:
+            return self.JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE
+        else:
+            return self.JOB_STATUS_CHECK_RESULT_EXECUABLE_TIMEOUT
+
     @Logging.func_logger
     def _on_job_status_completed(self):
         self.pbJob.value = 1.0
+        job_succeeded = True
         try:
             self.scheduler.remove_job(self.scheduler_job_id)
+            self.scheduler.pause()
+        except JobLookupError:
+            job_succeeded = False
+            Logging.warning(f'JOB_STATUS_CHECK: ビルトインスケジューラのジョブID({self.scheduler_job_id}) が見つかりません。実行可能な時間を超過した可能性があります。')
             self.scheduler.pause()
         except (KeyboardInterrupt, SystemExit):
             pass
 
-        self.lvProgressLog.controls.append(
+        if job_succeeded:
+            self.lvProgressLog.controls.append(
                 ft.Row(
                     [
                         ft.Icon(ft.icons.THUMB_UP_OUTLINED,
@@ -162,7 +205,7 @@ class JobProgressForm(ft.Card):
                     ]
                 )
             )
-        self.lvProgressLog.controls.append(
+            self.lvProgressLog.controls.append(
                 ft.TextButton(
                     'ジョブ出力の参照: ' +
                     self.session.get(
@@ -171,6 +214,48 @@ class JobProgressForm(ft.Card):
                         'awx_url') + '/#/jobs/playbook/{}/output'.format(self.session.get('job_id')),
                 ),
             )
+        else:
+            self.lvProgressLog.controls.append(
+                ft.Row(
+                    [
+                        ft.Icon(ft.icons.ERROR_OUTLINED,
+                                color=ft.colors.ERROR),
+                        ft.Text(
+                            value=f'{JobProgressForm._get_timestamp()} 処理は異常終了しました。実行可能な時間を超過した可能性があります。',
+                            theme_style=ft.TextThemeStyle.BODY_LARGE,
+                            color=ft.colors.SECONDARY
+                        ),
+                    ]
+                )
+            )
+        self.btnExit.disabled = False
+        self.lvProgressLog.update()
+        self.btnExit.update()
+
+    @Logging.func_logger
+    def _on_job_status_timeout(self):
+        try:
+            self.scheduler.remove_job(self.scheduler_job_id)
+            self.scheduler.pause()
+        except JobLookupError:
+            Logging.warning(f'JOB_STATUS_CHECK: ビルトインスケジューラのジョブID({self.scheduler_job_id}) が見つかりません。実行可能な時間を超過した可能性があります。')
+            self.scheduler.pause()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+
+        self.lvProgressLog.controls.append(
+            ft.Row(
+                [
+                    ft.Icon(ft.icons.ERROR_OUTLINED,
+                            color=ft.colors.ERROR),
+                    ft.Text(
+                        value=f'{JobProgressForm._get_timestamp()} ジョブの実行可能時間を超過しました。',
+                        theme_style=ft.TextThemeStyle.BODY_LARGE,
+                        color=ft.colors.SECONDARY
+                    ),
+                ]
+            )
+        )
         self.btnExit.disabled = False
         self.lvProgressLog.update()
         self.btnExit.update()
@@ -217,6 +302,31 @@ class JobProgressForm(ft.Card):
                                 color=ft.colors.ERROR),
                         ft.Text(
                             value=f'{JobProgressForm._get_timestamp()} ジョブの実行要求に失敗しました。',
+                            theme_style=ft.TextThemeStyle.BODY_LARGE,
+                            color=ft.colors.SECONDARY
+                        ),
+                    ]
+                )
+            )
+
+        try:
+            self.scheduler.remove_job(self.scheduler_job_id)
+            self.scheduler.pause()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        self.btnExit.disabled = False
+        self.lvProgressLog.update()
+        self.btnExit.update()
+
+    @Logging.func_logger
+    def _on_job_execution_failed(self):
+        self.lvProgressLog.controls.append(
+                ft.Row(
+                    [
+                        ft.Icon(ft.icons.ERROR_OUTLINED,
+                                color=ft.colors.ERROR),
+                        ft.Text(
+                            value=f'{JobProgressForm._get_timestamp()} ジョブの実行中にエラーが発生しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
                             color=ft.colors.SECONDARY
                         ),
