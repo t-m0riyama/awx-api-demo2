@@ -52,6 +52,12 @@ services:
       # Teams Webhookを利用した通知を行う際のメッセージ形式 (adaptive_card, message_card)
       - RMX_TEAMS_MESSAGE_FORMAT=message_card
 
+      # ジョブのステータスチェックのタイムアウト（sec）
+      - RMX_JOB_STATUS_CHECK_TIMEOUT_SECS=3600
+
+      # ジョブのステータスチェック間隔（sec）
+      - RMX_JOB_STATUS_CHECK_INTERVAL_SECS=5
+
       # ログを出力するディレクトリ
       - RMX_LOG_DIR=/app/log
 
