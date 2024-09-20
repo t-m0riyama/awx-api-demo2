@@ -89,7 +89,7 @@ class SessionHelper:
             # title=ft.Text("セッションのタイムアウト"),
             content=formSessionTimeoutConfirm,
             actions=[
-                ft.FilledButton("はい", on_click=_logout)
+                ft.FilledButton("OK", on_click=_logout)
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
