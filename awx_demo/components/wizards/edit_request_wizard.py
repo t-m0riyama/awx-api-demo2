@@ -92,7 +92,6 @@ class EditRequestWizard:
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self._update_request()
                 self.wizard_dialog.content = formStep
                 self.page.open(self.wizard_dialog)
             case "job_execute_confirm":
@@ -105,6 +104,7 @@ class EditRequestWizard:
                     body_height=self.BODY_HEIGHT - 70,
                     step_change_exit=self.on_click_cancel,
                 )
+                self._update_request()
                 self.wizard_dialog.content = formStep
                 self.page.open(self.wizard_dialog)
             case _:
