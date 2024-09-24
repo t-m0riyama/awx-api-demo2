@@ -135,17 +135,19 @@ class JobProgressForm(ft.Card):
             session=self.session,
         )
         db_session.close()
+
         if job_status == AWXApiHelper.JOB_STATUS_SUCCEEDED:
             self._on_job_status_completed()
             IaasRequestHelper.update_request_status(db.get_db(), self.session.get(
                 'document_id'), RequestStatus.COMPLETED, self.session)
-        elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
-            self._on_job_status_request_failed()
-
-        if job_status == AWXApiHelper.JOB_STATUS_RUNNING:
+            self.pbJob.update()
+            return
+        elif job_status == AWXApiHelper.JOB_STATUS_RUNNING:
             if self.pbJob.value < 0.9:
                 self.pbJob.value += 0.1
-        self.pbJob.update()
+            self.pbJob.update()
+        elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
+            self._on_job_status_request_failed()
 
         # ジョブの進捗状況の次回の確認が可能かどうかを判定
         next_runnable = self._job_next_runnable()
@@ -169,27 +171,17 @@ class JobProgressForm(ft.Card):
         dt_end_time = self.job_end_date.replace(tzinfo=jst)
         diff_date = (dt_end_time - dt_next_check).seconds - float(self.check_interval)
 
-        Logging.warning(f'NEXT: {dt_next_check}')
-        Logging.warning(f'END: {dt_end_time}')
-        Logging.warning(f'DIFF: {diff_date}')
         if diff_date > 0:
+            Logging.info(f"JOB_NEXT_RUN / TIMEOUT / DIFF: {dt_next_check.strftime('%Y-%m-%d %H:%M:%S')} / {dt_end_time.strftime('%Y-%m-%d %H:%M:%S')} / {diff_date}")
             return self.JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE
         else:
+            Logging.warning(f"JOB_NEXT_RUN / TIMEOUT / DIFF: {dt_next_check.strftime('%Y-%m-%d %H:%M:%S')} / {dt_end_time.strftime('%Y-%m-%d %H:%M:%S')} / {diff_date}")
             return self.JOB_STATUS_CHECK_RESULT_EXECUABLE_TIMEOUT
 
     @Logging.func_logger
     def _on_job_status_completed(self):
         self.pbJob.value = 1.0
-        job_succeeded = True
-        try:
-            self.scheduler.remove_job(self.scheduler_job_id)
-            self.scheduler.pause()
-        except JobLookupError:
-            job_succeeded = False
-            Logging.warning(f'JOB_STATUS_CHECK: ビルトインスケジューラのジョブID({self.scheduler_job_id}) が見つかりません。実行可能な時間を超過した可能性があります。')
-            self.scheduler.pause()
-        except (KeyboardInterrupt, SystemExit):
-            pass
+        job_succeeded = self._stop_job_and_scheduler()
 
         if job_succeeded:
             self.lvProgressLog.controls.append(
@@ -234,15 +226,7 @@ class JobProgressForm(ft.Card):
 
     @Logging.func_logger
     def _on_job_status_timeout(self):
-        try:
-            self.scheduler.remove_job(self.scheduler_job_id)
-            self.scheduler.pause()
-        except JobLookupError:
-            Logging.warning(f'JOB_STATUS_CHECK: ビルトインスケジューラのジョブID({self.scheduler_job_id}) が見つかりません。実行可能な時間を超過した可能性があります。')
-            self.scheduler.pause()
-        except (KeyboardInterrupt, SystemExit):
-            pass
-
+        self._stop_job_and_scheduler()
         self.lvProgressLog.controls.append(
             ft.Row(
                 [
@@ -262,11 +246,7 @@ class JobProgressForm(ft.Card):
 
     @Logging.func_logger
     def _on_job_status_request_failed(self):
-        try:
-            self.scheduler.remove_job(self.scheduler_job_id)
-            self.scheduler.pause()
-        except (KeyboardInterrupt, SystemExit):
-            pass
+        self._stop_job_and_scheduler()
         self.lvProgressLog.controls.append(
                 ft.Row(
                     [
@@ -309,11 +289,7 @@ class JobProgressForm(ft.Card):
                 )
             )
 
-        try:
-            self.scheduler.remove_job(self.scheduler_job_id)
-            self.scheduler.pause()
-        except (KeyboardInterrupt, SystemExit):
-            pass
+        self._stop_job_and_scheduler()
         self.btnExit.disabled = False
         self.lvProgressLog.update()
         self.btnExit.update()
@@ -334,14 +310,24 @@ class JobProgressForm(ft.Card):
                 )
             )
 
-        try:
-            self.scheduler.remove_job(self.scheduler_job_id)
-            self.scheduler.pause()
-        except (KeyboardInterrupt, SystemExit):
-            pass
+        self._stop_job_and_scheduler()
         self.btnExit.disabled = False
         self.lvProgressLog.update()
         self.btnExit.update()
+
+    @Logging.func_logger
+    def _stop_job_and_scheduler(self):
+        job_succeeded = True
+        try:
+            self.scheduler.remove_job(self.scheduler_job_id)
+            self.scheduler.pause()
+        except JobLookupError:
+            job_succeeded = False
+            self.scheduler.pause()
+            Logging.warning(f'JOB_AND_SCHEDULER_STOP: ビルトインスケジューラのジョブID({self.scheduler_job_id}) が見つかりません。実行可能な時間を超過した可能性があります。')
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        return job_succeeded
 
     @staticmethod
     @Logging.func_logger
