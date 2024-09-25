@@ -50,10 +50,12 @@ class SendRequestConfirmForm(ft.Card):
         self.checkShutdownBeforeChange = ft.Checkbox(
             label='設定変更前に、仮想マシンを停止する',
             value=bool(strtobool(str(self.session.get('job_options')['shutdown_before_change']))) if 'shutdown_before_change' in self.session.get('job_options') else True,
+            on_change=self.on_change_shutdown_before_change,
         )
         self.checkStartupAfterChange = ft.Checkbox(
             label='設定変更後に、仮想マシンを起動する',
             value=bool(strtobool(str(self.session.get('job_options')['startup_after_change']))) if 'startup_after_change' in self.session.get('job_options') else True,
+            on_change=self.on_change_startup_after_change,
         )
         self.checkExecuteJobImmediately = ft.Checkbox(
             label='この変更作業をすぐに実行する', value=False, disabled=execute_disabled)
@@ -189,3 +191,11 @@ class SendRequestConfirmForm(ft.Card):
                 Logging.error(ex)
 
         self.step_change_next(e)
+
+    @Logging.func_logger
+    def on_change_shutdown_before_change(self, e):
+        self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
+
+    @Logging.func_logger
+    def on_change_startup_after_change(self, e):
+        self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
