@@ -196,9 +196,9 @@ class IaasRequestHelper:
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
         # 更新前のIaaS作業担当者を取得
-        iaas_user_current = request.iaas_user
+        iaas_user_old = request.iaas_user
 
-        if iaas_user_current != iaas_user:
+        if iaas_user_old != iaas_user:
             request.iaas_user = iaas_user
             detail = IaasRequestReportHelper.generate_request_detail(request)
             db_session.commit()
@@ -211,7 +211,7 @@ class IaasRequestHelper:
                 request_operation=request.request_operation,
                 request_text=request.request_text,
                 request_deadline=request.request_deadline,
-                additional_info='({} -> {})'.format(iaas_user_current, iaas_user),
+                additional_info='({} -> {})'.format(iaas_user_old, iaas_user),
                 detail=detail,
                 is_succeeded=True,
             )

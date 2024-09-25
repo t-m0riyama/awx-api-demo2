@@ -148,13 +148,6 @@ class JobExecuteConfirmForm(ft.Card):
         self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
         job_options = self._generate_job_options()
 
-        try:
-            if not self.session.get('document_id'):
-                self._add_request(job_options, RequestStatus.APPLYING)
-        except Exception as ex:
-            Logging.error('failed to insert record ')
-            Logging.error(ex)
-
         db_session = db.get_db()
         request = IaasRequestHelper.get_request(db_session, self.session.get('document_id'))
         job_id = AWXApiHelper.start_job(
@@ -173,7 +166,7 @@ class JobExecuteConfirmForm(ft.Card):
             self.session.set('job_id', job_id)
             IaasRequestHelper.update_job_id(
                 db_session, self.session.get('document_id'), job_id)
-            db_session.close()
+        db_session.close()
 
         self.step_change_next(e)
 

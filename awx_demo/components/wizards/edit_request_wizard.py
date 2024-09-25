@@ -63,6 +63,8 @@ class EditRequestWizard:
         db_session.close()
 
     def _update_request(self):
+        if self.session.get("iaas_user") is None:
+            self.session.set("iaas_user", self.session.get("awx_loginid"))
         db_session = db.get_db()
         IaasRequestHelper.update_request(
             db_session=db_session,
