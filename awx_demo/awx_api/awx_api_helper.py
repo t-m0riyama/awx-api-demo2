@@ -116,7 +116,7 @@ class AWXApiHelper:
 
             Logging.info('AWX_LAUNCH_URL: ' + launch_url)
             Logging.info('AWX_LAUNCH_VARS: ' + vars_json)
-            detail = IaasRequestReportHelper.generate_request_detail(request)
+            detail = IaasRequestReportHelper.generate_request_detail(request, job_options)
             response = requests.post(launch_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False, data=vars_json)
             if response.status_code == 201:

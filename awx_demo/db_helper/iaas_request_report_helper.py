@@ -92,9 +92,12 @@ class IaasRequestReportHelper:
 
     @classmethod
     @Logging.func_logger
-    def generate_request_detail(cls, request):
+    def generate_request_detail(cls, request, job_options=None):
         request_report = copy.deepcopy(request)
-        request_report.job_options = json.loads(request_report.job_options)
+        if job_options is not None:
+            request_report.job_options = json.loads(job_options)
+        else:
+            request_report.job_options = json.loads(request_report.job_options)
         return "\n== 申請内容の詳細一覧 =============\n" + cls.to_friendly_request(vars(request_report))
 
     @classmethod

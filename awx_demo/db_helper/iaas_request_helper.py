@@ -31,7 +31,7 @@ class IaasRequestHelper:
             job_options=job_options,
             request_status=request_status,
         )
-        detail = IaasRequestReportHelper.generate_request_detail(request)
+        detail = IaasRequestReportHelper.generate_request_detail(request, job_options)
         db_session.add(request)
         db_session.commit()
 
@@ -99,9 +99,9 @@ class IaasRequestHelper:
         diff_changed = IaasRequestReportHelper.generate_diff_request(request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old)
         if diff_changed:
             diff_changed_friendly = "\n== 変更内容の詳細 =============\n" + IaasRequestReportHelper.to_friendly_request(diff_changed)
-            detail = diff_changed_friendly + IaasRequestReportHelper.generate_request_detail(request)
+            detail = diff_changed_friendly + IaasRequestReportHelper.generate_request_detail(request, job_options)
         else:
-            detail = IaasRequestReportHelper.generate_request_detail(request)
+            detail = IaasRequestReportHelper.generate_request_detail(request, job_options)
         db_session.commit()
 
         if diff_changed:
