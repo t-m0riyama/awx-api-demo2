@@ -1,4 +1,5 @@
 import json
+from distutils.util import strtobool
 
 import flet as ft
 
@@ -45,11 +46,11 @@ class JobExecuteConfirmForm(ft.Card):
         )
         self.checkShutdownBeforeChange = ft.Checkbox(
             label='設定変更前に、仮想マシンを停止する',
-            value=self.session.get('job_options')['shutdown_before_change'] if 'shutdown_before_change' in self.session.get('job_options') else True,
+            value=bool(strtobool(str(self.session.get('job_options')['shutdown_before_change']))) if 'shutdown_before_change' in self.session.get('job_options') else True,
         )
         self.checkStartupAfterChange = ft.Checkbox(
             label='設定変更後に、仮想マシンを起動する',
-            value=self.session.get('job_options')['startup_after_change'] if 'startup_after_change' in self.session.get('job_options') else True,
+            value=bool(strtobool(str(self.session.get('job_options')['startup_after_change']))) if 'startup_after_change' in self.session.get('job_options') else True,
         )
         self.btnNext = ft.ElevatedButton(
             '実行', on_click=self.on_click_send_request)
@@ -98,7 +99,7 @@ class JobExecuteConfirmForm(ft.Card):
         super().__init__(controls)
 
     @Logging.func_logger
-    def generate_job_options(self):
+    def _generate_job_options(self):
         target_options = [
             'vsphere_cluster',
             'target_vms',
@@ -113,7 +114,7 @@ class JobExecuteConfirmForm(ft.Card):
         return job_options
 
     @Logging.func_logger
-    def add_request(self, job_options, request_status):
+    def _add_request(self, job_options, request_status):
         document_id = DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH)
         self.session.set('document_id', document_id)
         db_session = db.get_db()
@@ -141,13 +142,13 @@ class JobExecuteConfirmForm(ft.Card):
 
     @Logging.func_logger
     def on_click_send_request(self, e):
-        self.session.get('job_options')['shutdown_before_change'] = self.checkShutdownBeforeChange.value
-        self.session.get('job_options')['startup_after_change'] = self.checkStartupAfterChange.value
-        job_options = self.generate_job_options()
+        self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
+        self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
+        job_options = self._generate_job_options()
 
         try:
             if not self.session.get('document_id'):
-                self.add_request(job_options, RequestStatus.APPLYING)
+                self._add_request(job_options, RequestStatus.APPLYING)
         except Exception as ex:
             Logging.error('failed to insert record ')
             Logging.error(ex)

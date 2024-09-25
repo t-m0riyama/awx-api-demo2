@@ -1,4 +1,5 @@
 import json
+from distutils.util import strtobool
 
 import flet as ft
 
@@ -48,11 +49,11 @@ class SendRequestConfirmForm(ft.Card):
             'user_role') == UserRole.USER_ROLE else False
         self.checkShutdownBeforeChange = ft.Checkbox(
             label='設定変更前に、仮想マシンを停止する',
-            value=self.session.get('job_options')['shutdown_before_change'] if 'shutdown_before_change' in self.session.get('job_options') else True,
+            value=bool(strtobool(str(self.session.get('job_options')['shutdown_before_change']))) if 'shutdown_before_change' in self.session.get('job_options') else True,
         )
         self.checkStartupAfterChange = ft.Checkbox(
             label='設定変更後に、仮想マシンを起動する',
-            value=self.session.get('job_options')['startup_after_change'] if 'startup_after_change' in self.session.get('job_options') else True,
+            value=bool(strtobool(str(self.session.get('job_options')['startup_after_change']))) if 'startup_after_change' in self.session.get('job_options') else True,
         )
         self.checkExecuteJobImmediately = ft.Checkbox(
             label='この変更作業をすぐに実行する', value=False, disabled=execute_disabled)
@@ -104,7 +105,7 @@ class SendRequestConfirmForm(ft.Card):
         super().__init__(controls)
 
     @Logging.func_logger
-    def generate_job_options(self):
+    def _generate_job_options(self):
         target_options = [
             'vsphere_cluster',
             'target_vms',
@@ -119,7 +120,7 @@ class SendRequestConfirmForm(ft.Card):
         return job_options
 
     @Logging.func_logger
-    def add_request(self, job_options, request_status):
+    def _add_request(self, job_options, request_status):
         document_id = DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH)
         self.session.set('document_id', document_id)
         db_session = db.get_db()
@@ -147,15 +148,15 @@ class SendRequestConfirmForm(ft.Card):
 
     @Logging.func_logger
     def on_click_send_request(self, e):
-        self.session.get('job_options')['shutdown_before_change'] = self.checkShutdownBeforeChange.value
-        self.session.get('job_options')['startup_after_change'] = self.checkStartupAfterChange.value
-        job_options = self.generate_job_options()
+        self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
+        self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
+        job_options = self._generate_job_options()
 
         if self.checkExecuteJobImmediately.value:
             self.session.set('execute_job_immediately', True)
 
             try:
-                self.add_request(job_options, RequestStatus.APPLYING)
+                self._add_request(job_options, RequestStatus.APPLYING)
             except Exception as ex:
                 Logging.error('failed to insert record ')
                 Logging.error(ex)
@@ -182,7 +183,7 @@ class SendRequestConfirmForm(ft.Card):
             db_session.close()
         else:
             try:
-                self.add_request(job_options, RequestStatus.START)
+                self._add_request(job_options, RequestStatus.START)
             except Exception as ex:
                 Logging.error('failed to insert record ')
                 Logging.error(ex)
