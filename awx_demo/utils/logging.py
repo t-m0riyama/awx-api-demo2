@@ -42,14 +42,14 @@ class Logging(object):
     def func_logger(cls, func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            if strtobool(os.getenv('RMX_FUNC_LOGGER_ENABLED', 'True')):
+            if bool(strtobool(os.getenv('RMX_FUNC_LOGGER_ENABLED', 'True'))):
                 func_name_str = func.__name__
                 # class/moduleのメソッドである場合は、クラス/モジュール名も出力する
                 if hasattr(func, '__module__'):
                     func_name_str = f"{func.__module__}.{func.__name__}"
 
                 # RMX_FUNC_LOGGER_ARGS_OUTPUTが'True'の場合は、引数を出力する
-                if strtobool(os.getenv('RMX_FUNC_LOGGER_ARGS_OUTPUT', 'False')):
+                if bool(strtobool(os.getenv('RMX_FUNC_LOGGER_ARGS_OUTPUT', 'False'))):
                     args_dict = cls._args_to_str(args)
                     cls.info(f"FUNC_CALLED / {func_name_str}: start (args_id={id(args)}, args = \n{pprint.pformat(args_dict)})")
                 else:
