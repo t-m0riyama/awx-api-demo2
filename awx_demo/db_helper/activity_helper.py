@@ -7,11 +7,11 @@ from awx_demo.utils.logging import Logging
 class ActivityHelper:
 
     class ActivitySpec:
-        def __init__(self, db_session=None, user=None, request_id=None, event_type=None, status=None, summary=None, detail=None):
+        def __init__(self, db_session=None, user=None, request_id=None, activity_type=None, status=None, summary=None, detail=None):
             self.db_session = db_session
             self.user = user
             self.request_id = request_id
-            self.event_type = event_type
+            self.activity_type = activity_type
             self.status = status
             self.summary = summary
             self.detail = detail
@@ -24,7 +24,7 @@ class ActivityHelper:
         request = base.Activity(
             user=activity_spec.user,
             request_id=activity_spec.request_id,
-            activity_type=activity_spec.event_type,
+            activity_type=activity_spec.activity_type,
             status=activity_spec.status,
             summary=activity_spec.summary,
             detail=activity_spec.detail,
@@ -74,8 +74,8 @@ class ActivityHelper:
 
     @staticmethod
     @Logging.func_logger
-    def get_filter_event_type(event_type):
-        return and_(base.Activity.event_type == event_type) if event_type else None
+    def get_filter_activity_type(activity_type):
+        return and_(base.Activity.activity_type == activity_type) if activity_type else None
 
     @staticmethod
     @Logging.func_logger
@@ -89,8 +89,8 @@ class ActivityHelper:
 
     @staticmethod
     @Logging.func_logger
-    def get_orderspec_event_type(is_asc):
-        return asc(base.Activity.event_type) if is_asc else desc(base.Activity.event_type)
+    def get_orderspec_activity_type(is_asc):
+        return asc(base.Activity.activity_type) if is_asc else desc(base.Activity.activity_type)
 
     @staticmethod
     @Logging.func_logger

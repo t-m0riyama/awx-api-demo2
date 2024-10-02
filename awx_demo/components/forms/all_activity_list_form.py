@@ -27,6 +27,6 @@ class AllActivityListForm(BaseActivityListForm):
             filters.append(ActivityHelper.get_filter_user(
                 self.session.get('filter_activity_user')))
         if self.session.get('filter_activity_type') and self.session.get('filter_activity_type') != 'すべての操作':
-            filters.append(ActivityHelper.get_filter_event_type(
+            filters.append(ActivityHelper.get_filter_activity_type(
                 EventType.to_formal(self.session.get('filter_activity_type'))))
         return filters

@@ -137,7 +137,7 @@ class LoginForm(ft.Card):
             activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
-                event_type=EventType.LOGIN,
+                activity_type=EventType.LOGIN,
                 status=EventStatus.FAILED,
                 summary="ログインに失敗しました。認証に失敗しました。ログインIDとパスワードを確認して下さい。",
                 detail="",
@@ -155,7 +155,7 @@ class LoginForm(ft.Card):
             activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
-                event_type=EventType.LOGIN,
+                activity_type=EventType.LOGIN,
                 status=EventStatus.FAILED,
                 summary="ログインに失敗しました。指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。",
                 detail="",
@@ -171,7 +171,7 @@ class LoginForm(ft.Card):
             activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
-                event_type=EventType.LOGIN,
+                activity_type=EventType.LOGIN,
                 status=EventStatus.SUCCEED,
                 summary="ログインに成功しました。{}ロールが付与されました。".format(
                     self.session.get("user_role")

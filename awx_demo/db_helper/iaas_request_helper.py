@@ -342,7 +342,7 @@ class IaasRequestHelper:
             db_session=db_session,
             user=user,
             request_id=request_id,
-            event_type=event_type,
+            activity_type=event_type,
             status=status,
             summary=summary,
             detail=detail,

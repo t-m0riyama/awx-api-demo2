@@ -72,7 +72,7 @@ class AppHeader(ft.Row):
         activity_spec = ActivityHelper.ActivitySpec(
             user=self.session.get("awx_loginid"),
             request_id="",
-            event_type=EventType.LOGOUT,
+            activity_type=EventType.LOGOUT,
             status=EventStatus.SUCCEED,
             summary="ログアウトに成功しました。",
             detail="",

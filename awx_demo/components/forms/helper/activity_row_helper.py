@@ -122,7 +122,7 @@ class ActivityRowHelper:
                 orderspec = ActivityHelper.get_orderspec_user(
                     activity_list_form.dtActivities.sort_ascending)
             case '操作種別':
-                orderspec = ActivityHelper.get_orderspec_event_type(
+                orderspec = ActivityHelper.get_orderspec_activity_type(
                     activity_list_form.dtActivities.sort_ascending)
             case '依頼ID':
                 orderspec = ActivityHelper.get_orderspec_request_id(
