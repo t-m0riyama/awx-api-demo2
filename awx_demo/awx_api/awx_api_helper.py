@@ -35,8 +35,8 @@ class AWXApiHelper:
         try:
             response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
-            Logging.info('AWX_LOGIN_URL: ' + request_url)
-            Logging.info('AWX_LOGIN_STATUS: ' + str(response.status_code))
+            Logging.info(f'AWX_LOGIN_URL: {request_url}')
+            Logging.info(f'AWX_LOGIN_STATUS: {str(response.status_code)} / {request_url}')
             if response.status_code == 200:
                 return True
             else:
@@ -57,15 +57,17 @@ class AWXApiHelper:
                 Logging.error("Failed to retrieve information for user")
                 return False
 
-            Logging.info('AWX_TEAMS_URL: ' +
-                jmespath.search("results[0].related.teams", response_me.json()))
             teams_url = uri_base + \
                 jmespath.search("results[0].related.teams", response_me.json())
+            Logging.info(f'AWX_TEAMS_URL: {teams_url}')
             response_teams = requests.get(
                 teams_url, headers=headers, auth=HTTPBasicAuth(loginid, password), verify=False)
+
             if response_teams.status_code != 200:
+                Logging.error(f'AWX_TEAMS_STATUS: {response_teams.status_code} / {teams_url}')
                 Logging.error("Failed to retrieve information for teams")
                 return False
+            Logging.info(f'AWX_TEAMS_STATUS: {response_teams.status_code} / {teams_url}')
 
             teams = []
             for team_name in jmespath.search("results[].name", response_teams.json()):
@@ -111,17 +113,16 @@ class AWXApiHelper:
                 '/api/v2/job_templates/{}/launch/'.format(job_template_id)
             # ジョブテンプレートが見つからない場合は、エラー終了
             if job_template_id == cls.JOB_TEMPLATE_ID_NOT_FOUND:
-                Logging.error('AWX_TEMPLATE_NOT_FOUND: ' + job_template_name)
+                Logging.error(f'AWX_TEMPLATE_NOT_FOUND: {job_template_name}')
                 return cls.JOB_LAUNCH_FAILED
 
-            Logging.info('AWX_LAUNCH_URL: ' + launch_url)
-            Logging.info('AWX_LAUNCH_VARS: ' + vars_json)
+            Logging.info(f'AWX_LAUNCH_URL: {launch_url}')
+            Logging.info(f'AWX_LAUNCH_VARS: {vars_json} / {launch_url}')
             detail = IaasRequestReportHelper.generate_request_detail(request, job_options)
             response = requests.post(launch_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False, data=vars_json)
             if response.status_code == 201:
                 response_results = jmespath.search('job', response.json())
-                Logging.info('AWX_JOB_ID: ' + str(response_results))
                 cls._emit_event_on_start_job(
                     db_session=db.get_db(),
                     user=session.get('awx_loginid'),
@@ -133,8 +134,9 @@ class AWXApiHelper:
                     detail=detail,
                     is_succeeded=True,
                 )
-                Logging.info('AWX_LAUNCH_STATUS: {}'.format(response.status_code))
-                Logging.info('AWX_LAUNCH_RESPONSE: {}'.format(response.text))
+                Logging.info(f'AWX_LAUNCH_STATUS: {response.status_code} / {launch_url}')
+                Logging.info(f'AWX_LAUNCH_JOB_ID: {str(response_results)} / {launch_url}')
+                # Logging.info(f'AWX_LAUNCH_RESPONSE: {response.text} / {launch_url}')
                 return response_results
             else:
                 cls._emit_event_on_start_job(
@@ -148,10 +150,11 @@ class AWXApiHelper:
                     detail=detail,
                     is_succeeded=False,
                 )
-                Logging.error('AWX_LAUNCH_STATUS: {}'.format(response.status_code))
-                Logging.error('AWX_LAUNCH_RESPONSE: {}'.format(response.text))
+                Logging.error(f'AWX_LAUNCH_STATUS: {response.status_code} / {launch_url}')
+                Logging.error(f'AWX_LAUNCH_RESPONSE: {response.text} / {launch_url}')
                 return cls.JOB_LAUNCH_FAILED
         except Exception as e:
+            Logging.error(e)
             return cls.JOB_LAUNCH_CONNECTION_FAILED
 
     @classmethod
@@ -165,15 +168,18 @@ class AWXApiHelper:
         job_templates_url = uri_base + '/api/v2/job_templates/{}/'.format(job_template_name)
         headers = {'Content-Type': 'application/json'}
         try:
+            Logging.info(f'AWX_JOB_TEMPLATE_URL: {job_templates_url}')
             response = requests.get(job_templates_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
             if response.status_code == 200:
+                Logging.info(f'AWX_JOB_TEMPLATE_STATUS: {response.status_code} / {job_templates_url}')
+                Logging.info(f'AWX_JOB_TEMPLATE_ID: {(response.json())["id"]} / {job_templates_url}')
                 return (response.json())['id']
             else:
+                Logging.error(f'AWX_JOB_TEMPLATE_STATUS: {response.status_code} / {job_templates_url}')
                 return cls.JOB_TEMPLATE_ID_NOT_FOUND
         except Exception as e:
             Logging.error(e)
-            Logging.error('AWX_JOB_TEMPLATE_URL: ' + job_templates_url)
             return cls.JOB_TEMPLATE_ID_CONNECTION_FAILED
 
     @classmethod
@@ -181,16 +187,16 @@ class AWXApiHelper:
     def get_job_status(cls, uri_base, loginid, password, request, job_id, session):
         job_status_url = uri_base + '/api/v2/jobs/{}/'.format(job_id)
         headers = {'Content-Type': 'application/json'}
-        Logging.info('AWX_JOB_STATUS_URL: ' + job_status_url)
+        Logging.info(f'AWX_JOB_STATUS_URL: {job_status_url}')
         detail = IaasRequestReportHelper.generate_request_detail(request)
         try:
             response = requests.get(job_status_url, headers=headers, auth=HTTPBasicAuth(
                 loginid, password), verify=False)
-            Logging.info('AWX_JOB_STATUS_STATUS: ' + str(response.status_code))
+            Logging.info(f'AWX_JOB_STATUS_STATUS: {str(response.status_code)} / {job_status_url}')
             if response.status_code == 200:
                 job_status = jmespath.search('status', response.json())
                 job_status_succeed = True if job_status == cls.JOB_STATUS_SUCCEEDED else False
-                Logging.info('AWX_JOB_STATUS: ' + str(job_status))
+                Logging.info(f'AWX_JOB_STATUS: {str(job_status)} / {job_status_url}')
                 if job_status == cls.JOB_STATUS_SUCCEEDED or job_status == cls.JOB_STATUS_FAILED:
                     cls._emit_event_on_job_completed(
                         db_session=db.get_db(),
@@ -238,7 +244,7 @@ class AWXApiHelper:
             db_session=db_session,
             user=user,
             request_id=request_id,
-            event_type=event_type,
+            activity_type=event_type,
             status=status,
             summary=summary,
             detail=detail,
