@@ -16,7 +16,7 @@ from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
 
-class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
+class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     # const
     CONTENT_HEIGHT = 640
@@ -34,70 +34,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
         self.page = page
         self.data_row_offset = 0
         self.session.set("sort_target_column", self.DEFAULT_SORT_TARGET_COLUMN)
-        super().__init__()
 
-    @abc.abstractmethod
-    def get_query_filters(self):
-        pass
-
-    @Logging.func_logger
-    def activate_action_button(self):
-        # １件以上の申請が選択されていて、申請者以外のロールである場合、アクションメニューを有効化
-        self.btnActions.disabled = True
-        if self.session.get("user_role") != UserRole.USER_ROLE:
-            for row in self.dtRequests.rows:
-                if row.selected:
-                    self.btnActions.disabled = False
-                    break
-        self.btnActions.update()
-
-    @Logging.func_logger
-    def deactivate_action_button(self):
-        self.btnActions.disabled = True
-        self.btnActions.update()
-
-    @Logging.func_logger
-    def open_delete_confirm_dialog(self):
-        formDeleteConfirm = DeleteConfirmForm(self.session, self.page)
-        self.dlgDeleteConfirm = ft.AlertDialog(
-            modal=True,
-            # title=ft.Text("削除の確認"),
-            content=formDeleteConfirm,
-            actions=[
-                ft.ElevatedButton("はい", on_click=self.on_click_delete_request_yes),
-                ft.FilledButton(
-                    "キャンセル", on_click=self.on_click_delete_request_cancel
-                ),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-        )
-        self.page.open(self.dlgDeleteConfirm)
-        self.dlgDeleteConfirm.open = True
-        self.page.update()
-
-    @Logging.func_logger
-    def open_add_request_dialog(self):
-        SessionHelper.clean_request_from_session(self.session)
-        wzdNewRequest = NewRequestWizard(self.session, self.page, self.refresh)
-        wzdNewRequest.open_wizard()
-
-    @Logging.func_logger
-    def open_edit_request_dialog(self):
-        wzdEditRequest = EditRequestWizard(
-            session=self.session,
-            page=self.page,
-            parent_refresh_func=self.refresh,
-        )
-        wzdEditRequest.open_wizard()
-
-    @Logging.func_logger
-    def refresh(self):
-        RequestRowHelper.refresh_data_rows(self)
-        RequestRowHelper.refresh_page_indicator(self)
-        self.btnActions.disabled = True
-        self.btnActions.update()
-
-    def build(self):
         formTitle = FormTitle(self.FORM_TITLE, None)
         self.dtRequests = ft.DataTable(
             columns=[
@@ -351,7 +288,7 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
             height=self.BODY_HEIGHT,
         )
 
-        return ft.Container(
+        self.controls = ft.Container(
             ft.ResponsiveRow(
                 [
                     ft.Column(
@@ -368,21 +305,89 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
             height=self.CONTENT_HEIGHT,
             # padding=ft.padding.all(0),
         )
+        # self.controls = self.build_controls()
+        super().__init__(self.controls)
+
+    @abc.abstractmethod
+    def get_query_filters(self):
+        pass
+
+    @Logging.func_logger
+    def activate_action_button(self):
+        # １件以上の申請が選択されていて、申請者以外のロールである場合、アクションメニューを有効化
+        self.btnActions.disabled = True
+        if self.session.get("user_role") != UserRole.USER_ROLE:
+            for row in self.dtRequests.rows:
+                if row.selected:
+                    self.btnActions.disabled = False
+                    break
+        self.btnActions.update()
+
+    @Logging.func_logger
+    def deactivate_action_button(self):
+        self.btnActions.disabled = True
+        self.btnActions.update()
+
+    @Logging.func_logger
+    def open_delete_confirm_dialog(self):
+        formDeleteConfirm = DeleteConfirmForm(self.session, self.page)
+        self.dlgDeleteConfirm = ft.AlertDialog(
+            modal=True,
+            # title=ft.Text("削除の確認"),
+            content=formDeleteConfirm,
+            actions=[
+                ft.ElevatedButton("はい", on_click=self.on_click_delete_request_yes),
+                ft.FilledButton(
+                    "キャンセル", on_click=self.on_click_delete_request_cancel
+                ),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+        self.page.open(self.dlgDeleteConfirm)
+        self.dlgDeleteConfirm.open = True
+        self.page.update()
+
+    @Logging.func_logger
+    def open_add_request_dialog(self):
+        SessionHelper.clean_request_from_session(self.session)
+        wzdNewRequest = NewRequestWizard(self.session, self.page, self.refresh)
+        wzdNewRequest.open_wizard()
+
+    @Logging.func_logger
+    def open_edit_request_dialog(self):
+        wzdEditRequest = EditRequestWizard(
+            session=self.session,
+            page=self.page,
+            parent_refresh_func=self.refresh,
+        )
+        wzdEditRequest.open_wizard()
+
+    @Logging.func_logger
+    def refresh(self):
+        RequestRowHelper.refresh_data_rows(self)
+        RequestRowHelper.refresh_page_indicator(self)
+        self.btnActions.disabled = True
+        self.btnActions.update()
 
     @Logging.func_logger
     def on_request_row_select(self, e):
+        self._lock_form_controls()
         e.control.selected = not e.control.selected
         self.activate_action_button()
+        self._unlock_form_controls()
         e.control.update()
 
     @Logging.func_logger
     def on_request_edit_open(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self.session.set("request_id", e.control.content.value)
+        self._unlock_form_controls()
         self.open_edit_request_dialog()
 
     @Logging.func_logger
     def on_change_request_status(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         match e.control.text:
             case RequestStatus.START_FRIENDLY:
@@ -393,69 +398,103 @@ class BaseRequestListForm(ft.Column, metaclass=abc.ABCMeta):
                 request_status = RequestStatus.COMPLETED
             case _:
                 request_status = ""
+        self._unlock_form_controls()
         RequestRowHelper.update_selected_request_status(self, request_status)
 
     @Logging.func_logger
     def on_change_request_iaas_user(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
         RequestRowHelper.update_selected_request_iaas_user(self, e.control.text)
 
     @Logging.func_logger
     def on_click_heading_column(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
         RequestRowHelper.sort_column(self, self.session, e.control.label.value)
         self.deactivate_action_button()
 
     @Logging.func_logger
     def on_selected_delete(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
         self.open_delete_confirm_dialog()
 
     @Logging.func_logger
     def on_click_add_request(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
         self.open_add_request_dialog()
 
     @Logging.func_logger
     def on_click_delete_request_yes(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm): return
         RequestRowHelper.delete_selected_requests(self)
+        self._unlock_form_controls()
         self.dlgDeleteConfirm.open = False
         self.page.update()
         self.refresh()
 
     @Logging.func_logger
     def on_click_delete_request_cancel(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm): return
+        self._unlock_form_controls()
         self.dlgDeleteConfirm.open = False
         self.page.update()
 
     @Logging.func_logger
     def on_click_edit_request_save(self, e):
+        self._lock_form_controls()
+
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgEditRequest): return
         RequestRowHelper.update_request(self.session)
+        self._unlock_form_controls()
         self.dlgEditRequest.open = False
         self.page.update()
         self.refresh()
 
     @Logging.func_logger
     def on_click_next_page(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         request_data_count = RequestRowHelper.count_request_all(self)
+        self._unlock_form_controls()
         if (self.data_row_offset + 1) < request_data_count:
             self.data_row_offset += self.DATA_ROW_MAX
             self.refresh()
 
     @Logging.func_logger
     def on_click_previous_page(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
         if (self.data_row_offset + 1) > self.DATA_ROW_MAX:
             self.data_row_offset -= self.DATA_ROW_MAX
             self.refresh()
 
     @Logging.func_logger
     def on_click_search_request_text(self, e):
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchRequestText.value)
         self.refresh()
+
+    @Logging.func_logger
+    def _lock_form_controls(self):
+        # クリック連打対策
+        self.controls.disabled = True
+        self.controls.update()
+
+    @Logging.func_logger
+    def _unlock_form_controls(self):
+        # クリック連打対策解除
+        self.controls.disabled = False
+        self.controls.update()

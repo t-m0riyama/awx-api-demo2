@@ -13,7 +13,7 @@ from awx_demo.utils.event_helper import EventType
 from awx_demo.utils.logging import Logging
 
 
-class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
+class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
     # const
     CONTENT_HEIGHT = 640
@@ -31,17 +31,6 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
         self.page = page
         self.data_row_offset = 0
         self.session.set("sort_target_column", self.DEFAULT_SORT_TARGET_COLUMN)
-        super().__init__()
-
-    @abc.abstractmethod
-    def get_query_filters(self):
-        pass
-
-    def refresh(self):
-        ActivityRowHelper.refresh_data_rows(self)
-        ActivityRowHelper.refresh_page_indicator(self)
-
-    def build(self):
         formTitle = FormTitle(self.FORM_TITLE, None)
         self.dtActivities = ft.DataTable(
             columns=[
@@ -233,7 +222,7 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
             height=self.BODY_HEIGHT,
         )
 
-        return ft.Container(
+        self.controls = ft.Container(
             ft.ResponsiveRow(
                 [
                     ft.Column(
@@ -250,6 +239,15 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
             height=self.CONTENT_HEIGHT,
             # padding=ft.padding.all(0),
         )
+        super().__init__(self.controls)
+
+    @abc.abstractmethod
+    def get_query_filters(self):
+        pass
+
+    def refresh(self):
+        ActivityRowHelper.refresh_data_rows(self)
+        ActivityRowHelper.refresh_page_indicator(self)
 
     @Logging.func_logger
     def on_request_edit_open(self, e):
@@ -298,3 +296,15 @@ class BaseActivityListForm(ft.Column, metaclass=abc.ABCMeta):
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchSummary.value)
         self.refresh()
+
+    @Logging.func_logger
+    def _lock_form_controls(self):
+        # クリック連打対策
+        self.controls.disabled = True
+        self.controls.update()
+
+    @Logging.func_logger
+    def _unlock_form_controls(self):
+        # クリック連打対策解除
+        self.controls.disabled = False
+        self.controls.update()

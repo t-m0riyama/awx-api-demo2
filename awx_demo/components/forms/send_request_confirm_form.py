@@ -90,7 +90,7 @@ class SendRequestConfirmForm(ft.Card):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        controls = ft.Container(
+        self.controls = ft.Container(
             ft.Column(
                 [
                     header,
@@ -104,7 +104,7 @@ class SendRequestConfirmForm(ft.Card):
             height=self.content_height,
             padding=30,
         )
-        super().__init__(controls)
+        super().__init__(self.controls)
 
     @Logging.func_logger
     def _generate_job_options(self):
@@ -150,6 +150,8 @@ class SendRequestConfirmForm(ft.Card):
 
     @Logging.func_logger
     def on_click_send_request(self, e):
+        self._lock_form_controls()
+
         self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
         self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
         job_options = self._generate_job_options()
@@ -190,6 +192,7 @@ class SendRequestConfirmForm(ft.Card):
                 Logging.error('failed to insert record ')
                 Logging.error(ex)
 
+        self._unlock_form_controls()
         self.step_change_next(e)
 
     @Logging.func_logger
@@ -199,3 +202,15 @@ class SendRequestConfirmForm(ft.Card):
     @Logging.func_logger
     def on_change_startup_after_change(self, e):
         self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
+
+    @Logging.func_logger
+    def _lock_form_controls(self):
+        # クリック連打対策
+        self.controls.disabled = True
+        self.controls.update()
+
+    @Logging.func_logger
+    def _unlock_form_controls(self):
+        # クリック連打対策解除
+        self.controls.disabled = False
+        self.controls.update()
