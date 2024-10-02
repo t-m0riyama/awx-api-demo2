@@ -95,9 +95,14 @@ class IaasRequestReportHelper:
     def generate_request_detail(cls, request, job_options=None):
         request_report = copy.deepcopy(request)
         if job_options is not None:
-            request_report.job_options = json.loads(job_options)
+            if isinstance(job_options, dict):
+                # ディクショナリの場合
+                request_report.job_options = job_options
+            else:
+                # JSON文字列の場合
+                request_report.job_options = json.loads(job_options)
         else:
-            request_report.job_options = json.loads(request_report.job_options)
+            request_report.job_options = {}
         return "\n== 申請内容の詳細一覧 =============\n" + cls.to_friendly_request(vars(request_report))
 
     @classmethod
@@ -111,7 +116,7 @@ class IaasRequestReportHelper:
             request_status_old=request_status_old,
             iaas_user_old=iaas_user_old,
         )
-        Logging.info("DIFF: " + str(diff_request))
+        Logging.info("REQUEST_DIFF: " + str(diff_request))
         if diff_request != {}:
             return diff_request
         else:
