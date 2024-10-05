@@ -123,4 +123,8 @@ docker/export/
 # MacOS
 .DS_Store
 
+# PyCharm directory
+.idea
+
+# build directory
 build/
