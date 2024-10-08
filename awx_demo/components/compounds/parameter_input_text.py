@@ -33,4 +33,3 @@ class ParameterInputText(ft.TextField):
                 on_change=on_change,
                 on_submit=on_submit,
             )
-

@@ -24,12 +24,12 @@ class RequestRowHelper:
 
     @staticmethod
     @Logging.func_logger
-    def generate_request_row(request_list_form, id, request_data: RequestRowData):
+    def generate_request_row(request_list_form, row_id, request_data: RequestRowData):
         return ft.DataRow(
             cells=[
                 ft.DataCell(RequestRowHelper._request_status_to_icon(
                     request_data.request_status)),
-                ft.DataCell(ft.Text(str(id), color=ft.colors.PRIMARY),
+                ft.DataCell(ft.Text(str(row_id), color=ft.colors.PRIMARY),
                             on_tap=request_list_form.on_request_edit_open),
                 ft.DataCell(ft.Text(str(request_data.request_deadline))),
                 ft.DataCell(ft.Text(str(request_data.updated))),

@@ -22,12 +22,11 @@ class JobProgressForm(ft.Card):
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
     JOB_STATUS_CHECK_ID_PREFIX = 'job_status_check'
-    JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT=3600
-    JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT=5
+    JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT = 3600
+    JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT = 5
     JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE = 0
     JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE = 1
-    JOB_STATUS_CHECK_RESULT_EXECUABLE_TIMEOUT = 2
-
+    JOB_STATUS_CHECK_RESULT_EXECUTABLE_TIMEOUT = 2
 
     def __init__(self, session, request_id, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
         self.session = session
@@ -91,7 +90,7 @@ class JobProgressForm(ft.Card):
         dt_now = datetime.now()
         dt_delta = timedelta(seconds=self.check_timeout)
         self.job_end_date = dt_now + dt_delta
-        job_end_date_str = (self.job_end_date).strftime('%Y-%m-%d %H:%M:%S')
+        job_end_date_str = self.job_end_date.strftime('%Y-%m-%d %H:%M:%S')
         Logging.info(f'JOB_TIMEOUT_DATE({self.scheduler_job_id}): {job_end_date_str}')
 
         self.scheduler = BackgroundScheduler()
@@ -156,13 +155,13 @@ class JobProgressForm(ft.Card):
         elif next_runnable == self.JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE:
             self._on_job_execution_failed()
             return
-        elif next_runnable == self.JOB_STATUS_CHECK_RESULT_EXECUABLE_TIMEOUT:
+        elif next_runnable == self.JOB_STATUS_CHECK_RESULT_EXECUTABLE_TIMEOUT:
             self._on_job_status_timeout()
             return
 
     @Logging.func_logger
     def _job_next_runnable(self):
-        jst  = ZoneInfo("Asia/Tokyo")
+        jst = ZoneInfo("Asia/Tokyo")
         job = self.scheduler.get_job(self.scheduler_job_id)
         if "next_run_time" not in dir(job):
             return self.JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE
@@ -176,7 +175,7 @@ class JobProgressForm(ft.Card):
             return self.JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE
         else:
             Logging.warning(f"JOB_NEXT_RUN / TIMEOUT / DIFF: {dt_next_check.strftime('%Y-%m-%d %H:%M:%S')} / {dt_end_time.strftime('%Y-%m-%d %H:%M:%S')} / {diff_date}")
-            return self.JOB_STATUS_CHECK_RESULT_EXECUABLE_TIMEOUT
+            return self.JOB_STATUS_CHECK_RESULT_EXECUTABLE_TIMEOUT
 
     @Logging.func_logger
     def _on_job_status_completed(self):

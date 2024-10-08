@@ -8,7 +8,6 @@ from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
-from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.doc_id_utils import DocIdUtils
 from awx_demo.utils.logging import Logging
 

@@ -217,6 +217,5 @@ class Sidebar(ft.Container):
     def toggle_nav_rail(self, e):
         self.main_nav_rail.visible = not self.main_nav_rail.visible
         self.toggle_nav_rail_button.selected = not self.toggle_nav_rail_button.selected
-        self.toggle_nav_rail_button.tooltip = "サイドバーを表示" if self.toggle_nav_rail_button.selected else "Collapse Side Bar"
-        self.view.update()
+        self.toggle_nav_rail_button.tooltip = "サイドバーを表示" if self.toggle_nav_rail_button.selected else "サイドバーを非表示"
         self.page.update()

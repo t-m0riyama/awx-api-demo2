@@ -1,5 +1,4 @@
 import base64
-import os
 
 from awx_demo.notification.notification_spec import NotificationSpec
 from awx_demo.utils.event_helper import EventStatus

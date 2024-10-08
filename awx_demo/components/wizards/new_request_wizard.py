@@ -17,11 +17,6 @@ class NewRequestWizard:
         self.session = session
         self.page = page
         self.parent_refresh_func = parent_refresh_func
-        super().__init__()
-
-    @Logging.func_logger
-    def open_wizard(self):
-        self.session.set("new_request_wizard_step", "create_request")
         formStep = CreateRequestForm(
             session=self.session,
             page=self.page,
@@ -38,6 +33,11 @@ class NewRequestWizard:
             content=formStep,
             actions_alignment=ft.MainAxisAlignment.END,
         )
+        super().__init__()
+
+    @Logging.func_logger
+    def open_wizard(self):
+        self.session.set("new_request_wizard_step", "create_request")
         self.page.open(self.wizard_dialog)
         self.wizard_dialog.open = True
         self.page.update()

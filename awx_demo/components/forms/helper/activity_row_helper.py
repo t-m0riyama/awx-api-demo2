@@ -21,7 +21,7 @@ class ActivityRowHelper:
 
     @staticmethod
     @Logging.func_logger
-    def generate_activity_row(activity_list_form, id, activity_data: ActivityRowData):
+    def generate_activity_row(activity_list_form, row_id, activity_data: ActivityRowData):
         return ft.DataRow(
             cells=[
                 ft.DataCell(ActivityRowHelper._activity_status_to_icon(
@@ -29,7 +29,7 @@ class ActivityRowHelper:
                 ft.DataCell(ft.Text(str(activity_data.created))),
                 ft.DataCell(ft.Text(activity_data.user)),
                 ft.DataCell(ft.Text(activity_data.activity_type)),
-                ft.DataCell(ft.Text(str(id))),
+                ft.DataCell(ft.Text(str(row_id))),
                 ft.DataCell(ft.Text(activity_data.summary)),
             ],
             # on_select_changed=activity_list_form.on_request_row_select,

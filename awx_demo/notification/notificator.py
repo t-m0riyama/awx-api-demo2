@@ -21,8 +21,8 @@ class Notificator:
     def notify(cls, notification_spec: NotificationSpec):
         match notification_spec.notification_type:
             case Notificator.TEAMS_NOTIFICATION:
-                teams_mesage_format = os.getenv("RMX_TEAMS_MESSAGE_FORMAT", cls.TEAMS_MESSAGE_FORMAT_DEFAULT)
-                match teams_mesage_format:
+                teams_message_format = os.getenv("RMX_TEAMS_MESSAGE_FORMAT", cls.TEAMS_MESSAGE_FORMAT_DEFAULT)
+                match teams_message_format:
                     case cls.TEAMS_MESSAGE_FORMAT_MESSAGE_CARD:
                         TeamsMessageCardNotificator.notify(notification_spec)
                     case cls.TEAMS_MESSAGE_FORMAT_ADAPTIVE_CARD:

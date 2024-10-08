@@ -47,7 +47,6 @@ class SessionHelper:
         SessionHelper._remove_session_key(session, "document_id")
         SessionHelper._remove_session_key(session, "confirm_text")
 
-
     @staticmethod
     @Logging.func_logger
     def load_request_to_session_from_db(session, db_session, request_id):

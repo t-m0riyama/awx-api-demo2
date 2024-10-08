@@ -81,7 +81,7 @@ class Logging(object):
                     # フィールドがメソッドの場合は、スキップ
                     if type(value) in [staticmethod, classmethod]:
                         continue
-                    args_dict[key] = cls._trancate_string(
+                    args_dict[key] = cls._truncate_string(
                         target_string=str(value),
                         max_length=int(os.getenv('RMX_FUNC_LOGGER_ARGS_LENGTH_MAX', cls.FUNC_LOGGER_ARGS_LENGTH_MAX_DEFAULT))
                     )
@@ -92,7 +92,7 @@ class Logging(object):
                 # フィールドがメソッドの場合は、スキップ
                 if type(arg) in [staticmethod, classmethod]:
                     continue
-                args_dict[str(non_dict_index)] = cls._trancate_string(
+                args_dict[str(non_dict_index)] = cls._truncate_string(
                     target_string=str(arg),
                     max_length=int(os.getenv('RMX_FUNC_LOGGER_ARGS_LENGTH_MAX', cls.FUNC_LOGGER_ARGS_LENGTH_MAX_DEFAULT))
                 )
@@ -100,9 +100,9 @@ class Logging(object):
         return args_dict
 
     @staticmethod
-    def _trancate_string(target_string, max_length, tranceted_mark=' ~'):
+    def _truncate_string(target_string, max_length, trunceted_mark=' ~'):
         if len(target_string) > max_length:
-            return target_string[0:max_length] + tranceted_mark
+            return target_string[0:max_length] + trunceted_mark
         else:
             return target_string
 

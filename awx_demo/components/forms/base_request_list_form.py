@@ -305,7 +305,20 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             height=self.CONTENT_HEIGHT,
             # padding=ft.padding.all(0),
         )
-        # self.controls = self.build_controls()
+
+        formDeleteConfirm = DeleteConfirmForm(self.session, self.page)
+        self.dlgDeleteConfirm = ft.AlertDialog(
+            modal=True,
+            # title=ft.Text("削除の確認"),
+            content=formDeleteConfirm,
+            actions=[
+                ft.ElevatedButton("はい", on_click=self.on_click_delete_request_yes),
+                ft.FilledButton(
+                    "キャンセル", on_click=self.on_click_delete_request_cancel
+                ),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
         super().__init__(self.controls)
 
     @abc.abstractmethod
@@ -330,19 +343,6 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def open_delete_confirm_dialog(self):
-        formDeleteConfirm = DeleteConfirmForm(self.session, self.page)
-        self.dlgDeleteConfirm = ft.AlertDialog(
-            modal=True,
-            # title=ft.Text("削除の確認"),
-            content=formDeleteConfirm,
-            actions=[
-                ft.ElevatedButton("はい", on_click=self.on_click_delete_request_yes),
-                ft.FilledButton(
-                    "キャンセル", on_click=self.on_click_delete_request_cancel
-                ),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-        )
         self.page.open(self.dlgDeleteConfirm)
         self.dlgDeleteConfirm.open = True
         self.page.update()
