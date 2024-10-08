@@ -4,9 +4,10 @@ import random
 from pprint import pprint
 
 from awx_demo.db import base, db
+from awx_demo.db_helper.types.request_category import RequestCategory, RequestOperation
 from awx_demo.utils.doc_id_utils import DocIdUtils
 
-DUCUMENT_ID_LENGTH = 7
+DOCUMENT_ID_LENGTH = 7
 
 if __name__ == "__main__":
     # ジェネレータから要素を取得
@@ -32,13 +33,13 @@ if __name__ == "__main__":
             datetime_str, "%Y/%m/%d %H:%M:%S") + datetime.timedelta(days=deadline_days)
         request = base.IaasRequest(
             id=i,
-            request_id=DocIdUtils.generate_id(DUCUMENT_ID_LENGTH),
+            request_id=DocIdUtils.generate_id(DOCUMENT_ID_LENGTH),
             request_date=datetime_formatted,
             request_deadline=datetime_deadline_formatted,
             request_user='moriyama',
             iaas_user='moriyama',
-            request_category='サーバに対する変更',
-            request_operation='CPUコア/メモリ割り当て変更',
+            request_category=RequestCategory.VM_SETTING_CHANGE_FRIENDLY,
+            request_operation=RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY,
             request_text='ABC{}システム向けWEBサーバCPU/メモリ増設'.format(i),
             job_options=json.dumps(job_options),
             request_status='request start',

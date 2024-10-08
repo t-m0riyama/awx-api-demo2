@@ -3,6 +3,7 @@ import flet as ft
 from awx_demo.components.forms.create_request_form import CreateRequestForm
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.wizards.set_vm_cpu_memory_wizard import SetVmCpuMemoryWizard
+from awx_demo.db_helper.types.request_category import RequestOperation
 from awx_demo.utils.logging import Logging
 
 
@@ -56,7 +57,7 @@ class NewRequestWizard:
         match self.session.get("new_request_wizard_step"):
             case "create_request":
                 match self.session.get("request_operation"):
-                    case "CPUコア/メモリ割り当て変更":
+                    case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
                         child_wizard = SetVmCpuMemoryWizard(
                             self.session,
                             self.page,

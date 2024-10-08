@@ -5,6 +5,7 @@ import flet as ft
 
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.db_helper.types.request_category import RequestCategory, RequestOperation
 from awx_demo.utils.logging import Logging
 
 
@@ -68,21 +69,21 @@ class RequestCommonInfoTabForm(ft.Card):
         self.dropCategory = ft.Dropdown(
             label='依頼区分',
             value=self.session.get('request_category') if self.session.contains_key(
-                'request_category') else 'サーバに対する変更',
+                'request_category') else RequestCategory.VM_SETTING_CHANGE_FRIENDLY,
             options=[
-                ft.dropdown.Option('新規サーバの構築', disabled=True),
-                ft.dropdown.Option('サーバに対する変更'),
-                ft.dropdown.Option('バックアップの停止', disabled=True),
-                ft.dropdown.Option('特権IDの払い出し', disabled=True),
+                ft.dropdown.Option(RequestCategory.VM_CREATE_FRIENDLY, disabled=True),
+                ft.dropdown.Option(RequestCategory.VM_SETTING_CHANGE_FRIENDLY),
+                ft.dropdown.Option(RequestCategory.BACKUP_STOP_OR_RESUME_FRIENDLY, disabled=True),
+                ft.dropdown.Option(RequestCategory.PRIVILEGED_ID_CREATE_FRIENDLY, disabled=True),
             ],
             disabled=True,
         )
         self.dropOperation = ft.Dropdown(
             label='申請項目',
             value=self.session.get('request_operation') if self.session.contains_key(
-                'request_operation') else 'CPUコア/メモリ割り当て変更',
+                'request_operation') else RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY,
             options=[
-                ft.dropdown.Option('CPUコア/メモリ割り当て変更'),
+                ft.dropdown.Option(RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY),
             ],
             disabled=True,
         )
