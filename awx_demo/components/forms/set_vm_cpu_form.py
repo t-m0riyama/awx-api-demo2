@@ -93,7 +93,7 @@ class SetVmCpuForm(ft.Card):
 
     @Logging.func_logger
     def on_change_vm_cpu_enabled(self, e):
-        self.session.get('job_options')['change_vm_cpu_enabled'] = e.control.value
+        self.session.get('job_options')['change_vm_cpu_enabled'] = str(e.control.value)
         self.dropCpus.disabled = False if e.control.value else True
         self.dropCpus.update()
 
