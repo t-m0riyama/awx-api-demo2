@@ -16,10 +16,10 @@ LOG_FILE_DEFAULT = "awx_api_demo2.log"
 def main(page: ft.Page):
 
     def route_change(e):
-        router = NavigationRouter(page.session, page, app_title, dlgLogin)
+        router = NavigationRouter(page.session, page, page.session.get("app_title_base"), dlgLogin)
         router.route_change()
 
-    app_title = os.getenv("RMX_APP_TITLE", APP_TITLE_DEFAULT).strip('"')
+    page.session.set("app_title_base", os.getenv("RMX_APP_TITLE", APP_TITLE_DEFAULT).strip('"'))
     formLogin = LoginForm(session=page.session, page=page)
     dlgLogin = ft.AlertDialog(
         modal=True,
@@ -27,7 +27,7 @@ def main(page: ft.Page):
     )
 
     # Page レイアウト
-    page.title = app_title
+    page.title = page.session.get("app_title_base")
     page.padding = 10
     page.window.height = 720
     page.window.width = 1120

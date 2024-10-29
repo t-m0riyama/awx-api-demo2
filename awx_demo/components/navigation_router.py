@@ -20,10 +20,10 @@ class NavigationRouter:
     コントロールの再作成を行う。
     """
 
-    def __init__(self, session, page: ft.Page, app_title, dlgLogin):
+    def __init__(self, session, page: ft.Page, app_title_base, dlgLogin):
         self.session = session
         self.page = page
-        self.app_title = app_title
+        self.app_title_base = app_title_base
         self.dlgLogin = dlgLogin
 
     def route_change(self):
@@ -43,22 +43,27 @@ class NavigationRouter:
                     case '/latest_requests':
                         formRequests = LatestRequestListForm(
                             self.session, self.page)
+                        self.page.title = f"{self.app_title_base} - 最新の申請"
                         navigation_selected_index = 0
                     case '/deadline_requests':
                         formRequests = DeadlineRequestListForm(
                             self.session, self.page)
+                        self.page.title = f"{self.app_title_base} - リリース希望日順"
                         navigation_selected_index = 1
                     case '/all_requests':
                         formRequests = AllRequestListForm(
                             self.session, self.page)
+                        self.page.title = f"{self.app_title_base} - すべての申請"
                         navigation_selected_index = 2
                     case '/completed_requests':
                         formRequests = CompletedRequestListForm(
                             self.session, self.page)
+                        self.page.title = f"{self.app_title_base} - 完了済みの申請"
                         navigation_selected_index = 3
                     case '/my_activities':
                         formRequests = MyActivityListForm(
                             self.session, self.page)
+                        self.page.title = f"{self.app_title_base} - 操作履歴"
                         navigation_selected_index = 0
                     case _:
                         Logging.error("error undefined route")
@@ -68,32 +73,32 @@ class NavigationRouter:
                     case '/latest_requests':
                         formRequests = LatestRequestListForm(
                             self.session, self.page)
-                        self.page.title = "最新の申請"
+                        self.page.title = f"{self.app_title_base} - 最新の申請"
                         navigation_selected_index = 0
                     case '/deadline_requests':
                         formRequests = DeadlineRequestListForm(
                             self.session, self.page)
-                        self.page.title = "リリース希望日順"
+                        self.page.title = f"{self.app_title_base} - リリース希望日順"
                         navigation_selected_index = 1
                     case '/my_requests':
                         formRequests = MyRequestListForm(
                             self.session, self.page)
-                        self.page.title = "自身の申請"
+                        self.page.title = f"{self.app_title_base} - 自身の申請"
                         navigation_selected_index = 2
                     case '/all_requests':
                         formRequests = AllRequestListForm(
                             self.session, self.page)
-                        self.page.title = "すべての申請"
+                        self.page.title = f"{self.app_title_base} - すべての申請"
                         navigation_selected_index = 3
                     case '/completed_requests':
                         formRequests = CompletedRequestListForm(
                             self.session, self.page)
-                        self.page.title = "完了済みの申請"
+                        self.page.title = f"{self.app_title_base} - 完了済みの申請"
                         navigation_selected_index = 4
                     case '/all_activities':
                         formRequests = AllActivityListForm(
                             self.session, self.page)
-                        self.page.title = "操作履歴"
+                        self.page.title = f"{self.app_title_base} - 操作履歴"
                         navigation_selected_index = 0
                     case _:
                         Logging.error("error undefined route")
@@ -114,7 +119,7 @@ class NavigationRouter:
                 vertical_alignment=ft.CrossAxisAlignment.START,  # 画面上部から表示
             )
 
-            AppHeader(self.session, self.page, self.app_title)
+            AppHeader(self.session, self.page, self.app_title_base)
             self.session.set('request_text_search_string', '')
             self.page.add(layout)
             self.page.update()

@@ -7,10 +7,11 @@ from awx_demo.components.forms.send_request_confirm_form import SendRequestConfi
 from awx_demo.components.forms.set_vm_cpu_form import SetVmCpuForm
 from awx_demo.components.forms.set_vm_memory_form import SetVmMemoryForm
 from awx_demo.components.session_helper import SessionHelper
+from awx_demo.components.wizards.base_wizard import BaseWizard
 from awx_demo.utils.logging import Logging
 
 
-class SetVmCpuMemoryWizard:
+class SetVmCpuMemoryWizard(BaseWizard):
 
     # const
     CONTENT_HEIGHT = 540
@@ -28,14 +29,6 @@ class SetVmCpuMemoryWizard:
         super().__init__()
 
     @Logging.func_logger
-    def on_click_cancel(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
-        if self.session.contains_key("job_options"):
-            self.session.remove("job_options")
-        self.wizard_dialog.open = False
-        self.page.update()
-
-    @Logging.func_logger
     def on_click_next(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("new_request_wizard_step"):
@@ -51,6 +44,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
                 self.page.open(self.wizard_dialog)
             case "select_target":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
@@ -64,6 +58,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - CPUの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "set_vm_memory")
@@ -77,6 +72,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - メモリの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "send_request_confirm")
@@ -91,6 +87,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 変更内容の確認"
                 self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 if self.session.get("execute_job_immediately"):
@@ -101,13 +98,15 @@ class SetVmCpuMemoryWizard:
                         height=self.CONTENT_HEIGHT,
                         width=self.CONTENT_WIDTH,
                         body_height=self.BODY_HEIGHT,
-                        step_change_exit=self.on_click_next,
+                        step_change_exit=self.on_click_save,
                     )
                     self.wizard_dialog.content = formStep
+                    self.page.title = f"{self.session.get('app_title_base')} - 処理の進捗"
                     self.page.open(self.wizard_dialog)
                 else:
                     self.wizard_dialog.open = False
                     self.parent_refresh_func()
+                    self.restore_parent_view_title()
                     self.page.update()
             case _:
                 Logging.error("undefined step!!!")
@@ -131,6 +130,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 申請の追加"
                 self.page.open(self.wizard_dialog)
             case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "select_target")
@@ -144,6 +144,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
                 self.page.open(self.wizard_dialog)
             case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
@@ -157,6 +158,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - CPUの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 self.session.set("new_request_wizard_step", "set_vm_memory")
@@ -170,6 +172,7 @@ class SetVmCpuMemoryWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - メモリの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case _:
                 Logging.error("undefined step!!!")

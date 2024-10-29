@@ -1,18 +1,16 @@
-import json
-
 import flet as ft
 
 from awx_demo.components.forms.edit_request_form import EditRequestForm
 from awx_demo.components.forms.job_execute_confirm_form import JobExecuteConfirmForm
 from awx_demo.components.forms.job_progress_form import JobProgressForm
 from awx_demo.components.session_helper import SessionHelper
+from awx_demo.components.wizards.base_wizard import BaseWizard
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
-from awx_demo.utils.doc_id_utils import DocIdUtils
 from awx_demo.utils.logging import Logging
 
 
-class EditRequestWizard:
+class EditRequestWizard(BaseWizard):
 
     # const
     CONTENT_HEIGHT = 540
@@ -25,11 +23,10 @@ class EditRequestWizard:
         self.session = session
         self.page = page
         self.parent_refresh_func = parent_refresh_func
-        super().__init__()
-
-    @Logging.func_logger
-    def open_wizard(self):
-        self.session.set("edit_request_wizard_step", "edit_request")
+        db_session = db.get_db()
+        request_operation = IaasRequestHelper.get_request(db_session, self.session.get("request_id")).request_operation
+        Logging.warning(f"job_options: {request_operation}")
+        db_session.close()
         formStep = EditRequestForm(
             session=self.session,
             page=self.page,
@@ -48,35 +45,16 @@ class EditRequestWizard:
             content=formStep,
             actions_alignment=ft.MainAxisAlignment.END,
         )
+        super().__init__()
+
+    @Logging.func_logger
+    def open_wizard(self):
+        self.session.set("edit_request_wizard_step", "edit_request")
+        self.save_parent_view_title()
         self.page.open(self.wizard_dialog)
         self.wizard_dialog.open = True
+        self.page.title = f"{self.session.get('app_title_base')} - 申請の編集"
         self.page.update()
-
-    def _duplicate_request(self):
-        db_session = db.get_db()
-        IaasRequestHelper.duplicate_request(
-            db_session=db_session,
-            request_id=self.session.get("request_id"),
-            new_request_id=DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH),
-            session=self.session,
-        )
-        db_session.close()
-
-    def _update_request(self):
-        if self.session.get("iaas_user") is None:
-            self.session.set("iaas_user", self.session.get("awx_loginid"))
-        db_session = db.get_db()
-        IaasRequestHelper.update_request(
-            db_session=db_session,
-            request_id=self.session.get("request_id"),
-            request_deadline=self.session.get("request_deadline"),
-            request_text=self.session.get("request_text"),
-            job_options=json.dumps(self.session.get("job_options")),
-            request_status=self.session.get("request_status"),
-            iaas_user=self.session.get("iaas_user"),
-            session=self.session,
-        )
-        db_session.close()
 
     @Logging.func_logger
     def on_click_next(self, e):
@@ -95,6 +73,7 @@ class EditRequestWizard:
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 変更内容の確認"
                 self.page.open(self.wizard_dialog)
             case "job_execute_confirm":
                 self.session.set("edit_request_wizard_step", "job_progress")
@@ -108,6 +87,7 @@ class EditRequestWizard:
                 )
                 self._update_request()
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 処理の進捗"
                 self.page.open(self.wizard_dialog)
             case _:
                 Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
@@ -132,32 +112,8 @@ class EditRequestWizard:
                     click_cancel_func=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 申請の編集"
                 self.page.open(self.wizard_dialog)
             case _:
                 Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
         self.page.update()
-
-    @Logging.func_logger
-    def on_click_save(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
-        self._update_request()
-        self.wizard_dialog.open = False
-        self.page.update()
-        self.parent_refresh_func()
-
-    @Logging.func_logger
-    def on_click_duplicate(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
-        self._duplicate_request()
-        self.wizard_dialog.open = False
-        self.page.update()
-        self.parent_refresh_func()
-
-    @Logging.func_logger
-    def on_click_cancel(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
-        if self.session.contains_key("job_options"):
-            self.session.remove("job_options")
-        self.wizard_dialog.open = False
-        self.page.update()
-        self.parent_refresh_func()
