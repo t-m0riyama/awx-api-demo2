@@ -48,6 +48,7 @@ class CreateRequestForm(ft.Card):
             last_date=datetime.datetime(
                 end_date.year, end_date.month, end_date.day),
             current_date=current_date,
+            value=current_date,
         )
         self.page.overlay.append(self.dpRequestDeadline)
 
@@ -80,8 +81,8 @@ class CreateRequestForm(ft.Card):
             ],
         )
         self.lblRequestDeadline = ft.Text(
-            value=('リリース希望日: ' + self.session.get('request_deadline').strftime('%Y/%m/%d')
-                   ) if self.session.contains_key('request_deadline') else 'リリース希望日:(未指定)',
+            value=(f"リリース希望日: {self.session.get('request_deadline').strftime('%Y/%m/%d')}"
+                   ) if self.session.contains_key('request_deadline') else f"リリース希望日: {start_date.strftime('%Y/%m/%d')}",
             theme_style=ft.TextThemeStyle.BODY_LARGE,
             color=ft.colors.PRIMARY,
         )
@@ -95,7 +96,6 @@ class CreateRequestForm(ft.Card):
         self.btnNext = ft.FilledButton(
             '次へ',
             on_click=self.on_click_next,
-            disabled=False if self.session.contains_key('request_deadline') else True,
         )
         self.btnCancel = ft.ElevatedButton(
             'キャンセル', on_click=self.on_click_cancel)
@@ -149,12 +149,7 @@ class CreateRequestForm(ft.Card):
     def on_change_request_deadline(self, e):
         self.lblRequestDeadline.value = 'リリース希望日: ' + \
             self.dpRequestDeadline.value.strftime('%Y/%m/%d')
-        if self.dpRequestDeadline.value:
-            self.btnNext.disabled = False
-        else:
-            self.btnNext.disabled = True
         self.lblRequestDeadline.update()
-        self.btnNext.update()
 
     @Logging.func_logger
     def on_click_cancel(self, e):
@@ -165,6 +160,5 @@ class CreateRequestForm(ft.Card):
         self.session.set('request_text', self.tfRequestText.value)
         self.session.set('request_category', self.dropCategory.value)
         self.session.set('request_operation', self.dropOperation.value)
-        if self.dpRequestDeadline.value:
-            self.session.set('request_deadline', self.dpRequestDeadline.value)
+        self.session.set('request_deadline', self.dpRequestDeadline.value)
         self.step_change_next(e)
