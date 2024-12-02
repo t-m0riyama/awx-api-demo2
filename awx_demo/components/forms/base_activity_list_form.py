@@ -158,7 +158,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         )
 
         self.tfSearchSummary = ParameterInputText(
-            label="概要に含まれる文字を検索",
+            label="概要を検索",
             # width=220,
             expand=True,
             on_submit=self.on_click_search_summary,
@@ -167,7 +167,15 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             icon=ft.icons.SEARCH,
             icon_color=ft.colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_search_summary,
+            autofocus=True,
             tooltip="検索 (Control+Enter)",
+        )
+        self.btnReloadRequestList = ft.IconButton(
+            icon=ft.icons.SYNC,
+            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            on_click=lambda e: self.refresh(),
+            autofocus=True,
+            tooltip="操作履歴一覧の再読み込み (Control+R)",
         )
         range_min, range_max, request_data_count = ActivityRowHelper.get_page_range(
             self
@@ -210,6 +218,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
                             controls=[
                                 self.tfSearchSummary,
                                 self.btnSearchSummary,
+                                self.btnReloadRequestList,
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
@@ -314,12 +323,12 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
     def get_query_filters(self):
         pass
 
-    def refresh(self):
+    def refresh(self, e=None):
         ActivityRowHelper.refresh_data_rows(self)
         ActivityRowHelper.refresh_page_indicator(self)
 
     @Logging.func_logger
-    def on_request_edit_open(self, e):
+    def on_request_edit_open(self):
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self.session.set("request_id", e.control.content.value)
         # TODO: アクティビティの詳細をダイアログで表示する場合は別途実装する

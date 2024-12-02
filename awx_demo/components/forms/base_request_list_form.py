@@ -234,6 +234,13 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             autofocus=True,
             tooltip="検索 (Control+Enter)",
         )
+        self.btnReloadRequestList = ft.IconButton(
+            icon=ft.icons.SYNC,
+            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            on_click=lambda e: self.refresh(),
+            autofocus=True,
+            tooltip="申請一覧の再読み込み (Control+R)",
+        )
         range_min, range_max, request_data_count = RequestRowHelper.get_page_range(self)
         self.textRequestsRange = ft.Text(
             "{}-{} / {}".format(range_min, range_max, request_data_count)
@@ -279,6 +286,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             controls=[
                                 self.tfSearchRequestText,
                                 self.btnSearchRequestText,
+                                self.btnReloadRequestList,
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
