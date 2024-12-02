@@ -11,7 +11,7 @@ class MyRequestListForm(BaseRequestListForm):
     # const
     DEFAULT_SORT_TARGET_COLUMN = '最終更新日'
     DEFAULT_SORT_COLUMN_INDEX = 3
-    DEFAULT_SORT_ASCENDING = True
+    DEFAULT_SORT_ASCENDING = False
     FORM_TITLE = '自身の申請'
 
     def __init__(self, session, page: ft.Page):
