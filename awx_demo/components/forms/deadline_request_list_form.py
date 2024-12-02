@@ -25,7 +25,7 @@ class DeadlineRequestListForm(BaseRequestListForm):
         filters.append(IaasRequestHelper.get_filter_request_text(
             self.session.get('request_text_search_string')))
         filters.append(IaasRequestHelper.get_filter_request_status(
-            [RequestStatus.APPROVED, RequestStatus.APPLYING, RequestStatus.START]))
+            [RequestStatus.APPROVED, RequestStatus.APPLYING, RequestStatus.APPLYING_FAILED, RequestStatus.START]))
         if self.session.get('user_role') == UserRole.USER_ROLE:
             filters.append(IaasRequestHelper.get_filter_request_user(
                 self.session.get('awx_loginid')))
