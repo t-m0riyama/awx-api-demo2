@@ -7,6 +7,7 @@ from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.forms.helper.activity_row_helper import ActivityRowData, ActivityRowHelper
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.utils.event_helper import EventType
@@ -122,9 +123,11 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
                 else "すべてのユーザ"
             ),
             options=iaas_user_options,
-            hint_text="操作を実行したアカウントを指定します。",
+            hint_text="操作を実行したアカウント",
             on_change=self.on_change_filter_activity_user,
-            width=150,
+            # width=150,
+            expand=True,
+            dense=True,
             disabled=user_change_disabled,
         )
         self.dropActivityType = ft.Dropdown(
@@ -149,19 +152,22 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             ],
             hint_text="操作種別を指定します。",
             on_change=self.on_change_filter_activity_type,
-            width=200,
+            # width=200,
+            expand=True,
+            dense=True,
         )
 
         self.tfSearchSummary = ParameterInputText(
             label="概要に含まれる文字を検索",
-            width=280,
+            # width=220,
+            expand=True,
             on_submit=self.on_click_search_summary,
         )
         self.btnSearchSummary = ft.IconButton(
             icon=ft.icons.SEARCH,
             icon_color=ft.colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_search_summary,
-            tooltip="検索",
+            tooltip="検索 (Control+Enter)",
         )
         range_min, range_max, request_data_count = ActivityRowHelper.get_page_range(
             self
@@ -170,12 +176,14 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             "{}-{} / {}".format(range_min, range_max, request_data_count)
         )
         self.btnPreviousPage = ft.IconButton(
+            tooltip="前へ (Control+Shift+<)",
             icon=ft.icons.ARROW_LEFT,
             icon_color=ft.colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
+            tooltip="次へ (Control+Shift+>)",
             icon=ft.icons.ARROW_RIGHT,
             icon_color=ft.colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
@@ -190,7 +198,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
                 ft.ResponsiveRow(
                     [
                         ft.Row(
-                            col={"sm": 5, "md": 5, "lg": 5, "xl": 5, "xxl": 4},
+                            col={"sm": 6},
                             controls=[
                                 self.dropUser,
                                 self.dropActivityType,
@@ -198,7 +206,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
                             alignment=ft.MainAxisAlignment.START,
                         ),
                         ft.Row(
-                            col={"sm": 4, "md": 4, "lg": 4, "xl": 4, "xxl": 5},
+                            col={"sm": 3},
                             controls=[
                                 self.tfSearchSummary,
                                 self.btnSearchSummary,
@@ -206,7 +214,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
                         ft.Row(
-                            col={"sm": 3, "md": 3, "lg": 3, "xl": 3, "xxl": 3},
+                            col={"sm": 3},
                             controls=[
                                 self.btnPreviousPage,
                                 self.textRequestsRange,
@@ -239,7 +247,68 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             height=self.CONTENT_HEIGHT,
             # padding=ft.padding.all(0),
         )
+        self.register_key_shortcuts()
         super().__init__(self.controls)
+
+    @Logging.func_logger
+    def register_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        # 操作履歴一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key=">", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_next_page,
+        )
+        # 操作履歴一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="<", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_previous_page,
+        )
+        # 操作履歴一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_next_page,
+        )
+        # 操作履歴一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_previous_page,
+        )
+
+    @Logging.func_logger
+    def unregister_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        # 操作履歴一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key=">", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 操作履歴一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="<", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 操作履歴一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 操作履歴一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
 
     @abc.abstractmethod
     def get_query_filters(self):

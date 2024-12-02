@@ -1,6 +1,7 @@
 import abc
 import json
 
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
@@ -30,10 +31,11 @@ class BaseWizard(metaclass=abc.ABCMeta):
     def _update_request(self):
         if self.session.get("iaas_user") is None:
             self.session.set("iaas_user", self.session.get("awx_loginid"))
+        request_id = self.session.get("request_id") if "request_id" in self.session.get_keys() else self.session.get("document_id")
         db_session = db.get_db()
         IaasRequestHelper.update_request(
             db_session=db_session,
-            request_id=self.session.get("request_id"),
+            request_id=request_id,
             request_deadline=self.session.get("request_deadline"),
             request_text=self.session.get("request_text"),
             job_options=json.dumps(self.session.get("job_options")),
@@ -60,6 +62,7 @@ class BaseWizard(metaclass=abc.ABCMeta):
         self.restore_parent_view_title()
         self.page.update()
         self.parent_refresh_func()
+        self._restore_key_shortcuts()
 
     @Logging.func_logger
     def on_click_save(self, e):
@@ -69,6 +72,7 @@ class BaseWizard(metaclass=abc.ABCMeta):
         self.restore_parent_view_title()
         self.page.update()
         self.parent_refresh_func()
+        self._restore_key_shortcuts()
 
     @Logging.func_logger
     def on_click_duplicate(self, e):
@@ -78,6 +82,7 @@ class BaseWizard(metaclass=abc.ABCMeta):
         self.restore_parent_view_title()
         self.page.update()
         self.parent_refresh_func()
+        self._restore_key_shortcuts()
 
     @abc.abstractmethod
     def on_click_next(self, e):
@@ -86,3 +91,14 @@ class BaseWizard(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def on_click_previous(self, e):
         pass
+
+    @Logging.func_logger
+    def _save_keyboard_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keybord_shortcut_manager.save_key_shortcuts()
+        keybord_shortcut_manager.clear_key_shortcuts()
+
+    @Logging.func_logger
+    def _restore_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keybord_shortcut_manager.restore_key_shortcuts()

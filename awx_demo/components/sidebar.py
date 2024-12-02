@@ -1,6 +1,10 @@
+from functools import partial
+
 import flet as ft
 
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.utils.logging import Logging
 
 
 class Sidebar(ft.Container):
@@ -14,8 +18,9 @@ class Sidebar(ft.Container):
     OPTION_RAIL_HEIGHT = 120
     ICON_SIZE = 28
 
-    def __init__(self, session, default_selected_index=0):
+    def __init__(self, session, page: ft.Page, default_selected_index=0):
         self.session = session
+        self.page = page
         self.nav_rail_visible = True
         if self.session.get('user_role') == UserRole.USER_ROLE:
             self.main_nav_rail_items = [
@@ -24,26 +29,38 @@ class Sidebar(ft.Container):
                         ft.icons.FIBER_NEW, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
-                    label="最新"
+                    label_content=ft.Text(
+                        "最新",
+                        tooltip="最新の申請 (Cotrol+Shift+L)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(
                         ft.icons.WARNING_AMBER, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
-                    label="リリース希望日"
+                    label_content=ft.Text(
+                        "リリース希望日",
+                        tooltip="リリース希望日 (Cotrol+Shift+D)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(ft.icons.LIST, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.LIST_OUTLINED, size=self.ICON_SIZE),
-                    label="全て"
+                    label_content=ft.Text(
+                        "全て",
+                        tooltip="全て (Cotrol+Shift+A)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(
                         ft.icons.CHECK_OUTLINED, size=self.ICON_SIZE),
                     selected_icon=ft.Icon(ft.icons.CHECK, size=self.ICON_SIZE),
-                    label="完了"
+                    label_content=ft.Text(
+                        "完了",
+                        tooltip="完了 (Cotrol+Shift+E)",
+                    )
                 ),
             ]
         else:
@@ -53,33 +70,48 @@ class Sidebar(ft.Container):
                         ft.icons.FIBER_NEW, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
-                    label="最新"
+                    label_content=ft.Text(
+                        "最新",
+                        tooltip="最新の申請 (Cotrol+Shift+L)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(
                         ft.icons.WARNING_AMBER, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
-                    label="リリース希望日"
+                    label_content=ft.Text(
+                        "リリース希望日",
+                        tooltip="リリース希望日 (Cotrol+Shift+D)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(
                         ft.icons.ACCOUNT_BOX, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.ACCOUNT_BOX_OUTLINED, size=self.ICON_SIZE),
-                    label="自身の申請"
+                    label_content=ft.Text(
+                        "自身の申請",
+                        tooltip="自身の申請 (Cotrol+Shift+M)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(ft.icons.LIST, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.LIST_OUTLINED, size=self.ICON_SIZE),
-                    label="全て"
+                    label_content=ft.Text(
+                        "全て",
+                        tooltip="全て (Cotrol+Shift+A)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(
                         ft.icons.CHECK_OUTLINED, size=self.ICON_SIZE),
                     selected_icon=ft.Icon(ft.icons.CHECK, size=self.ICON_SIZE),
-                    label="完了"
+                    label_content=ft.Text(
+                        "完了",
+                        tooltip="完了 (Cotrol+Shift+E)",
+                    )
                 ),
             ]
 
@@ -90,7 +122,10 @@ class Sidebar(ft.Container):
                         ft.icons.HISTORY_OUTLINED, size=self.ICON_SIZE),
                     selected_icon=ft.Icon(
                         ft.icons.HISTORY, size=self.ICON_SIZE),
-                    label="操作履歴"
+                    label_content=ft.Text(
+                        "操作履歴",
+                        tooltip="操作履歴 (Cotrol+Shift+H)",
+                    )
                 ),
             ]
         else:
@@ -100,14 +135,20 @@ class Sidebar(ft.Container):
                         ft.icons.HISTORY_OUTLINED, size=self.ICON_SIZE),
                     selected_icon=ft.Icon(
                         ft.icons.HISTORY, size=self.ICON_SIZE),
-                    label="操作履歴"
+                    label_content=ft.Text(
+                        "操作履歴",
+                        tooltip="操作履歴 (Cotrol+Shift+H)",
+                    )
                 ),
                 ft.NavigationRailDestination(
                     icon_content=ft.Icon(
                         ft.icons.SETTINGS_OUTLINED, size=self.ICON_SIZE),
                     selected_icon_content=ft.Icon(
                         ft.icons.SETTINGS, size=self.ICON_SIZE),
-                    label_content=ft.Text("設定"),
+                    label_content=ft.Text(
+                        "設定",
+                        tooltip="設定 (Cotrol+Shift+C)",
+                    )
                 ),
             ]
         self.main_nav_rail = ft.NavigationRail(
@@ -175,12 +216,98 @@ class Sidebar(ft.Container):
             bgcolor=ft.colors.SURFACE_VARIANT,
             border_radius=ft.border_radius.all(5),
         )
-
+        self.register_key_shortcuts()
         super().__init__(controls)
 
-    def on_click_main_navigation_item(self, e):
+    @Logging.func_logger
+    def register_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
         if self.session.get('user_role') == UserRole.USER_ROLE:
-            match e.control.selected_index:
+            # 最新の申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="L", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=0),
+            )
+            # リリース希望日順
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="D", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=1),
+            )
+            # 自身の申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="M", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=2),
+            )
+            # 全ての申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="A", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=3),
+            )
+            # 完了済みの申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="H", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_option_navigation_item, item_index=0),
+            )
+        else:
+            # 最新の申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="L", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=0),
+            )
+            # リリース希望日順
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="D", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=1),
+            )
+            # 自身の申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="M", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=2),
+            )
+            # 全ての申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="A", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=3),
+            )
+            # 完了済みの申請
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="E", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=4),
+            )
+            # 操作履歴
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key="H", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=partial(self.on_click_option_navigation_item, item_index=0),
+            )
+
+    def on_click_main_navigation_item(self, e, item_index=None):
+        # キーボードショートカットから呼ばれた場合、
+        # item_indexにセットされている値をNavigationRailDestinationのインデックスの代わりに利用する
+        selected_index = item_index if item_index is not None else e.control.selected_index
+        if self.session.get('user_role') == UserRole.USER_ROLE:
+            match selected_index:
                 case 0:
                     e.page.go('/latest_requests')
                 case 1:
@@ -190,7 +317,7 @@ class Sidebar(ft.Container):
                 case 3:
                     e.page.go('/completed_requests')
         else:
-            match e.control.selected_index:
+            match selected_index:
                 case 0:
                     e.page.go('/latest_requests')
                 case 1:
@@ -202,17 +329,20 @@ class Sidebar(ft.Container):
                 case 4:
                     e.page.go('/completed_requests')
 
-    def on_click_option_navigation_item(self, e):
+    def on_click_option_navigation_item(self, e, item_index=None):
+        # キーボードショートカットから呼ばれた場合、
+        # item_indexにセットされている値をNavigationRailDestinationのインデックスの代わりに利用する
+        selected_index = item_index if item_index is not None else e.control.selected_index
         if self.session.get('user_role') == UserRole.USER_ROLE:
-            match e.control.selected_index:
+            match selected_index:
                 case 0:
                     e.page.go('/my_activities')
         elif self.session.get('user_role') != UserRole.USER_ROLE:
-            match e.control.selected_index:
+            match selected_index:
                 case 0:
                     e.page.go('/all_activities')
-                case 1:
-                    e.page.go('/configurations')
+                # case 1:
+                #     e.page.go('/configurations')
 
     def toggle_nav_rail(self, e):
         self.main_nav_rail.visible = not self.main_nav_rail.visible

@@ -5,10 +5,11 @@ import flet as ft
 
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.utils.logging import Logging
 
 
-class SetVmMemoryForm(ft.Card):
+class SetVmMemoryForm(BaseWizardCard):
 
     # const
     CONTENT_HEIGHT = 500
@@ -16,8 +17,9 @@ class SetVmMemoryForm(ft.Card):
     BODY_HEIGHT = 250
     VM_MEMORY_SIZES_GB_DEFAULT = '4,8,12,16,24,32'
 
-    def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
+    def __init__(self, session, page: ft.Page, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
+        self.page = page
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
@@ -32,6 +34,7 @@ class SetVmMemoryForm(ft.Card):
         self.checkChangeVmMemoryEnabled = ft.Checkbox(
             label='メモリ容量を変更する',
             value=self.session.get('job_options')['change_vm_memory_enabled'] if 'change_vm_memory_enabled' in self.session.get('job_options') else True,
+            autofocus=True,
             on_change=self.on_change_vm_memory_enabled,
         )
 
@@ -46,14 +49,15 @@ class SetVmMemoryForm(ft.Card):
             value=self.session.get('job_options')[
                 'memory_gb'] if 'memory_gb' in self.session.get('job_options') else '8',
             options=vm_memory_options,
+            autofocus=True,
             disabled=(not bool(strtobool(self.session.get('job_options')['change_vm_memory_enabled']))) if 'change_vm_memory_enabled' in self.session.get('job_options') else False,
         )
         self.btnNext = ft.FilledButton(
-            '次へ', on_click=self.on_click_next)
+            '次へ', tooltip='次へ (Cotrol+Shift+N)', on_click=self.on_click_next)
         self.btnPrev = ft.ElevatedButton(
-            '戻る', on_click=self.on_click_previous)
+            '戻る', tooltip='戻る (Cotrol+Shift+P)', on_click=self.on_click_previous)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Cotrol+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
@@ -77,7 +81,7 @@ class SetVmMemoryForm(ft.Card):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        controls = ft.Container(
+        self.controls = ft.Container(
             ft.Column(
                 [
                     header,
@@ -91,7 +95,7 @@ class SetVmMemoryForm(ft.Card):
             height=self.content_height,
             padding=30,
         )
-        super().__init__(controls)
+        super().__init__(self.controls)
 
     @Logging.func_logger
     def generate_confirm_text(self):
@@ -123,17 +127,11 @@ class SetVmMemoryForm(ft.Card):
         self.dropMemorySize.update()
 
     @Logging.func_logger
-    def on_click_cancel(self, e):
-        self.step_change_cancel(e)
-
-    @Logging.func_logger
-    def on_click_previous(self, e):
-        self.step_change_previous(e)
-
-    @Logging.func_logger
     def on_click_next(self, e):
+        self._lock_form_controls()
         self.session.get('job_options')['change_vm_memory_enabled'] = str(self.checkChangeVmMemoryEnabled.value)
         self.session.get('job_options')['memory_gb'] = int(self.dropMemorySize.value)
         self.session.set('confirm_text', self.generate_confirm_text())
         Logging.info('JOB_OPTIONS: ' + str(self.session.get('job_options')))
+        self._unlock_form_controls()
         self.step_change_next(e)

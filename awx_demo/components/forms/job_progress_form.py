@@ -9,13 +9,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
 
-class JobProgressForm(ft.Card):
+class JobProgressForm(BaseWizardCard):
 
     # const
     CONTENT_HEIGHT = 500
@@ -28,13 +29,14 @@ class JobProgressForm(ft.Card):
     JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE = 1
     JOB_STATUS_CHECK_RESULT_EXECUTABLE_TIMEOUT = 2
 
-    def __init__(self, session, request_id, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
+    def __init__(self, session, page: ft.Page, request_id, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
         self.session = session
+        self.page = page
         self.request_id = request_id
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
-        self.step_change_exit = step_change_exit
+        self.step_change_cancel = step_change_exit
         self.scheduler_job_id = ''
 
         # controls
@@ -60,7 +62,7 @@ class JobProgressForm(ft.Card):
             )
         )
         self.btnExit = ft.FilledButton(
-            '閉じる', on_click=self.exit_clicked, disabled=True)
+            '閉じる', tooltip='閉じる (Cotrol+Shift+X)', on_click=self.on_click_cancel, disabled=True)
 
         # Content
         header = ft.Container(
@@ -101,7 +103,7 @@ class JobProgressForm(ft.Card):
         except (KeyboardInterrupt, SystemExit):
             pass
 
-        controls = ft.Container(
+        self.controls = ft.Container(
             ft.Column(
                 [
                     header,
@@ -115,12 +117,14 @@ class JobProgressForm(ft.Card):
             height=self.content_height,
             padding=30,
         )
-        super().__init__(controls)
+        super().__init__(self.controls)
 
     @Logging.func_logger
     def refresh_progress(self):
         if self.session.get('job_id') is None:
             self._on_job_request_failed()
+            IaasRequestHelper.update_request_status(db.get_db(), self.session.get('document_id'),
+                RequestStatus.APPLYING_FAILED, self.session)
             return
 
         db_session = db.get_db()
@@ -137,8 +141,8 @@ class JobProgressForm(ft.Card):
 
         if job_status == AWXApiHelper.JOB_STATUS_SUCCEEDED:
             self._on_job_status_completed()
-            IaasRequestHelper.update_request_status(db.get_db(), self.session.get(
-                'document_id'), RequestStatus.COMPLETED, self.session)
+            IaasRequestHelper.update_request_status(db.get_db(), self.session.get('document_id'),
+                RequestStatus.COMPLETED, self.session)
             self.pbJob.update()
             return
         elif job_status == AWXApiHelper.JOB_STATUS_RUNNING:
@@ -147,6 +151,10 @@ class JobProgressForm(ft.Card):
             self.pbJob.update()
         elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
             self._on_job_status_request_failed()
+            IaasRequestHelper.update_request_status(db.get_db(), self.session.get('document_id'),
+                RequestStatus.APPLYING_FAILED, self.session)
+            self.pbJob.update()
+            return
 
         # ジョブの進捗状況の次回の確認が可能かどうかを判定
         next_runnable = self._job_next_runnable()
@@ -334,7 +342,3 @@ class JobProgressForm(ft.Card):
         dt_now = datetime.now()
         timestamp = dt_now.strftime('%Y-%m-%d %H:%M:%S')
         return timestamp
-
-    @Logging.func_logger
-    def exit_clicked(self, e):
-        self.step_change_exit(e)

@@ -36,6 +36,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                 self.session.set("new_request_wizard_step", "select_target")
                 formStep = SelectTargetForm(
                     session=self.session,
+                    page=self.page,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
                     body_height=self.BODY_HEIGHT,
@@ -50,6 +51,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
                 formStep = SetVmCpuForm(
                     session=self.session,
+                    page=self.page,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
                     body_height=self.BODY_HEIGHT,
@@ -64,6 +66,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                 self.session.set("new_request_wizard_step", "set_vm_memory")
                 formStep = SetVmMemoryForm(
                     session=self.session,
+                    page=self.page,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
                     body_height=self.BODY_HEIGHT,
@@ -78,6 +81,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                 self.session.set("new_request_wizard_step", "send_request_confirm")
                 formStep = SendRequestConfirmForm(
                     session=self.session,
+                    page=self.page,
                     title=self.CONFIRM_FORM_TITLE,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
@@ -94,11 +98,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     self.session.set("new_request_wizard_step", "job_progress")
                     formStep = JobProgressForm(
                         session=self.session,
+                        page=self.page,
                         request_id=self.session.get("request_id"),
                         height=self.CONTENT_HEIGHT,
                         width=self.CONTENT_WIDTH,
                         body_height=self.BODY_HEIGHT,
-                        step_change_exit=self.on_click_save,
+                        step_change_exit=self.on_click_cancel,
                     )
                     self.wizard_dialog.content = formStep
                     self.page.title = f"{self.session.get('app_title_base')} - 処理の進捗"
@@ -136,6 +141,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                 self.session.set("new_request_wizard_step", "select_target")
                 formStep = SelectTargetForm(
                     session=self.session,
+                    page=self.page,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
                     body_height=self.BODY_HEIGHT,
@@ -150,6 +156,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
                 formStep = SetVmCpuForm(
                     session=self.session,
+                    page=self.page,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
                     body_height=self.BODY_HEIGHT,
@@ -164,6 +171,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                 self.session.set("new_request_wizard_step", "set_vm_memory")
                 formStep = SetVmMemoryForm(
                     session=self.session,
+                    page=self.page,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
                     body_height=self.BODY_HEIGHT,

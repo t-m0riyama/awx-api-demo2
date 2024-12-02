@@ -25,11 +25,15 @@ class NavigationRouter:
         self.page = page
         self.app_title_base = app_title_base
         self.dlgLogin = dlgLogin
+        self.formRequests = None
 
     def route_change(self):
         template_route = ft.TemplateRoute(self.page.route)
+
+        # 遷移前のフォームのショートカットキーを登録解除
+        if self.formRequests is not None:
+            self.formRequests.unregister_key_shortcuts()
         self.page.controls.clear()
-        formRequests = None
 
         if template_route.match('/login'):
             self.page.open(self.dlgLogin)
@@ -38,30 +42,31 @@ class NavigationRouter:
         else:
             if SessionHelper.logout_if_session_expired(self.page, self.session): return
             self.dlgLogin.open = False
+
             if self.session.get('user_role') == UserRole.USER_ROLE:
                 match template_route.route:
                     case '/latest_requests':
-                        formRequests = LatestRequestListForm(
+                        self.formRequests = LatestRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - 最新の申請"
                         navigation_selected_index = 0
                     case '/deadline_requests':
-                        formRequests = DeadlineRequestListForm(
+                        self.formRequests = DeadlineRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - リリース希望日順"
                         navigation_selected_index = 1
                     case '/all_requests':
-                        formRequests = AllRequestListForm(
+                        self.formRequests = AllRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - すべての申請"
                         navigation_selected_index = 2
                     case '/completed_requests':
-                        formRequests = CompletedRequestListForm(
+                        self.formRequests = CompletedRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - 完了済みの申請"
                         navigation_selected_index = 3
                     case '/my_activities':
-                        formRequests = MyActivityListForm(
+                        self.formRequests = MyActivityListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - 操作履歴"
                         navigation_selected_index = 0
@@ -71,32 +76,32 @@ class NavigationRouter:
             else:
                 match template_route.route:
                     case '/latest_requests':
-                        formRequests = LatestRequestListForm(
+                        self.formRequests = LatestRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - 最新の申請"
                         navigation_selected_index = 0
                     case '/deadline_requests':
-                        formRequests = DeadlineRequestListForm(
+                        self.formRequests = DeadlineRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - リリース希望日順"
                         navigation_selected_index = 1
                     case '/my_requests':
-                        formRequests = MyRequestListForm(
+                        self.formRequests = MyRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - 自身の申請"
                         navigation_selected_index = 2
                     case '/all_requests':
-                        formRequests = AllRequestListForm(
+                        self.formRequests = AllRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - すべての申請"
                         navigation_selected_index = 3
                     case '/completed_requests':
-                        formRequests = CompletedRequestListForm(
+                        self.formRequests = CompletedRequestListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - 完了済みの申請"
                         navigation_selected_index = 4
                     case '/all_activities':
-                        formRequests = AllActivityListForm(
+                        self.formRequests = AllActivityListForm(
                             self.session, self.page)
                         self.page.title = f"{self.app_title_base} - 操作履歴"
                         navigation_selected_index = 0
@@ -109,11 +114,11 @@ class NavigationRouter:
                     ft.Column(col={
                                   "sm": 2, "md": 2, "lg": 2, "xl": 2, "xxl": 1
                               },
-                              controls=[Sidebar(self.session, navigation_selected_index)]),
+                              controls=[Sidebar(self.session, self.page, navigation_selected_index)]),
                     ft.Column(col={
                                   "sm": 10, "md": 10, "lg": 10, "xl": 10, "xxl": 11
                               },
-                              controls=[formRequests]),
+                              controls=[self.formRequests]),
                 ],
                 spacing=30,
                 vertical_alignment=ft.CrossAxisAlignment.START,  # 画面上部から表示

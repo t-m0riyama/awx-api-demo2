@@ -20,6 +20,7 @@ class NewRequestWizard(BaseWizard):
         self.session = session
         self.page = page
         self.parent_refresh_func = parent_refresh_func
+        self._save_keyboard_shortcuts()
         formStep = CreateRequestForm(
             session=self.session,
             page=self.page,

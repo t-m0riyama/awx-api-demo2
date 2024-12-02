@@ -47,6 +47,11 @@ class RequestCommonInfoTabForm(ft.Card):
         self.page.overlay.append(self.dpRequestDeadline)
 
         # controls
+        self.textRequestId = ft.Text(
+            value=('申請ID: ' + self.session.get('request_id')),
+            theme_style=ft.TextThemeStyle.BODY_LARGE,
+            color=ft.colors.PRIMARY,
+        )
         self.textRequestDate = ft.Text(
             value=('申請日: ' + self.session.get('request_date').strftime('%Y/%m/%d %H:%M')
                    ) if self.session.contains_key('request_date') else '申請日:(未指定)',
@@ -110,6 +115,7 @@ class RequestCommonInfoTabForm(ft.Card):
             [
                 ft.Row(
                     [
+                        self.textRequestId,
                         self.textRequestDate,
                         self.textUpdated,
                     ],

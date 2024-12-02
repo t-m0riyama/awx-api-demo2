@@ -25,7 +25,8 @@ class EditRequestWizard(BaseWizard):
         self.parent_refresh_func = parent_refresh_func
         db_session = db.get_db()
         request_operation = IaasRequestHelper.get_request(db_session, self.session.get("request_id")).request_operation
-        Logging.warning(f"job_options: {request_operation}")
+        Logging.info(f"job_options: {request_operation}")
+        self._save_keyboard_shortcuts()
         db_session.close()
         formStep = EditRequestForm(
             session=self.session,
@@ -64,6 +65,7 @@ class EditRequestWizard(BaseWizard):
                 self.session.set("edit_request_wizard_step", "job_execute_confirm")
                 formStep = JobExecuteConfirmForm(
                     session=self.session,
+                    page=self.page,
                     title=self.CONFIRM_FORM_TITLE,
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,
@@ -79,6 +81,7 @@ class EditRequestWizard(BaseWizard):
                 self.session.set("edit_request_wizard_step", "job_progress")
                 formStep = JobProgressForm(
                     session=self.session,
+                    page=self.page,
                     request_id=self.session.get("request_id"),
                     height=self.CONTENT_HEIGHT,
                     width=self.CONTENT_WIDTH,

@@ -1,5 +1,6 @@
 import flet as ft
 
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.db_helper.activity_helper import ActivityHelper
@@ -18,16 +19,21 @@ class AppHeader(ft.Row):
         self.toggle_dark_light_icon = ft.IconButton(
             icon="light_mode",
             selected_icon="dark_mode",
-            tooltip="ライトモード/ダークモードの切り替え",
-            on_click=self.toggle_icon,
+            tooltip="ライトモード/ダークモードの切り替え (Cotrol+Shift+T)",
+            on_click=self.toggle_thema_mode,
         )
         role_friendly = UserRole.to_friendly(self.session.get("user_role"))
         self.appbar_items = [
             ft.PopupMenuItem(
-                text=(self.session.get("awx_loginid") + " (" + role_friendly + ")")
+                text=(self.session.get("awx_loginid") + " [" + role_friendly + "]")
             ),
             ft.PopupMenuItem(),
-            ft.PopupMenuItem(text="ログアウト", on_click=self.logout_clicked),
+            ft.PopupMenuItem(
+                content=ft.Text(
+                    "ログアウト (Cotrol+Shift+Q)"
+                ),
+                on_click=self.logout_clicked
+            ),
             # ft.PopupMenuItem(text='設定'),
         ]
         # appbarフィールドの設定
@@ -60,9 +66,42 @@ class AppHeader(ft.Row):
                 )
             ],
         )
+        self.register_key_shortcuts()
 
     @Logging.func_logger
-    def toggle_icon(self, e):
+    def register_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        # ダークモード/ライトモードのテーマ切り替え
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="T", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.toggle_thema_mode,
+        )
+        # ログアウト
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Q", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.logout_clicked,
+        )
+        # ログへのセッションダンプ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="V", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=lambda e, session=self.session: SessionHelper.dump_session(session),
+        )
+        # ログへのキーボードショートカット一覧出力
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Z", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=lambda e: keybord_shortcut_manager.dump_key_shortcuts(),
+        )
+
+    @Logging.func_logger
+    def toggle_thema_mode(self, e):
         self.page.theme_mode = "dark" if self.page.theme_mode == "light" else "light"
         self.toggle_dark_light_icon.selected = not self.toggle_dark_light_icon.selected
         self.page.update()

@@ -56,6 +56,7 @@ class ManageInfoTabForm(ft.Card):
             hint_text="Iaas作業担当者のアカウントを指定します。",
             on_change=self.on_change_iaas_user,
             disabled=iaas_user_change_disabled,
+            autofocus=True,
         )
 
         status_change_disabled = (
@@ -76,6 +77,7 @@ class ManageInfoTabForm(ft.Card):
             hint_text="申請の状態を指定します。",
             on_change=self.on_change_request_status,
             disabled=status_change_disabled,
+            autofocus=True,
         )
         self.textJobId = ft.Text(
             value=(

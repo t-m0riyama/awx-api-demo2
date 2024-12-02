@@ -5,11 +5,13 @@ import flet as ft
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.utils.logging import Logging
 
 
-class SelectTargetForm(ft.Card):
+class SelectTargetForm(BaseWizardCard):
 
     # const
     CONTENT_HEIGHT = 500
@@ -18,8 +20,9 @@ class SelectTargetForm(ft.Card):
     VMS_LENGTH_MAX = 120
     VSPHERE_CLUSTERS_DEFAULT = 'cluster-1'
 
-    def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
+    def __init__(self, session, page: ft.Page, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
+        self.page = page
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
@@ -48,6 +51,7 @@ class SelectTargetForm(ft.Card):
             value=self.session.get('job_options')['vsphere_cluster'] if 'vsphere_cluster' in self.session.get('job_options') else '指定なし',
             options=cluster_options,
             hint_text='仮想マシンの稼働するクラスタ名を指定します。',
+            autofocus=True,
             disabled=change_disabled,
         )
         self.tfVms = ParameterInputText(
@@ -57,14 +61,15 @@ class SelectTargetForm(ft.Card):
             hint_text='仮想マシンを指定します。複数の仮想マシンは、「,」で区切ることで指定できます。',
             max_length=self.VMS_LENGTH_MAX,
             on_change=self.on_change_vms,
+            on_submit=self.on_click_next,
         )
         self.btnNext = ft.FilledButton(
-            '次へ', on_click=self.on_click_next,
+            '次へ', tooltip='次へ (Cotrol+Shift+N)', on_click=self.on_click_next,
             disabled=False if 'target_vms' in self.session.get('job_options') else True)
         self.btnPrev = ft.ElevatedButton(
-            '戻る', on_click=self.on_click_previous)
+            '戻る', tooltip='戻る (Cotrol+Shift+P)', on_click=self.on_click_previous)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Cotrol+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
@@ -88,7 +93,7 @@ class SelectTargetForm(ft.Card):
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
-        controls = ft.Container(
+        self.controls = ft.Container(
             ft.Column(
                 [
                     header,
@@ -102,7 +107,26 @@ class SelectTargetForm(ft.Card):
             height=self.content_height,
             padding=30,
         )
-        super().__init__(controls)
+        super().__init__(self.controls)
+
+    # @Logging.func_logger
+    # def register_key_shortcuts(self):
+    #     keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+    #     keybord_shortcut_manager.register_key_shortcut(
+    #         key_set=keybord_shortcut_manager.create_key_set(
+    #             key="N", shift=True, ctrl=True, alt=False, meta=False
+    #         ),
+    #         func=self.on_click_next,
+    #     )
+
+    # @Logging.func_logger
+    # def unregister_key_shortcuts(self):
+    #     keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+    #     keybord_shortcut_manager.unregister_key_shortcut(
+    #         key_set=keybord_shortcut_manager.create_key_set(
+    #             key="N", shift=True, ctrl=True, alt=False, meta=False
+    #         ),
+    #     )
 
     @Logging.func_logger
     def on_change_vms(self, e):
@@ -113,16 +137,10 @@ class SelectTargetForm(ft.Card):
         self.btnNext.update()
 
     @Logging.func_logger
-    def on_click_cancel(self, e):
-        self.step_change_cancel(e)
-
-    @Logging.func_logger
-    def on_click_previous(self, e):
-        self.step_change_previous(e)
-
-    @Logging.func_logger
     def on_click_next(self, e):
-        self.session.get('job_options')[
-            'vsphere_cluster'] = self.dropCluster.value
+        if self.tfVms.value == '': return
+        self._lock_form_controls()
+        self.session.get('job_options')['vsphere_cluster'] = self.dropCluster.value
         self.session.get('job_options')['target_vms'] = self.tfVms.value
+        self._unlock_form_controls()
         self.step_change_next(e)

@@ -8,6 +8,7 @@ from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.forms.delete_confirm_form import DeleteConfirmForm
 from awx_demo.components.forms.helper.request_row_helper import RequestRowData, RequestRowHelper
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.components.wizards.edit_request_wizard import EditRequestWizard
@@ -28,6 +29,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     DEFAULT_SORT_ASCENDING = True
     FORM_TITLE = "最新の申請"
     FILTERED_IAAS_USERS_DEFAULT = "root,admin,awxcli"
+    REQUEST_ID_COLUMN_NUMBER = 1
 
     def __init__(self, session, page: ft.Page):
         self.session = session
@@ -80,6 +82,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
         requests_data = RequestRowHelper.query_request_all(self)
         self.dtRequests.rows = []
+        shortcut_index = 0
         for request_data in requests_data:
             request_row_data = RequestRowData(
                 request_status=request_data.request_status,
@@ -92,11 +95,13 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             )
             self.dtRequests.rows.append(
                 RequestRowHelper.generate_request_row(
-                    self,
-                    request_data.request_id,
-                    request_row_data,
+                    request_list_form=self,
+                    row_id=request_data.request_id,
+                    request_data=request_row_data,
+                    shortcut_index=shortcut_index,
                 )
             )
+            shortcut_index += 1
         self.rowRequests = ft.ResponsiveRow(
             [
                 ft.Column(
@@ -110,8 +115,10 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         )
         self.btnAddRequest = ft.FilledButton(
             text="新規作成",
+            tooltip="新規作成 (Cotrol+Shift+N)",
             icon=ft.icons.ADD,
             on_click=self.on_click_add_request,
+            autofocus=True,
         )
 
         filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip('\'').split(",")
@@ -143,17 +150,17 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             items=[
                                 ft.PopupMenuItem(
                                     icon=ft.icons.FIBER_NEW,
-                                    text=RequestStatus.START_FRIENDLY,
+                                    text=RequestStatus.START_FRIENDLY + " (Alt+Shift+I)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
                                     icon=ft.icons.APPROVAL,
-                                    text=RequestStatus.APPROVED_FRIENDLY,
+                                    text=RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
                                     icon=ft.icons.CHECK_CIRCLE,
-                                    text=RequestStatus.COMPLETED_FRIENDLY,
+                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)",
                                     on_click=self.on_change_request_status,
                                 ),
                             ],
@@ -179,7 +186,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                     ft.PopupMenuItem(),  # divider
                     ft.PopupMenuItem(
                         icon=ft.icons.DELETE,
-                        text="削除",
+                        text="削除 (Alt+Shift+R)",
                         on_click=self.on_selected_delete,
                     ),
                 ]
@@ -192,7 +199,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             items=[
                                 ft.PopupMenuItem(
                                     icon=ft.icons.CHECK_CIRCLE,
-                                    text=RequestStatus.COMPLETED_FRIENDLY,
+                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)",
                                     on_click=self.on_change_request_status,
                                 ),
                             ],
@@ -216,26 +223,30 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         )
         self.tfSearchRequestText = ParameterInputText(
             label="依頼内容に含まれる文字を検索",
-            width=340,
+            # width=340,
+            expand=True,
             on_submit=self.on_click_search_request_text,
         )
         self.btnSearchRequestText = ft.IconButton(
             icon=ft.icons.SEARCH,
             icon_color=ft.colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_search_request_text,
-            tooltip="検索",
+            autofocus=True,
+            tooltip="検索 (Control+Enter)",
         )
         range_min, range_max, request_data_count = RequestRowHelper.get_page_range(self)
         self.textRequestsRange = ft.Text(
             "{}-{} / {}".format(range_min, range_max, request_data_count)
         )
         self.btnPreviousPage = ft.IconButton(
+            tooltip="前へ (Control+Shift+<)",
             icon=ft.icons.ARROW_LEFT,
             icon_color=ft.colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
+            tooltip="次へ (Control+Shift+>)",
             icon=ft.icons.ARROW_RIGHT,
             icon_color=ft.colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
@@ -256,7 +267,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                 ft.ResponsiveRow(
                     [
                         ft.Row(
-                            col={"sm": 3, "md": 3, "lg": 3, "xl": 3, "xxl": 3},
+                            col={"sm": 3},
                             controls=[
                                 self.btnAddRequest,
                                 self.btnActions,
@@ -264,7 +275,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             alignment=ft.MainAxisAlignment.START,
                         ),
                         ft.Row(
-                            col={"sm": 6, "md": 6, "lg": 6, "xl": 7, "xxl": 7},
+                            col={"sm": 6},
                             controls=[
                                 self.tfSearchRequestText,
                                 self.btnSearchRequestText,
@@ -272,7 +283,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
                         ft.Row(
-                            col={"sm": 3, "md": 3, "lg": 3, "xl": 2, "xxl": 2},
+                            col={"sm": 3},
                             controls=[
                                 self.btnPreviousPage,
                                 self.textRequestsRange,
@@ -312,14 +323,187 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             # title=ft.Text("削除の確認"),
             content=formDeleteConfirm,
             actions=[
-                ft.ElevatedButton("はい", on_click=self.on_click_delete_request_yes),
+                ft.ElevatedButton("はい", tooltip="はい (Control+Shift+Y)", on_click=self.on_click_delete_request_yes),
                 ft.FilledButton(
-                    "キャンセル", on_click=self.on_click_delete_request_cancel
+                    "キャンセル", tooltip="キャンセル (Esc)", on_click=self.on_click_delete_request_cancel
                 ),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
+        self.register_key_shortcuts()
         super().__init__(self.controls)
+
+    @Logging.func_logger
+    def register_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        # 申請の新規作成
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="N", shift=True, ctrl=True, alt=False, meta=False
+            ),
+            func=self.on_click_add_request,
+        )
+        # 依頼内容に含まれる文字の検索を実行
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_search_request_text,
+        )
+        # 申請一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key=">", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_next_page,
+        )
+        # 申請一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="<", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_previous_page,
+        )
+        # 申請一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_next_page,
+        )
+        # 申請一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.on_click_previous_page,
+        )
+        # 申請の状態の変更 => 申請中
+        status_text = RequestStatus.START_FRIENDLY + " (Alt+Shift+I)"
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="I", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+            func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
+        )
+        # 申請の状態の変更 => 承認済み
+        status_text = RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)"
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="P", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+            func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
+        )
+        # 申請の状態の変更 => 作業完了
+        status_text = RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)"
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="E", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+            func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
+        )
+        # 申請の削除
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="R", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+            func=self.on_selected_delete,
+        )
+        # 申請の編集
+        for row_index in range(0, 10):
+            request_id = self.dtRequests.rows[row_index].cells[self.REQUEST_ID_COLUMN_NUMBER].content.value
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key=f"{row_index}", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+                func=lambda e, request_id=request_id: self.on_request_edit_open(request_id=request_id),
+            )
+        # 申請の選択・選択解除
+        for selected_index in range(0, 10):
+            keybord_shortcut_manager.register_key_shortcut(
+                key_set=keybord_shortcut_manager.create_key_set(
+                    key=f"{selected_index}", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=lambda e, selected_index=selected_index: self.on_request_row_select(selected_index=selected_index),
+            )
+
+    @Logging.func_logger
+    def unregister_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        # 申請の新規作成
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="N", shift=True, ctrl=True, alt=False, meta=False
+            ),
+        )
+        # 依頼内容に含まれる文字の検索を実行
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 申請一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key=">", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 申請一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="<", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 申請一覧のページ送り / 次のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 申請一覧のページ送り / 前のページへ
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 申請の状態の変更 => 申請中
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="I", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+        )
+        # 申請の状態の変更 => 承認済み
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="P", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+        )
+        # 申請の状態の変更 => 作業完了
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="E", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+        )
+        # 申請の削除
+        keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="R", shift=True, ctrl=False, alt=True, meta=False,
+            ),
+        )
+        # 申請の編集
+        for row_index in range(0, 10):
+            keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key=str(row_index), shift=True, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 申請の選択・選択解除
+        for row_index in range(0, 10):
+            keybord_shortcut_manager.unregister_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key=str(row_index), shift=True, ctrl=False, alt=True, meta=False,
+            ),
+        )
 
     @abc.abstractmethod
     def get_query_filters(self):
@@ -370,34 +554,48 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self.btnActions.update()
 
     @Logging.func_logger
-    def on_request_row_select(self, e):
+    def on_request_row_select(self, e=None, selected_index=None):
         self._lock_form_controls()
-        e.control.selected = not e.control.selected
+        # キーボードショートカットから呼ばれた場合、
+        # selected_indexにセットされている値を申請一覧のインデックスの代わりに利用する
+        if selected_index is not None:
+            self.dtRequests.rows[selected_index].selected = not self.dtRequests.rows[selected_index].selected
+            self.dtRequests.rows[selected_index].update()
+        else:
+            e.control.selected = not e.control.selected
+            e.control.update()
         self.activate_action_button()
         self._unlock_form_controls()
-        e.control.update()
 
     @Logging.func_logger
-    def on_request_edit_open(self, e):
+    def on_request_edit_open(self, e=None, request_id=None):
         self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
-        self.session.set("request_id", e.control.content.value)
+
+        # キーボードショートカットから呼ばれた場合、
+        # request_idにセットされている値を申請IDの代わりに利用する
+        request_id = request_id if request_id is not None else e.control.content.value
+        self.session.set("request_id", request_id)
         self._unlock_form_controls()
         self.open_edit_request_dialog()
 
     @Logging.func_logger
-    def on_change_request_status(self, e):
+    def on_change_request_status(self, e=None, status_text=None):
         self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
-        match e.control.text:
-            case RequestStatus.START_FRIENDLY:
-                request_status = RequestStatus.START
-            case RequestStatus.APPROVED_FRIENDLY:
-                request_status = RequestStatus.APPROVED
-            case RequestStatus.COMPLETED_FRIENDLY:
-                request_status = RequestStatus.COMPLETED
-            case _:
-                request_status = ""
+        if self.btnActions.disabled: return
+
+        # キーボードショートカットから呼ばれた場合、
+        # status_textにセットされている値を変更したいステータスの代わりに利用する
+        status_text = status_text if status_text is not None else e.control.text
+        if status_text == RequestStatus.START_FRIENDLY + " (Alt+Shift+I)":
+            request_status = RequestStatus.START
+        elif status_text == RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)":
+            request_status = RequestStatus.APPROVED
+        elif status_text == RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)":
+            request_status = RequestStatus.COMPLETED
+        else:
+            request_status = ""
         self._unlock_form_controls()
         RequestRowHelper.update_selected_request_status(self, request_status)
 
@@ -420,6 +618,23 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     def on_selected_delete(self, e):
         self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if self.btnActions.disabled: return
+        self._save_keyboard_shortcuts()
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        # 削除確認時に”はい”を選択
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Y", shift=True, ctrl=True, alt=False, meta=False
+            ),
+            func=self.on_click_delete_request_yes,
+        )
+        # 削除確認時に”キャンセル”を選択
+        keybord_shortcut_manager.register_key_shortcut(
+            key_set=keybord_shortcut_manager.create_key_set(
+                key="Escape", shift=False, ctrl=False, alt=False, meta=False
+            ),
+            func=self.on_click_delete_request_cancel,
+        )
         self._unlock_form_controls()
         self.open_delete_confirm_dialog()
 
@@ -439,6 +654,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self.dlgDeleteConfirm.open = False
         self.page.update()
         self.refresh()
+        self._restore_key_shortcuts()
 
     @Logging.func_logger
     def on_click_delete_request_cancel(self, e):
@@ -447,6 +663,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self._unlock_form_controls()
         self.dlgDeleteConfirm.open = False
         self.page.update()
+        self.refresh()
+        self._restore_key_shortcuts()
 
     @Logging.func_logger
     def on_click_edit_request_save(self, e):
@@ -498,3 +716,14 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # クリック連打対策解除
         self.controls.disabled = False
         self.controls.update()
+
+    @Logging.func_logger
+    def _save_keyboard_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keybord_shortcut_manager.save_key_shortcuts()
+        keybord_shortcut_manager.clear_key_shortcuts()
+
+    @Logging.func_logger
+    def _restore_key_shortcuts(self):
+        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keybord_shortcut_manager.restore_key_shortcuts()

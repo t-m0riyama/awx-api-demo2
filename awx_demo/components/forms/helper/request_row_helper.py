@@ -2,6 +2,7 @@ import json
 
 import flet as ft
 
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.db_helper.types.request_status import RequestStatus
@@ -24,13 +25,18 @@ class RequestRowHelper:
 
     @staticmethod
     @Logging.func_logger
-    def generate_request_row(request_list_form, row_id, request_data: RequestRowData):
+    def generate_request_row(request_list_form, row_id, request_data: RequestRowData, shortcut_index: int):
+        row_id_content = None
+        if shortcut_index <= 9:
+            row_id_content = ft.Text(str(row_id), color=ft.colors.PRIMARY, tooltip=f"Control+Shift+{shortcut_index}")
+        else:
+            row_id_content = ft.Text(str(row_id), color=ft.colors.PRIMARY)
+
         return ft.DataRow(
             cells=[
                 ft.DataCell(RequestRowHelper._request_status_to_icon(
                     request_data.request_status)),
-                ft.DataCell(ft.Text(str(row_id), color=ft.colors.PRIMARY),
-                            on_tap=request_list_form.on_request_edit_open),
+                ft.DataCell(row_id_content, on_tap=request_list_form.on_request_edit_open),
                 ft.DataCell(ft.Text(str(request_data.request_deadline))),
                 ft.DataCell(ft.Text(str(request_data.updated))),
                 ft.DataCell(ft.Text(request_data.request_user)),
@@ -50,6 +56,8 @@ class RequestRowHelper:
                 return ft.Icon(name=ft.icons.APPROVAL, color=ft.colors.PRIMARY, tooltip=RequestStatus.APPROVED_FRIENDLY)
             case RequestStatus.APPLYING:
                 return ft.ProgressRing(width=16, height=16, stroke_width=2, tooltip=RequestStatus.APPLYING_FRIENDLY)
+            case RequestStatus.APPLYING_FAILED:
+                return ft.Icon(name=ft.icons.RUNNING_WITH_ERRORS_OUTLINED, color=ft.colors.ERROR, tooltip=RequestStatus.APPLYING_FAILED_FRIENDLY)
             case RequestStatus.COMPLETED:
                 return ft.Icon(name=ft.icons.CHECK_CIRCLE, color=ft.colors.PRIMARY, tooltip=RequestStatus.COMPLETED_FRIENDLY)
 
@@ -116,6 +124,7 @@ class RequestRowHelper:
     def refresh_data_rows(request_list_form):
         requests_data = RequestRowHelper.query_request_all(request_list_form)
         request_list_form.dtRequests.rows = []
+        shortcut_index = 0
         for request_data in requests_data:
             request_row_data = RequestRowData(
                 request_status=request_data.request_status,
@@ -129,11 +138,13 @@ class RequestRowHelper:
             )
             request_list_form.dtRequests.rows.append(
                 RequestRowHelper.generate_request_row(
-                    request_list_form,
-                    request_data.request_id,
-                    request_row_data,
+                    request_list_form=request_list_form,
+                    row_id=request_data.request_id,
+                    request_data=request_row_data,
+                    shortcut_index=shortcut_index,
                 )
             )
+            shortcut_index += 1
         request_list_form.dtRequests.update()
 
     @staticmethod

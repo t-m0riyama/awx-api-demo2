@@ -7,14 +7,16 @@ from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
+from awx_demo.db_helper.types.request_category import RequestOperation
 from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.doc_id_utils import DocIdUtils
 from awx_demo.utils.logging import Logging
 
 
-class SendRequestConfirmForm(ft.Card):
+class SendRequestConfirmForm(BaseWizardCard):
 
     # const
     CONTENT_HEIGHT = 600
@@ -25,8 +27,9 @@ class SendRequestConfirmForm(ft.Card):
     VARS_TEMPLATE_NAME = 'aap_demo_extra_vars'
     DOCUMENT_ID_LENGTH = 7
 
-    def __init__(self, session, title=DEFAULT_FORM_TITLE, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
+    def __init__(self, session, page: ft.Page, title=DEFAULT_FORM_TITLE, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
+        self.page = page
         self.title = title
         self.content_height = height
         self.content_width = width
@@ -45,33 +48,34 @@ class SendRequestConfirmForm(ft.Card):
             max_lines=4,
             read_only=True,
         )
-        execute_disabled = True if self.session.get(
-            'user_role') == UserRole.USER_ROLE else False
+        execute_disabled = True if self.session.get('user_role') == UserRole.USER_ROLE else False
         self.checkShutdownBeforeChange = ft.Checkbox(
             label='設定変更前に、仮想マシンを停止する',
             value=bool(strtobool(str(self.session.get('job_options')['shutdown_before_change']))) if 'shutdown_before_change' in self.session.get('job_options') else True,
+            autofocus=True,
             on_change=self.on_change_shutdown_before_change,
         )
         self.checkStartupAfterChange = ft.Checkbox(
             label='設定変更後に、仮想マシンを起動する',
             value=bool(strtobool(str(self.session.get('job_options')['startup_after_change']))) if 'startup_after_change' in self.session.get('job_options') else True,
+            autofocus=True,
             on_change=self.on_change_startup_after_change,
         )
         self.checkExecuteJobImmediately = ft.Checkbox(
             label='この変更作業をすぐに実行する', value=False, disabled=execute_disabled)
         self.btnNext = ft.FilledButton(
-            '申請する', on_click=self.on_click_send_request)
+            '申請する', tooltip='申請する (Cotrol+Shift+N)', on_click=self.on_click_next)
         self.btnPrev = ft.ElevatedButton(
-            '戻る', on_click=self.on_click_previous)
+            '戻る', tooltip='戻る (Cotrol+Shift+P)', on_click=self.on_click_previous)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Cotrol+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
             formTitle,
             margin=ft.margin.only(bottom=20),
         )
-        body = ft.Column(
+        body_general = ft.Column(
             [
                 formDescription,
                 self.tfConfirmText,
@@ -81,6 +85,15 @@ class SendRequestConfirmForm(ft.Card):
             ],
             height=self.body_height,
         )
+        body_start_stop = ft.Column(
+            [
+                formDescription,
+                self.tfConfirmText,
+                self.checkExecuteJobImmediately,
+            ],
+            height=self.body_height,
+        )
+        body = body_start_stop if self.session.get('request_operation') == RequestOperation.VM_START_OR_STOP_FRIENDLY else body_general
         footer = ft.Row(
             [
                 self.btnCancel,
@@ -117,8 +130,12 @@ class SendRequestConfirmForm(ft.Card):
             'change_vm_memory_enabled',
             'shutdown_before_change',
             'startup_after_change',
+            'vm_start_stop',
         ]
-        job_options = {key: str(self.session.get('job_options')[key]) for key in target_options}
+        job_options = {}
+        for key in target_options:
+            if key in self.session.get('job_options'):
+                job_options[key] = str(self.session.get('job_options')[key])
         return job_options
 
     @Logging.func_logger
@@ -141,19 +158,12 @@ class SendRequestConfirmForm(ft.Card):
         db_session.close()
 
     @Logging.func_logger
-    def on_click_cancel(self, e):
-        self.step_change_cancel(e)
-
-    @Logging.func_logger
-    def on_click_previous(self, e):
-        self.step_change_previous(e)
-
-    @Logging.func_logger
-    def on_click_send_request(self, e):
+    def on_click_next(self, e):
         self._lock_form_controls()
 
-        self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
-        self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
+        if not self.session.get('request_operation') == RequestOperation.VM_START_OR_STOP_FRIENDLY:
+            self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
+            self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
         job_options = self._generate_job_options()
 
         if self.checkExecuteJobImmediately.value:
@@ -202,15 +212,3 @@ class SendRequestConfirmForm(ft.Card):
     @Logging.func_logger
     def on_change_startup_after_change(self, e):
         self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
-
-    @Logging.func_logger
-    def _lock_form_controls(self):
-        # クリック連打対策
-        self.controls.disabled = True
-        self.controls.update()
-
-    @Logging.func_logger
-    def _unlock_form_controls(self):
-        # クリック連打対策解除
-        self.controls.disabled = False
-        self.controls.update()

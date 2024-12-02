@@ -6,11 +6,12 @@ import flet as ft
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.db_helper.types.request_category import RequestCategory, RequestOperation
 from awx_demo.utils.logging import Logging
 
 
-class CreateRequestForm(ft.Card):
+class CreateRequestForm(BaseWizardCard):
 
     # const
     CONTENT_HEIGHT = 550
@@ -28,6 +29,7 @@ class CreateRequestForm(ft.Card):
         self.step_change_next = step_change_next
         self.step_change_previous = step_change_previous
         self.step_change_cancel = step_change_cancel
+        self.wizard_card_start = True
 
         # initialize Job options
         if not self.session.contains_key('job_options'):
@@ -60,11 +62,14 @@ class CreateRequestForm(ft.Card):
                 'request_text') else '',
             label='依頼内容',
             max_length=80,
-            hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバ構築')
+            hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバ構築',
+            on_submit=self.on_click_next,
+        )
         self.dropCategory = ft.Dropdown(
             label='依頼区分',
             value=self.session.get('request_category') if self.session.contains_key(
                 'request_category') else 'サーバに対する変更',
+            # autofocus=True,
             options=[
                 ft.dropdown.Option(RequestCategory.VM_CREATE_FRIENDLY, disabled=True),
                 ft.dropdown.Option(RequestCategory.VM_SETTING_CHANGE_FRIENDLY),
@@ -76,8 +81,10 @@ class CreateRequestForm(ft.Card):
             label='申請項目',
             value=self.session.get('request_operation') if self.session.contains_key(
                 'request_operation') else RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY,
+            # autofocus=True,
             options=[
                 ft.dropdown.Option(RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY),
+                ft.dropdown.Option(RequestOperation.VM_START_OR_STOP_FRIENDLY),
             ],
         )
         self.lblRequestDeadline = ft.Text(
@@ -89,16 +96,15 @@ class CreateRequestForm(ft.Card):
         self.btnRequestDeadline = ft.FilledTonalButton(
             '希望日の指定',
             icon=ft.icons.CALENDAR_MONTH,
+            # autofocus=True,
             on_click=lambda _: self.page.open(
                 self.dpRequestDeadline
             ),
         )
         self.btnNext = ft.FilledButton(
-            '次へ',
-            on_click=self.on_click_next,
-        )
+            '次へ', tooltip='次へ (Cotrol+Shift+N)', on_click=self.on_click_next)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Cotrol+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
@@ -150,10 +156,6 @@ class CreateRequestForm(ft.Card):
         self.lblRequestDeadline.value = 'リリース希望日: ' + \
             self.dpRequestDeadline.value.strftime('%Y/%m/%d')
         self.lblRequestDeadline.update()
-
-    @Logging.func_logger
-    def on_click_cancel(self, e):
-        self.step_change_cancel(e)
 
     @Logging.func_logger
     def on_click_next(self, e):
