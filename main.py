@@ -15,16 +15,13 @@ LOG_FILE_DEFAULT = "awx_api_demo2.log"
 
 def main(page: ft.Page):
 
-    def route_change(e):
-        router = NavigationRouter(page.session, page, page.session.get("app_title_base"), dlgLogin)
-        router.route_change()
-
     page.session.set("app_title_base", os.getenv("RMX_APP_TITLE", APP_TITLE_DEFAULT).strip('"'))
     formLogin = LoginForm(session=page.session, page=page)
     dlgLogin = ft.AlertDialog(
         modal=True,
         content=formLogin,
     )
+    router = NavigationRouter(page.session, page, page.session.get("app_title_base"), dlgLogin)
 
     # Page レイアウト
     page.title = page.session.get("app_title_base")
@@ -33,7 +30,7 @@ def main(page: ft.Page):
     page.window.width = 1120
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.on_route_change = route_change
+    page.on_route_change = lambda e: router.route_change()
     page.theme_mode = "light"
 
     # Locale Settings
