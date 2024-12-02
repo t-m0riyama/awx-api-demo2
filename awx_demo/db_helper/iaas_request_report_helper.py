@@ -49,6 +49,7 @@ class IaasRequestReportHelper:
         "change_vm_memory_enabled",
         "shutdown_before_change",
         "startup_after_change",
+        "vm_start_stop",
     ]
     JOB_OPTIONS_FRIENDLY_KEYS = [
         "クラスタ名",
@@ -59,6 +60,7 @@ class IaasRequestReportHelper:
         "メモリ容量の変更",
         "設定変更前に、仮想マシンを停止する",
         "設定変更後に、仮想マシンを起動する",
+        "仮想マシンの起動/停止",
     ]
 
     @classmethod
