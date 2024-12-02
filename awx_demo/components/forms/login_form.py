@@ -41,7 +41,7 @@ class LoginForm(ft.Card):
                 if self.session.contains_key("awx_loginid")
                 else ""
             ),
-            on_submit=self.login_clicked,
+            on_submit=self.on_click_login,
         )
         self.tfPassword = ParameterInputText(
             label="Password",
@@ -51,7 +51,7 @@ class LoginForm(ft.Card):
                 else ""
             ),
             is_password=True,
-            on_submit=self.login_clicked,
+            on_submit=self.on_click_login,
         )
         self.tfAWXUrl = ParameterInputText(
             label="AWX URL",
@@ -60,7 +60,7 @@ class LoginForm(ft.Card):
                 if self.session.contains_key("awx_url")
                 else default_awx_url
             ),
-            on_submit=self.login_clicked,
+            on_submit=self.on_click_login,
         )
         self.txtLoginMessage = ft.Text(
             "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。",
@@ -68,7 +68,7 @@ class LoginForm(ft.Card):
             color=ft.colors.ERROR,
             visible=False,
         )
-        self.btnLogin = ft.FilledButton("ログイン", on_click=self.login_clicked)
+        self.btnLogin = ft.FilledButton("ログイン", on_click=self.on_click_login)
 
         header = AppTitle(title=app_title, width=self.CONTENT_WIDTH)
         body = ft.Column(
@@ -104,7 +104,7 @@ class LoginForm(ft.Card):
         super().__init__(controls)
 
     @Logging.func_logger
-    def login_clicked(self, e):
+    def on_click_login(self, e):
         loginid = self.tfLoginid.value
         password = self.tfPassword.value
         awx_url = self.tfAWXUrl.value
