@@ -3,13 +3,14 @@ import flet as ft
 
 class ParameterInputText(ft.TextField):
 
-    def __init__(self, value=None, label='', hint_text='', is_password=False, text_size=16, text_align=ft.TextAlign.LEFT, max_length=None, width=0, expand=False, disabled=False, on_change=None, on_submit=None):
+    def __init__(self, value=None, label='', hint_text='', helper_text='', is_password=False, text_size=16, text_align=ft.TextAlign.LEFT, max_length=None, width=0, expand=False, disabled=False, on_change=None, on_submit=None):
         if width:
             super().__init__(
                 value=value,
                 label=label,
                 autofocus=True,
                 hint_text=hint_text,
+                helper_text=helper_text,
                 password=is_password,
                 can_reveal_password=is_password,
                 text_size=text_size,
@@ -28,6 +29,7 @@ class ParameterInputText(ft.TextField):
                 label=label,
                 autofocus=True,
                 hint_text=hint_text,
+                helper_text=helper_text,
                 password=is_password,
                 can_reveal_password=is_password,
                 text_size=text_size,
