@@ -4,6 +4,7 @@ from distutils.util import strtobool
 import flet as ft
 
 from awx_demo.awx_api.awx_api_helper import AWXApiHelper
+from awx_demo.awx_api.job_options_helper import JobOptionsHelper
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.types.user_role import UserRole
@@ -23,8 +24,6 @@ class SendRequestConfirmForm(BaseWizardCard):
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 300
     DEFAULT_FORM_TITLE = '確認'
-    JOB_TEMPLATE_NAME = 'vm-config-utils_set_vm_cpu'
-    VARS_TEMPLATE_NAME = 'aap_demo_extra_vars'
     DOCUMENT_ID_LENGTH = 7
 
     def __init__(self, session, page: ft.Page, title=DEFAULT_FORM_TITLE, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
@@ -120,25 +119,6 @@ class SendRequestConfirmForm(BaseWizardCard):
         super().__init__(self.controls)
 
     @Logging.func_logger
-    def _generate_job_options(self):
-        target_options = [
-            'vsphere_cluster',
-            'target_vms',
-            'vcpus',
-            'memory_gb',
-            'change_vm_cpu_enabled',
-            'change_vm_memory_enabled',
-            'shutdown_before_change',
-            'startup_after_change',
-            'vm_start_stop',
-        ]
-        job_options = {}
-        for key in target_options:
-            if key in self.session.get('job_options'):
-                job_options[key] = str(self.session.get('job_options')[key])
-        return job_options
-
-    @Logging.func_logger
     def _add_request(self, job_options, request_status):
         document_id = DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH)
         self.session.set('document_id', document_id)
@@ -164,7 +144,7 @@ class SendRequestConfirmForm(BaseWizardCard):
         if not self.session.get('request_operation') == RequestOperation.VM_START_OR_STOP_FRIENDLY:
             self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
             self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
-        job_options = self._generate_job_options()
+        job_options = JobOptionsHelper.generate_job_options(self.session, RequestOperation.to_formal(self.session.get('request_operation')))
 
         if self.checkExecuteJobImmediately.value:
             self.session.set('execute_job_immediately', True)
@@ -177,11 +157,12 @@ class SendRequestConfirmForm(BaseWizardCard):
 
             db_session = db.get_db()
             request = IaasRequestHelper.get_request(db_session, self.session.get('document_id'))
+            job_template_name = JobOptionsHelper.get_job_template_name(RequestOperation.to_formal(self.session.get('request_operation')))
             job_id = AWXApiHelper.start_job(
                 uri_base=self.session.get('awx_url'),
                 loginid=self.session.get('awx_loginid'),
                 password=self.session.get('awx_password'),
-                job_template_name=self.JOB_TEMPLATE_NAME,
+                job_template_name=job_template_name,
                 request=request,
                 job_options=job_options,
                 session=self.session,

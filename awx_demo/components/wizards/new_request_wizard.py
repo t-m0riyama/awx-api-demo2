@@ -21,7 +21,7 @@ class NewRequestWizard(BaseWizard):
         self.page = page
         self.parent_refresh_func = parent_refresh_func
         self._save_keyboard_shortcuts()
-        formStep = CreateRequestForm(
+        self.formStep = CreateRequestForm(
             session=self.session,
             page=self.page,
             height=self.CONTENT_HEIGHT,
@@ -34,7 +34,7 @@ class NewRequestWizard(BaseWizard):
         self.wizard_dialog = ft.AlertDialog(
             modal=True,
             # title=ft.Text("削除の確認"),
-            content=formStep,
+            content=self.formStep,
             actions_alignment=ft.MainAxisAlignment.END,
         )
         super().__init__()
@@ -51,23 +51,27 @@ class NewRequestWizard(BaseWizard):
     @Logging.func_logger
     def on_click_next(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        Logging.warning("step: " + self.session.get("new_request_wizard_step"))
+        Logging.warning("op: " + self.session.get("request_operation"))
         match self.session.get("new_request_wizard_step"):
             case "create_request":
                 match self.session.get("request_operation"):
                     case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
                         child_wizard = SetVmCpuMemoryWizard(
-                            self.session,
-                            self.page,
-                            self.wizard_dialog,
-                            self.parent_refresh_func,
+                            session=self.session,
+                            page=self.page,
+                            wizard_dialog=self.wizard_dialog,
+                            parent_wizard=self,
+                            parent_refresh_func=self.parent_refresh_func,
                         )
                         child_wizard.on_click_next(e)
                     case RequestOperation.VM_START_OR_STOP_FRIENDLY:
                         child_wizard = SetVmStartStopWizard(
-                            self.session,
-                            self.page,
-                            self.wizard_dialog,
-                            self.parent_refresh_func,
+                            session=self.session,
+                            page=self.page,
+                            wizard_dialog=self.wizard_dialog,
+                            parent_wizard=self,
+                            parent_refresh_func=self.parent_refresh_func,
                         )
                         child_wizard.on_click_next(e)
                     case _:
@@ -81,5 +85,8 @@ class NewRequestWizard(BaseWizard):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("new_request_wizard_step"):
             case _:
-                Logging.error("undefined step!!!")
+                self.session.set("new_request_wizard_step", "create_request")
+                self.wizard_dialog.content = self.formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 申請の追加"
+                self.page.open(self.wizard_dialog)
         self.page.update()

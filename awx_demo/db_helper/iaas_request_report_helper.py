@@ -50,6 +50,9 @@ class IaasRequestReportHelper:
         "shutdown_before_change",
         "startup_after_change",
         "vm_start_stop",
+        "change_vm_start_stop_enabled",
+        "shutdown_timeout_sec",
+        "tools_wait_timeout_sec",
     ]
     JOB_OPTIONS_FRIENDLY_KEYS = [
         "クラスタ名",
@@ -61,6 +64,9 @@ class IaasRequestReportHelper:
         "設定変更前に、仮想マシンを停止する",
         "設定変更後に、仮想マシンを起動する",
         "仮想マシンの起動/停止",
+        "仮想マシンの起動/停止の変更",
+        "シャットダウン時の待ち合わせ時間(秒)",
+        "VMware Tools起動の待ち合わせ時間(秒)",
     ]
 
     @classmethod

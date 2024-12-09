@@ -6,11 +6,14 @@ from awx_demo.components.forms.edit_tab.request_common_info_tab_form import Requ
 from awx_demo.components.forms.edit_tab.select_target_tab_form import SelectTargetTabForm
 from awx_demo.components.forms.edit_tab.set_vm_cpu_tab_form import SetVmCpuTabForm
 from awx_demo.components.forms.edit_tab.set_vm_memory_tab_form import SetVmMemoryTabForm
+from awx_demo.components.forms.edit_tab.set_vm_start_stop_tab_form import SetVmStartStopTabForm
 from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.db import db
+from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
+from awx_demo.db_helper.types.request_category import RequestOperation
 from awx_demo.db_helper.types.request_status import RequestStatus
 from awx_demo.utils.logging import Logging
 
@@ -41,40 +44,8 @@ class EditRequestForm(BaseWizardCard):
         db_session = db.get_db()
         SessionHelper.load_request_to_session_from_db(
             self.session, db_session, self.request_id)
+        request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
         db_session.close()
-
-        # overlayを利用する可能性があるコントロールは、あらかじめインスタンスを作成する
-        self.formCreateRequest = RequestCommonInfoTabForm(
-            self.session,
-            self.page,
-            self.tab_content_height,
-            self.tab_content_width,
-            self.tab_body_height,
-        )
-        self.formSelectTarget = SelectTargetTabForm(
-            self.session,
-            self.tab_content_height,
-            self.tab_content_width,
-            self.tab_body_height,
-        )
-        self.formSetVmCpu = SetVmCpuTabForm(
-            self.session,
-            self.tab_content_height,
-            self.tab_content_width,
-            self.tab_body_height,
-        )
-        self.formSetVmMemory = SetVmMemoryTabForm(
-            self.session,
-            self.tab_content_height,
-            self.tab_content_width,
-            self.tab_body_height,
-        )
-        self.formManageInfo = ManageInfoTabForm(
-            self.session,
-            self.tab_content_height,
-            self.tab_content_width,
-            self.tab_body_height,
-        )
 
         # controls
         if self.session.get('user_role') == UserRole.USER_ROLE:
@@ -82,36 +53,119 @@ class EditRequestForm(BaseWizardCard):
         else:
             formTitle = FormTitle('申請の編集', '')
 
-        self.tabRequest = ft.Tabs(
-            selected_index=0,
-            animation_duration=300,
-            tabs=[
-                ft.Tab(
-                    tab_content=ft.Text('共通', tooltip='共通 (Cotrol+Shift+G)'),
-                    content=self.formCreateRequest,
-                ),
-                ft.Tab(
-                    tab_content=ft.Text('変更対象', tooltip='変更対象 (Cotrol+Shift+T)'),
-                    content=self.formSelectTarget,
-                ),
-                ft.Tab(
-                    tab_content=ft.Text('CPU', tooltip='CPU (Cotrol+Shift+C)'),
-                    content=self.formSetVmCpu,
-                ),
-                ft.Tab(
-                    tab_content=ft.Text('メモリ', tooltip='メモリ (Cotrol+Shift+M)'),
-                    content=self.formSetVmMemory,
-                ),
-                ft.Tab(
-                    tab_content=ft.Text('管理情報', tooltip='管理情報 (Cotrol+Shift+A)'),
-                    content=self.formManageInfo,
-                ),
-            ],
-            scrollable=True,
-            expand=1,
-        )
-        change_disabled = True if self.session.get(
-            'user_role') == UserRole.USER_ROLE else False
+        # overlayを利用する可能性があるコントロールは、あらかじめインスタンスを作成する
+        match request_operation:
+            case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
+                self.formCommonInfo = RequestCommonInfoTabForm(
+                    self.session,
+                    self.page,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.formSelectTarget = SelectTargetTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.formSetVmCpu = SetVmCpuTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.formSetVmMemory = SetVmMemoryTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.formManageInfo = ManageInfoTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.tabRequest = ft.Tabs(
+                    selected_index=0,
+                    animation_duration=300,
+                    tabs=[
+                        ft.Tab(
+                            tab_content=ft.Text('共通', tooltip='共通 (Cotrol+Shift+G)'),
+                            content=self.formCommonInfo,
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Cotrol+Shift+T)'),
+                            content=self.formSelectTarget,
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text('CPU', tooltip='CPU (Cotrol+Shift+C)'),
+                            content=self.formSetVmCpu,
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text('メモリ', tooltip='メモリ (Cotrol+Shift+M)'),
+                            content=self.formSetVmMemory,
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Cotrol+Shift+A)'),
+                            content=self.formManageInfo,
+                        ),
+                    ],
+                    scrollable=True,
+                    expand=1,
+                )
+            case RequestOperation.VM_START_OR_STOP_FRIENDLY:
+                self.formCommonInfo = RequestCommonInfoTabForm(
+                    self.session,
+                    self.page,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.formSelectTarget = SelectTargetTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.formStartStop= SetVmStartStopTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.formManageInfo = ManageInfoTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.tabRequest = ft.Tabs(
+                    selected_index=0,
+                    animation_duration=300,
+                    tabs=[
+                        ft.Tab(
+                            tab_content=ft.Text('共通', tooltip='共通 (Cotrol+Shift+G)'),
+                            content=self.formCommonInfo,
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Cotrol+Shift+T)'),
+                            content=self.formSelectTarget,
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text('起動/停止', tooltip='変更対象 (Cotrol+Shift+B)'),
+                            content=self.formStartStop,
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Cotrol+Shift+A)'),
+                            content=self.formManageInfo,
+                        ),
+                    ],
+                    scrollable=True,
+                    expand=1,
+                )
+        change_disabled = True if self.session.get('user_role') == UserRole.USER_ROLE else False
         is_execute_disabled = self.session.get('request_status') not in [
             RequestStatus.APPROVED, RequestStatus.COMPLETED]
         self.btnExecute = ft.ElevatedButton(
@@ -161,25 +215,48 @@ class EditRequestForm(BaseWizardCard):
 
     @Logging.func_logger
     def generate_confirm_text(self):
+        db_session = db.get_db()
+        request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
+        db_session.close()
         confirm_text = '== 基本情報 ====================='
-        confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
-        confirm_text += '\n依頼内容: ' + (self.session.get('request_text') if self.session.contains_key(
-            'request_text') and self.session.get('request_text') != '' else '(未指定)')
-        confirm_text += '\n依頼区分: ' + self.session.get('request_category')
-        confirm_text += '\n申請項目: ' + self.session.get('request_operation')
-        request_deadline = self.session.get('request_deadline').strftime(
-            '%Y/%m/%d') if self.session.contains_key('request_deadline') else '(未指定)'
-        confirm_text += '\nリリース希望日: ' + request_deadline
-        confirm_text += '\n\n== 詳細情報 ====================='
-        confirm_text += '\nクラスタ: ' + \
-            self.session.get('job_options')['vsphere_cluster']
-        confirm_text += '\n仮想マシン: ' + \
-            self.session.get('job_options')['target_vms']
-        if str(self.session.get('job_options')['change_vm_cpu_enabled']) == 'True':
-            confirm_text += '\nCPUコア数: ' + \
-                str(self.session.get('job_options')['vcpus'])
-        if str(self.session.get('job_options')['change_vm_memory_enabled']) == 'True':
-            confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
+        match request_operation:
+            case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
+                confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
+                confirm_text += '\n依頼内容: ' + (self.session.get('request_text') if self.session.contains_key(
+                    'request_text') and self.session.get('request_text') != '' else '(未指定)')
+                confirm_text += '\n依頼区分: ' + self.session.get('request_category')
+                confirm_text += '\n申請項目: ' + self.session.get('request_operation')
+                request_deadline = self.session.get('request_deadline').strftime(
+                    '%Y/%m/%d') if self.session.contains_key('request_deadline') else '(未指定)'
+                confirm_text += '\nリリース希望日: ' + request_deadline
+                confirm_text += '\n\n== 詳細情報 ====================='
+                confirm_text += '\nクラスタ: ' + \
+                    self.session.get('job_options')['vsphere_cluster']
+                confirm_text += '\n仮想マシン: ' + \
+                    self.session.get('job_options')['target_vms']
+                if str(self.session.get('job_options')['change_vm_cpu_enabled']) == 'True':
+                    confirm_text += '\nCPUコア数: ' + \
+                        str(self.session.get('job_options')['vcpus'])
+                if str(self.session.get('job_options')['change_vm_memory_enabled']) == 'True':
+                    confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
+            case RequestOperation.VM_START_OR_STOP_FRIENDLY:
+                confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
+                confirm_text += '\n依頼内容: ' + (self.session.get('request_text') if self.session.contains_key(
+                    'request_text') and self.session.get('request_text') != '' else '(未指定)')
+                confirm_text += '\n依頼区分: ' + self.session.get('request_category')
+                confirm_text += '\n申請項目: ' + self.session.get('request_operation')
+                request_deadline = self.session.get('request_deadline').strftime(
+                    '%Y/%m/%d') if self.session.contains_key('request_deadline') else '(未指定)'
+                confirm_text += '\nリリース希望日: ' + request_deadline
+                confirm_text += '\n\n== 詳細情報 ====================='
+                confirm_text += '\nクラスタ: ' + \
+                    self.session.get('job_options')['vsphere_cluster']
+                confirm_text += '\n仮想マシン: ' + \
+                    self.session.get('job_options')['target_vms']
+                if str(self.session.get('job_options')['change_vm_start_stop_enabled']) == 'True':
+                    confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
+                    confirm_text += '\nシャットダウン時の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
+                    confirm_text += '\nVMware Tools起動の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
         return confirm_text
 
     @Logging.func_logger

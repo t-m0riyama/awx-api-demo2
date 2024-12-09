@@ -20,11 +20,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
     CONFIRM_FORM_TITLE = "CPU/メモリ割り当て変更"
 
     def __init__(
-        self, session, page: ft.Page, wizard_dialog: ft.AlertDialog, parent_refresh_func
+        self, session, page: ft.Page, wizard_dialog: ft.AlertDialog, parent_wizard, parent_refresh_func
     ):
         self.session = session
         self.page = page
         self.wizard_dialog = wizard_dialog
+        self.parent_wizard = parent_wizard
         self.parent_refresh_func = parent_refresh_func
         super().__init__()
 
@@ -123,20 +124,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
         match self.session.get("new_request_wizard_step"):
             case "select_target":
-                self.session.set("new_request_wizard_step", "create_request")
-                formStep = CreateRequestForm(
-                    session=self.session,
-                    page=self.page,
-                    height=self.CONTENT_HEIGHT,
-                    width=self.CONTENT_WIDTH,
-                    body_height=self.BODY_HEIGHT,
-                    step_change_next=self.on_click_next,
-                    step_change_previous=self.on_click_previous,
-                    step_change_cancel=self.on_click_cancel,
-                )
-                self.wizard_dialog.content = formStep
-                self.page.title = f"{self.session.get('app_title_base')} - 申請の追加"
-                self.page.open(self.wizard_dialog)
+                self.parent_wizard.on_click_previous(e)
             case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "select_target")
                 formStep = SelectTargetForm(
