@@ -328,7 +328,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         ActivityRowHelper.refresh_page_indicator(self)
 
     @Logging.func_logger
-    def on_request_edit_open(self):
+    def on_request_edit_open(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self.session.set("request_id", e.control.content.value)
         # TODO: アクティビティの詳細をダイアログで表示する場合は別途実装する
