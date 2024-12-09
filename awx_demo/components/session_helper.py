@@ -8,6 +8,8 @@ from awx_demo.utils.logging import Logging
 
 
 class SessionHelper:
+    # const
+    SESSION_DUMP_FILTER = ["password", "token"]
 
     @classmethod
     @Logging.func_logger
@@ -29,7 +31,12 @@ class SessionHelper:
     @Logging.func_logger
     def dump_session(session):
         for session_key_name in session.get_keys():
-            Logging.info(f"SESSION_DUMP / {session_key_name}: {session.get(session_key_name)}")
+            session_value = session.get(session_key_name)
+            for filter in SessionHelper.SESSION_DUMP_FILTER:
+                if filter.lower() in session_key_name.lower():
+                    session_value = '*********'
+                    break
+            Logging.info(f"SESSION_DUMP / {session_key_name}: {session_value}")
 
     @staticmethod
     @Logging.func_logger
