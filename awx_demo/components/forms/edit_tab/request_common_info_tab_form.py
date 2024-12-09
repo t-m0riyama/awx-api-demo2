@@ -69,10 +69,10 @@ class RequestCommonInfoTabForm(ft.Card):
                 'request_text') else '',
             label='依頼内容',
             max_length=80,
-            hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバ構築',
+            hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバCPU増設',
             on_change=self.on_change_request_text)
         self.dropCategory = ft.Dropdown(
-            label='依頼区分',
+            label='依頼区分(＊)',
             value=self.session.get('request_category') if self.session.contains_key(
                 'request_category') else RequestCategory.VM_SETTING_CHANGE_FRIENDLY,
             options=[
@@ -84,17 +84,18 @@ class RequestCommonInfoTabForm(ft.Card):
             disabled=True,
         )
         self.dropOperation = ft.Dropdown(
-            label='申請項目',
+            label='申請項目(＊)',
             value=self.session.get('request_operation') if self.session.contains_key(
                 'request_operation') else RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY,
             options=[
                 ft.dropdown.Option(RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY),
+                ft.dropdown.Option(RequestOperation.VM_START_OR_STOP_FRIENDLY),
             ],
             disabled=True,
         )
         self.textRequestDeadline = ft.Text(
-            value=('リリース希望日: ' + self.session.get('request_deadline').strftime('%Y/%m/%d')
-                   ) if self.session.contains_key('request_deadline') else 'リリース希望日:(未指定)',
+            value=('リリース希望日(＊): ' + self.session.get('request_deadline').strftime('%Y/%m/%d')
+                   ) if self.session.contains_key('request_deadline') else 'リリース希望日(＊):(未指定)',
             theme_style=ft.TextThemeStyle.BODY_LARGE,
             color=ft.colors.PRIMARY,
         )

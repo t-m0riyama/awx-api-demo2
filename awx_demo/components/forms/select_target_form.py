@@ -32,7 +32,7 @@ class SelectTargetForm(BaseWizardCard):
 
         # controls
         formTitle = FormTitle('変更対象の選択', 'クラスタと仮想マシンの指定')
-        formDescription = FormDescription('変更対象の仮想マシンと稼働するクラスタを指定します。クラスタは作業時に担当者が指定します。')
+        formDescription = FormDescription('変更対象の仮想マシンと稼働するクラスタを指定します。クラスタは作業時に担当者が指定します。＊は入力/選択が必須の項目です。')
 
         # 申請者ロールの場合は、変更できないようにする
         change_disabled = (
@@ -57,7 +57,7 @@ class SelectTargetForm(BaseWizardCard):
         self.tfVms = ParameterInputText(
             value=self.session.get('job_options')[
                 'target_vms'] if 'target_vms' in self.session.get('job_options') else '',
-            label='仮想マシン',
+            label='仮想マシン名(＊)',
             hint_text='仮想マシンを指定します。複数の仮想マシンは、「,」で区切ることで指定できます。',
             max_length=self.VMS_LENGTH_MAX,
             on_change=self.on_change_vms,

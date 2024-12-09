@@ -35,7 +35,7 @@ class SetVmCpuTabForm(ft.Card):
             vm_cpu_options.append(ft.dropdown.Option(vm_cpu_option.strip()))
 
         self.dropCpus = ft.Dropdown(
-            label='CPUコア数',
+            label='CPUコア数(＊)',
             value=self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else '2',
             options=vm_cpu_options,
             on_change=self.on_change_dropcpus,

@@ -34,7 +34,7 @@ class SetVmMemoryTabForm(ft.Card):
         for vm_memory_option in vm_memory_sizes.split(","):
             vm_memory_options.append(ft.dropdown.Option(vm_memory_option.strip()))
         self.dropMemorySize = ft.Dropdown(
-            label='メモリ容量(GB)',
+            label='メモリ容量(GB)(＊)',
             value=self.session.get('job_options')[
                 'memory_gb'] if 'memory_gb' in self.session.get('job_options') else 8,
             options=vm_memory_options,

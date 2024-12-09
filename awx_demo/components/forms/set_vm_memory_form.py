@@ -30,7 +30,7 @@ class SetVmMemoryForm(BaseWizardCard):
         # controls
 
         formTitle = FormTitle('メモリの割り当て変更', '変更内容')
-        formDescription = FormDescription('仮想マシンに割り当てるメモリ容量を変更します。')
+        formDescription = FormDescription('仮想マシンに割り当てるメモリ容量を変更します。＊は入力/選択が必須の項目です。')
         self.checkChangeVmMemoryEnabled = ft.Checkbox(
             label='メモリ容量を変更する',
             value=self.session.get('job_options')['change_vm_memory_enabled'] if 'change_vm_memory_enabled' in self.session.get('job_options') else True,
@@ -45,7 +45,7 @@ class SetVmMemoryForm(BaseWizardCard):
             vm_memory_options.append(ft.dropdown.Option(vm_memory_option.strip()))
 
         self.dropMemorySize = ft.Dropdown(
-            label='メモリ容量(GB)',
+            label='メモリ容量(GB)(＊)',
             value=self.session.get('job_options')[
                 'memory_gb'] if 'memory_gb' in self.session.get('job_options') else '8',
             options=vm_memory_options,

@@ -41,7 +41,7 @@ class SelectTargetTabForm(ft.Card):
         self.tfVms = ParameterInputText(
             value=self.session.get('job_options')[
                 'target_vms'] if 'target_vms' in self.session.get('job_options') else '',
-            label='仮想マシン',
+            label='仮想マシン名(＊)',
             hint_text='仮想マシンを指定します。複数の仮想マシンは、「,」で区切ることで指定できます。',
             max_length=self.VMS_LENGTH_MAX,
             on_change=self.on_change_vms,

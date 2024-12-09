@@ -29,7 +29,7 @@ class SetVmCpuForm(BaseWizardCard):
 
         # controls
         formTitle = FormTitle('CPUの割り当て変更', '変更内容')
-        formDescription = FormDescription('仮想マシンに割り当てるCPUコア数を変更します。')
+        formDescription = FormDescription('仮想マシンに割り当てるCPUコア数を変更します。＊は入力/選択が必須の項目です。')
         self.checkChangeVmCpuEnabled = ft.Checkbox(
             label='CPUコア数を変更する',
             value=self.session.get('job_options')['change_vm_cpu_enabled'] if 'change_vm_cpu_enabled' in self.session.get('job_options') else True,
@@ -44,7 +44,7 @@ class SetVmCpuForm(BaseWizardCard):
             vm_cpu_options.append(ft.dropdown.Option(vm_cpu_option.strip()))
 
         self.dropCpus = ft.Dropdown(
-            label='CPUコア数',
+            label='CPUコア数(＊)',
             value=self.session.get('job_options')['vcpus'] if 'vcpus' in self.session.get('job_options') else '2',
             options=vm_cpu_options,
             autofocus=True,
