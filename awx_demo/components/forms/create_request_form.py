@@ -56,17 +56,17 @@ class CreateRequestForm(BaseWizardCard):
 
         # Controls
         formTitle = FormTitle('申請の追加', '申請項目の種類を選択')
-        formDescription = FormDescription('新しく申請を作成します。')
+        formDescription = FormDescription('新しく申請を作成します。＊は入力/選択が必須の項目です。')
         self.tfRequestText = ParameterInputText(
             value=self.session.get('request_text') if self.session.contains_key(
                 'request_text') else '',
             label='依頼内容',
             max_length=80,
-            hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバ構築',
+            hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバCPU増設',
             on_submit=self.on_click_next,
         )
         self.dropCategory = ft.Dropdown(
-            label='依頼区分',
+            label='依頼区分(＊)',
             value=self.session.get('request_category') if self.session.contains_key(
                 'request_category') else 'サーバに対する変更',
             # autofocus=True,
@@ -78,7 +78,7 @@ class CreateRequestForm(BaseWizardCard):
             ],
         )
         self.dropOperation = ft.Dropdown(
-            label='申請項目',
+            label='申請項目(＊)',
             value=self.session.get('request_operation') if self.session.contains_key(
                 'request_operation') else RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY,
             # autofocus=True,
@@ -88,8 +88,8 @@ class CreateRequestForm(BaseWizardCard):
             ],
         )
         self.lblRequestDeadline = ft.Text(
-            value=(f"リリース希望日: {self.session.get('request_deadline').strftime('%Y/%m/%d')}"
-                   ) if self.session.contains_key('request_deadline') else f"リリース希望日: {start_date.strftime('%Y/%m/%d')}",
+            value=(f"リリース希望日(＊): {self.session.get('request_deadline').strftime('%Y/%m/%d')}"
+                   ) if self.session.contains_key('request_deadline') else f"リリース希望日(＊): {start_date.strftime('%Y/%m/%d')}",
             theme_style=ft.TextThemeStyle.BODY_LARGE,
             color=ft.colors.PRIMARY,
         )
