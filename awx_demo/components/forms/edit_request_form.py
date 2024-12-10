@@ -255,8 +255,8 @@ class EditRequestForm(BaseWizardCard):
                     self.session.get('job_options')['target_vms']
                 if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
                     confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
-                    confirm_text += '\nシャットダウン時の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
-                    confirm_text += '\nVMware Tools起動の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
+                    confirm_text += '\nシャットダウン時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
+                    confirm_text += '\n起動時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
         return confirm_text
 
     @Logging.func_logger

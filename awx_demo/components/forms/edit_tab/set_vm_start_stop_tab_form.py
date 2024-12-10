@@ -43,7 +43,7 @@ class SetVmStartStopTabForm(ft.Card):
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
             value=self.session.get('job_options')['shutdown_timeout_sec'] if 'shutdown_timeout_sec' in self.session.get('job_options') else 600,
-            label='シャットダウン時の待ち合わせ時間(秒)',
+            label='シャットダウン時の最大待ち合わせ時間(秒)',
             text_align=ft.TextAlign.RIGHT,
             expand=True,
             hint_text='シャットダウンに時間を要するサーバは、この値をより大きく設定して下さい。',
@@ -51,7 +51,7 @@ class SetVmStartStopTabForm(ft.Card):
         )
         self.tfToolsWaitTimeoutSec = ParameterInputText(
             value=self.session.get('job_options')['tools_wait_timeout_sec'] if 'tools_wait_timeout_sec' in self.session.get('job_options') else 600,
-            label='VMware Tools起動の待ち合わせ時間(秒)',
+            label='起動時の最大待ち合わせ時間(秒)',
             text_align=ft.TextAlign.RIGHT,
             expand=True,
             hint_text='起動に時間を要するサーバは、この値をより大きく設定して下さい。',
@@ -106,8 +106,8 @@ class SetVmStartStopTabForm(ft.Card):
             self.session.get('job_options')['target_vms']
         if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
             confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
-            confirm_text += '\nシャットダウン時の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
-            confirm_text += '\nVMware Tools起動の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
+            confirm_text += '\nシャットダウン時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
+            confirm_text += '\n起動時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
         return confirm_text
 
     @Logging.func_logger

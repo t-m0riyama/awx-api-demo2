@@ -31,7 +31,7 @@ class SetVmStartStopForm(BaseWizardCard):
 
         # controls
         formTitle = FormTitle('仮想マシンの起動/停止', '変更内容')
-        formDescription = FormDescription('仮想マシンを起動または停止します。起動・停止に時間を要するサーバは、待ち合わせ時間をより大きく設定します。＊は入力/選択が必須の項目です。')
+        formDescription = FormDescription('仮想マシンを起動または停止します。起動・停止に時間を要するサーバは、最大待ち合わせ時間をより大きく設定します。＊は入力/選択が必須の項目です。')
         self.checkChangeStartStopEnabled = ft.Checkbox(
             label='起動/停止の状態を変更する',
             value=self.session.get('job_options')['vm_start_stop_enabled'] if 'vm_start_stop_enabled' in self.session.get('job_options') else True,
@@ -51,13 +51,13 @@ class SetVmStartStopForm(BaseWizardCard):
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
             value=self.session.get('job_options')['shutdown_timeout_sec'] if 'shutdown_timeout_sec' in self.session.get('job_options') else 600,
-            label='シャットダウン時の待ち合わせ時間(秒)',
+            label='シャットダウン時の最大待ち合わせ時間(秒)',
             text_align=ft.TextAlign.RIGHT,
             expand=True,
             hint_text='シャットダウンに時間を要するサーバは、この値をより大きく設定して下さい。')
         self.tfToolsWaitTimeoutSec = ParameterInputText(
             value=self.session.get('job_options')['tools_wait_timeout_sec'] if 'tools_wait_timeout_sec' in self.session.get('job_options') else 600,
-            label='VMware Tools起動の待ち合わせ時間(秒)',
+            label='起動時の最大待ち合わせ時間(秒)',
             text_align=ft.TextAlign.RIGHT,
             expand=True,
             hint_text='起動に時間を要するサーバは、この値をより大きく設定して下さい。')
@@ -128,8 +128,8 @@ class SetVmStartStopForm(BaseWizardCard):
             self.session.get('job_options')['target_vms']
         if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
             confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
-            confirm_text += '\nシャットダウン時の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
-            confirm_text += '\nVMware Tools起動の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
+            confirm_text += '\nシャットダウン時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
+            confirm_text += '\n起動時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
         return confirm_text
 
     @Logging.func_logger
