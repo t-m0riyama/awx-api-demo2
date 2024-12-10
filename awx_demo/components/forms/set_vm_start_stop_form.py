@@ -34,7 +34,7 @@ class SetVmStartStopForm(BaseWizardCard):
         formDescription = FormDescription('仮想マシンを起動または停止します。起動・停止に時間を要するサーバは、待ち合わせ時間をより大きく設定します。＊は入力/選択が必須の項目です。')
         self.checkChangeStartStopEnabled = ft.Checkbox(
             label='起動/停止の状態を変更する',
-            value=self.session.get('job_options')['change_vm_start_stop_enabled'] if 'change_vm_start_stop_enabled' in self.session.get('job_options') else True,
+            value=self.session.get('job_options')['vm_start_stop_enabled'] if 'vm_start_stop_enabled' in self.session.get('job_options') else True,
             on_change=self.on_change_vm_start_stop_enabled,
             disabled=True,
         )
@@ -47,7 +47,7 @@ class SetVmStartStopForm(BaseWizardCard):
                 ft.dropdown.Option(self.VM_STOP_DESCRIPTION),
                 ft.dropdown.Option(self.VM_POWEROFF_DESCRIPTION),
             ],
-            disabled=(not bool(strtobool(self.session.get('job_options')['change_vm_start_stop_enabled']))) if 'change_vm_start_stop_enabled' in self.session.get('job_options') else False,
+            disabled=(not bool(strtobool(self.session.get('job_options')['vm_start_stop_enabled']))) if 'vm_start_stop_enabled' in self.session.get('job_options') else False,
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
             value=self.session.get('job_options')['shutdown_timeout_sec'] if 'shutdown_timeout_sec' in self.session.get('job_options') else 600,
@@ -126,7 +126,7 @@ class SetVmStartStopForm(BaseWizardCard):
             self.session.get('job_options')['vsphere_cluster']
         confirm_text += '\n仮想マシン: ' + \
             self.session.get('job_options')['target_vms']
-        if str(self.session.get('job_options')['change_vm_start_stop_enabled']) == 'True':
+        if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
             confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
             confirm_text += '\nシャットダウン時の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
             confirm_text += '\nVMware Tools起動の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
@@ -134,7 +134,7 @@ class SetVmStartStopForm(BaseWizardCard):
 
     @Logging.func_logger
     def on_change_vm_start_stop_enabled(self, e):
-        self.session.get('job_options')['change_vm_start_stop_enabled'] = str(e.control.value)
+        self.session.get('job_options')['vm_start_stop_enabled'] = str(e.control.value)
         self.dropStartStop.disabled = False if e.control.value else True
         self.tfShutdownTimeoutSec.disabled = False if e.control.value else True
         self.tfToolsWaitTimeoutSec.disabled = False if e.control.value else True
@@ -145,7 +145,7 @@ class SetVmStartStopForm(BaseWizardCard):
     @Logging.func_logger
     def on_click_next(self, e):
         self._lock_form_controls()
-        self.session.get('job_options')['change_vm_start_stop_enabled'] = str(self.checkChangeStartStopEnabled.value)
+        self.session.get('job_options')['vm_start_stop_enabled'] = str(self.checkChangeStartStopEnabled.value)
         self.session.get('job_options')['vm_start_stop'] = self.dropStartStop.value
         self.session.get('job_options')['shutdown_timeout_sec'] = int(self.tfShutdownTimeoutSec.value)
         self.session.get('job_options')['tools_wait_timeout_sec'] = int(self.tfToolsWaitTimeoutSec.value)

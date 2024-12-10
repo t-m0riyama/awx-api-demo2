@@ -253,7 +253,7 @@ class EditRequestForm(BaseWizardCard):
                     self.session.get('job_options')['vsphere_cluster']
                 confirm_text += '\n仮想マシン: ' + \
                     self.session.get('job_options')['target_vms']
-                if str(self.session.get('job_options')['change_vm_start_stop_enabled']) == 'True':
+                if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
                     confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
                     confirm_text += '\nシャットダウン時の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
                     confirm_text += '\nVMware Tools起動の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])

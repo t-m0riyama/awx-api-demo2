@@ -50,7 +50,7 @@ class IaasRequestReportHelper:
         "shutdown_before_change",
         "startup_after_change",
         "vm_start_stop",
-        "change_vm_start_stop_enabled",
+        "vm_start_stop_enabled",
         "shutdown_timeout_sec",
         "tools_wait_timeout_sec",
     ]

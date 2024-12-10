@@ -30,7 +30,7 @@ class JobOptionsHelper:
                     'vsphere_cluster',
                     'target_vms',
                     'vm_start_stop',
-                    'change_vm_start_stop_enabled',
+                    'vm_start_stop_enabled',
                     'shutdown_timeout_sec',
                     'tools_wait_timeout_sec',
                 ]

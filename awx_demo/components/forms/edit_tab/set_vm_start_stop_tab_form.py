@@ -26,7 +26,7 @@ class SetVmStartStopTabForm(ft.Card):
         # controls
         self.checkChangeStartStopEnabled = ft.Checkbox(
             label='起動/停止の状態を変更する',
-            value=self.session.get('job_options')['change_vm_start_stop_enabled'] if 'change_vm_start_stop_enabled' in self.session.get('job_options') else True,
+            value=self.session.get('job_options')['vm_start_stop_enabled'] if 'vm_start_stop_enabled' in self.session.get('job_options') else True,
             on_change=self.on_change_vm_start_stop_enabled,
             disabled=True,
         )
@@ -39,7 +39,7 @@ class SetVmStartStopTabForm(ft.Card):
                 ft.dropdown.Option(self.VM_STOP_DESCRIPTION),
                 ft.dropdown.Option(self.VM_POWEROFF_DESCRIPTION),
             ],
-            disabled=(not bool(strtobool(self.session.get('job_options')['change_vm_start_stop_enabled']))) if 'change_vm_start_stop_enabled' in self.session.get('job_options') else False,
+            disabled=(not bool(strtobool(self.session.get('job_options')['vm_start_stop_enabled']))) if 'vm_start_stop_enabled' in self.session.get('job_options') else False,
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
             value=self.session.get('job_options')['shutdown_timeout_sec'] if 'shutdown_timeout_sec' in self.session.get('job_options') else 600,
@@ -104,7 +104,7 @@ class SetVmStartStopTabForm(ft.Card):
             self.session.get('job_options')['vsphere_cluster']
         confirm_text += '\n仮想マシン: ' + \
             self.session.get('job_options')['target_vms']
-        if str(self.session.get('job_options')['change_vm_start_stop_enabled']) == 'True':
+        if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
             confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
             confirm_text += '\nシャットダウン時の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
             confirm_text += '\nVMware Tools起動の待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
@@ -112,7 +112,7 @@ class SetVmStartStopTabForm(ft.Card):
 
     @Logging.func_logger
     def on_change_vm_start_stop_enabled(self, e):
-        self.session.get('job_options')['change_vm_start_stop_enabled'] = str(e.control.value)
+        self.session.get('job_options')['vm_start_stop_enabled'] = str(e.control.value)
         self.dropVmStartStop.disabled = False if e.control.value else True
         self.tfShutdownTimeoutSec.disabled = False if e.control.value else True
         self.tfToolsWaitTimeoutSec.disabled = False if e.control.value else True
