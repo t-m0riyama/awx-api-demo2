@@ -21,13 +21,6 @@ class BaseWizardCard(ft.Card):
             ),
             func=self.on_click_next,
         )
-        # 次へ / Enter
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key="Enter", shift=False, ctrl=False, alt=False, meta=False
-            ),
-            func=self.on_click_next,
-        )
         # 前へ
         keybord_shortcut_manager.register_key_shortcut(
             key_set=keybord_shortcut_manager.create_key_set(
