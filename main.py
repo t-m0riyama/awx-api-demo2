@@ -56,5 +56,5 @@ if __name__ == "__main__":
     Logging.init(log_dir, log_file)
     flet_path = os.getenv("FLET_PATH", FLET_PATH_DEFAULT)
     flet_port = int(os.getenv("FLET_PORT", FLET_PORT_DEFAULT))
-    # ft.app(target=main, port=flet_port, view=ft.AppView.FLET_APP)
-    ft.app(target=main, port=flet_port, view=ft.AppView.WEB_BROWSER)
+    # ft.app(target=main, port=flet_port, assets_dir="assets", view=ft.AppView.FLET_APP)
+    ft.app(target=main, port=flet_port, assets_dir="assets", view=ft.AppView.WEB_BROWSER)
