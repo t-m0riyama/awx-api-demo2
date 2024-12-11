@@ -70,3 +70,8 @@ services:
       # ログレベル（DB関連）
       - RMX_LOG_LEVEL_DB=WARNING
 
+      # CPUコア/メモリ割り当て変更を行う、AWX/AAPのジョブテンプレート名
+      JOB_TEMPLATE_SET_VM_CPU_MEMORY=vm-config-utils_set_vm_cpu
+
+      # サーバの起動/停止を行う、AWX/AAPのジョブテンプレート名
+      JOB_TEMPLATE_VM_START_STOP=vm-config-utils_vm_start_stop
