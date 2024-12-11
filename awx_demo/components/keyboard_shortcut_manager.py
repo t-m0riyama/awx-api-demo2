@@ -83,6 +83,10 @@ class KeyboardShortcutManager(SingletonComponent):
         return self.key_shortcuts
 
     @Logging.func_logger
+    def set_key_shortcuts(self, key_shortcuts) -> None:
+        self.key_shortcuts = key_shortcuts
+
+    @Logging.func_logger
     def on_keyboard_press(self, e: ft.KeyboardEvent):
         for key_shortcut in self.key_shortcuts:
             if key_shortcut["key_set"] == self.create_key_set(e.key, e.shift, e.ctrl, e.alt, e.meta):
