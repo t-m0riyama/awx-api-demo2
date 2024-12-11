@@ -312,27 +312,50 @@ class EditRequestForm(BaseWizardCard):
             ),
             func=lambda e: self._keyboard_switch_tab(1),
         )
-        # CPUタブに切り替え
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key="C", shift=True, ctrl=True, alt=False, meta=False
-            ),
-            func=lambda e: self._keyboard_switch_tab(2),
-        )
-        # メモリタブに切り替え
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key="M", shift=True, ctrl=True, alt=False, meta=False
-            ),
-            func=lambda e: self._keyboard_switch_tab(3),
-        )
-        # 管理情報タブに切り替え
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key="A", shift=True, ctrl=True, alt=False, meta=False
-            ),
-            func=lambda e: self._keyboard_switch_tab(4),
-        )
+
+        # 申請の種類に応じて、タブに対応したキーボードショートカットを登録
+        db_session = db.get_db()
+        request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
+        db_session.close()
+        match request_operation:
+            case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
+                # CPUタブに切り替え
+                keybord_shortcut_manager.register_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="C", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(2),
+                )
+                # メモリタブに切り替え
+                keybord_shortcut_manager.register_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="M", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(3),
+                )
+                # 管理情報タブに切り替え
+                keybord_shortcut_manager.register_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="A", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(4),
+                )
+            case RequestOperation.VM_START_OR_STOP_FRIENDLY:
+                # 起動/停止タブに切り替え
+                keybord_shortcut_manager.register_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="B", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(2),
+                )
+                # 管理情報タブに切り替え
+                keybord_shortcut_manager.register_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="A", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(3),
+                )
+
         # ログへのセッションダンプ
         keybord_shortcut_manager.register_key_shortcut(
             key_set=keybord_shortcut_manager.create_key_set(
@@ -398,18 +421,33 @@ class EditRequestForm(BaseWizardCard):
                 key="T", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
-        # CPUタブに切り替え
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key="C", shift=True, ctrl=True, alt=False, meta=False
-            ),
-        )
-        # メモリタブに切り替え
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key="M", shift=True, ctrl=True, alt=False, meta=False
-            ),
-        )
+
+        # 申請の種類に応じて、タブに対応したキーボードショートカットを登録
+        db_session = db.get_db()
+        request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
+        db_session.close()
+        match request_operation:
+            case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
+                # CPUタブに切り替え
+                keybord_shortcut_manager.unregister_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="C", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                )
+                # メモリタブに切り替え
+                keybord_shortcut_manager.unregister_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="M", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                )
+            case RequestOperation.VM_START_OR_STOP_FRIENDLY:
+                # 起動/停止タブに切り替え
+                keybord_shortcut_manager.unregister_key_shortcut(
+                    key_set=keybord_shortcut_manager.create_key_set(
+                        key="B", shift=True, ctrl=True, alt=False, meta=False
+                    ),
+                )
+
         # 管理情報タブに切り替え
         keybord_shortcut_manager.unregister_key_shortcut(
             key_set=keybord_shortcut_manager.create_key_set(
