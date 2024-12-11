@@ -72,6 +72,7 @@ class ManageInfoTabForm(ft.Card):
             options=[
                 ft.dropdown.Option(RequestStatus.START_FRIENDLY),
                 ft.dropdown.Option(RequestStatus.APPROVED_FRIENDLY),
+                ft.dropdown.Option(RequestStatus.APPLYING_FAILED_FRIENDLY),
                 ft.dropdown.Option(RequestStatus.COMPLETED_FRIENDLY),
             ],
             hint_text="申請の状態を指定します。",

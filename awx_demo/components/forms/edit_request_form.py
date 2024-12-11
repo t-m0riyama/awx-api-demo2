@@ -15,6 +15,7 @@ from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.db_helper.types.request_category import RequestOperation
 from awx_demo.db_helper.types.request_status import RequestStatus
+from awx_demo.db_helper.types.vm_start_stop import VmStartStop
 from awx_demo.utils.logging import Logging
 
 
@@ -254,7 +255,7 @@ class EditRequestForm(BaseWizardCard):
                 confirm_text += '\n仮想マシン: ' + \
                     self.session.get('job_options')['target_vms']
                 if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
-                    confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
+                    confirm_text += '\n起動/停止: ' + VmStartStop.to_friendly(self.session.get('job_options')['vm_start_stop'])
                     confirm_text += '\nシャットダウン時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
                     confirm_text += '\n起動時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
         return confirm_text

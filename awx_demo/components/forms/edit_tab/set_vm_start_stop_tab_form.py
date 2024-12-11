@@ -4,6 +4,7 @@ import flet as ft
 
 from awx_demo.components.compounds.parameter_input_text import ParameterInputText
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.db_helper.types.vm_start_stop import VmStartStop
 from awx_demo.utils.logging import Logging
 
 
@@ -33,12 +34,13 @@ class SetVmStartStopTabForm(ft.Card):
 
         self.dropVmStartStop = ft.Dropdown(
             label='起動または停止',
-            value=self.session.get('job_options')['vm_start_stop'] if 'vm_start_stop' in self.session.get('job_options') else self.VM_START_DESCRIPTION,
+            value=VmStartStop.to_friendly(self.session.get('job_options')['vm_start_stop']) if 'vm_start_stop' in self.session.get('job_options') else VmStartStop.STARTUP_FRIENDLY,
             options=[
-                ft.dropdown.Option(self.VM_START_DESCRIPTION),
-                ft.dropdown.Option(self.VM_STOP_DESCRIPTION),
-                ft.dropdown.Option(self.VM_POWEROFF_DESCRIPTION),
+                ft.dropdown.Option(VmStartStop.STARTUP_FRIENDLY),
+                ft.dropdown.Option(VmStartStop.SHUTDOWN_FRIENDLY),
+                ft.dropdown.Option(VmStartStop.POWEROFF_FRIENDLY),
             ],
+            on_change=self.on_change_vm_start_stop,
             disabled=(not bool(strtobool(self.session.get('job_options')['vm_start_stop_enabled']))) if 'vm_start_stop_enabled' in self.session.get('job_options') else False,
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
@@ -47,6 +49,7 @@ class SetVmStartStopTabForm(ft.Card):
             text_align=ft.TextAlign.RIGHT,
             expand=True,
             hint_text='シャットダウンに時間を要するサーバは、この値をより大きく設定して下さい。',
+            input_filter=ft.InputFilter(allow=True, regex_string=r"^\d{1,4}$", replacement_string=""),
             on_change=self.on_change_shutdown_timeout_sec,
         )
         self.tfToolsWaitTimeoutSec = ParameterInputText(
@@ -55,6 +58,7 @@ class SetVmStartStopTabForm(ft.Card):
             text_align=ft.TextAlign.RIGHT,
             expand=True,
             hint_text='起動に時間を要するサーバは、この値をより大きく設定して下さい。',
+            input_filter=ft.InputFilter(allow=True, regex_string=r"^\d{1,4}$", replacement_string=""),
             on_change=self.on_change_tools_wait_timeout_sec,
         )
 
@@ -105,7 +109,7 @@ class SetVmStartStopTabForm(ft.Card):
         confirm_text += '\n仮想マシン: ' + \
             self.session.get('job_options')['target_vms']
         if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
-            confirm_text += '\n起動/停止: ' + str(self.session.get('job_options')['vm_start_stop'])
+            confirm_text += '\n起動/停止: ' + VmStartStop.to_friendly(self.session.get('job_options')['vm_start_stop'])
             confirm_text += '\nシャットダウン時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
             confirm_text += '\n起動時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
         return confirm_text
@@ -122,7 +126,7 @@ class SetVmStartStopTabForm(ft.Card):
 
     @Logging.func_logger
     def on_change_vm_start_stop(self, e):
-        self.session.get('job_options')['vm_start_stop'] = self.dropVmStartStop.value
+        self.session.get('job_options')['vm_start_stop'] = VmStartStop.to_formal(self.dropVmStartStop.value)
 
     @Logging.func_logger
     def on_change_shutdown_timeout_sec(self, e):

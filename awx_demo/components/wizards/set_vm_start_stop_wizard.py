@@ -1,6 +1,5 @@
 import flet as ft
 
-from awx_demo.components.forms.create_request_form import CreateRequestForm
 from awx_demo.components.forms.job_progress_form import JobProgressForm
 from awx_demo.components.forms.select_target_form import SelectTargetForm
 from awx_demo.components.forms.send_request_confirm_form import SendRequestConfirmForm
