@@ -116,7 +116,10 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self.btnAddRequest = ft.FilledButton(
             text="新規作成",
             tooltip="新規作成 (Cotrol+Shift+N)",
-            icon=ft.icons.ADD,
+            icon=ft.icons.ADD_CARD_OUTLINED,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=8),
+            ),
             on_click=self.on_click_add_request,
             autofocus=True,
         )
