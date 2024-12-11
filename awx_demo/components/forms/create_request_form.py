@@ -20,7 +20,8 @@ class CreateRequestForm(BaseWizardCard):
     START_DATE_DAYS_DEFAULT = 7
     END_DATE_DAYS_DEFAULT = 30
 
-    def __init__(self, session, page: ft.Page, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
+    def __init__(self, session, page: ft.Page, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT,
+                 step_change_next=None, step_change_previous=None, step_change_cancel=None):
         self.session = session
         self.page = page
         self.content_height = height

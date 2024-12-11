@@ -17,35 +17,6 @@ class BaseWizard(metaclass=abc.ABCMeta):
     BODY_HEIGHT = 290
 
     @Logging.func_logger
-    def _duplicate_request(self):
-        db_session = db.get_db()
-        IaasRequestHelper.duplicate_request(
-            db_session=db_session,
-            request_id=self.session.get("request_id"),
-            new_request_id=DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH),
-            session=self.session,
-        )
-        db_session.close()
-
-    @Logging.func_logger
-    def _update_request(self):
-        if self.session.get("iaas_user") is None:
-            self.session.set("iaas_user", self.session.get("awx_loginid"))
-        request_id = self.session.get("request_id") if "request_id" in self.session.get_keys() else self.session.get("document_id")
-        db_session = db.get_db()
-        IaasRequestHelper.update_request(
-            db_session=db_session,
-            request_id=request_id,
-            request_deadline=self.session.get("request_deadline"),
-            request_text=self.session.get("request_text"),
-            job_options=json.dumps(self.session.get("job_options")),
-            request_status=self.session.get("request_status"),
-            iaas_user=self.session.get("iaas_user"),
-            session=self.session,
-        )
-        db_session.close()
-
-    @Logging.func_logger
     def save_parent_view_title(self):
         self.session.set("parent_view_title", self.page.title)
 
@@ -102,3 +73,32 @@ class BaseWizard(metaclass=abc.ABCMeta):
     def _restore_key_shortcuts(self):
         keybord_shortcut_manager = KeyboardShortcutManager(self.page)
         keybord_shortcut_manager.restore_key_shortcuts()
+
+    @Logging.func_logger
+    def _duplicate_request(self):
+        db_session = db.get_db()
+        IaasRequestHelper.duplicate_request(
+            db_session=db_session,
+            request_id=self.session.get("request_id"),
+            new_request_id=DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH),
+            session=self.session,
+        )
+        db_session.close()
+
+    @Logging.func_logger
+    def _update_request(self):
+        if self.session.get("iaas_user") is None:
+            self.session.set("iaas_user", self.session.get("awx_loginid"))
+        request_id = self.session.get("request_id") if "request_id" in self.session.get_keys() else self.session.get("document_id")
+        db_session = db.get_db()
+        IaasRequestHelper.update_request(
+            db_session=db_session,
+            request_id=request_id,
+            request_deadline=self.session.get("request_deadline"),
+            request_text=self.session.get("request_text"),
+            job_options=json.dumps(self.session.get("job_options")),
+            request_status=self.session.get("request_status"),
+            iaas_user=self.session.get("iaas_user"),
+            session=self.session,
+        )
+        db_session.close()
