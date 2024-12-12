@@ -46,7 +46,7 @@ class SetVmStartStopForm(BaseWizardCard):
             options=[
                 ft.dropdown.Option(VmStartStop.STARTUP_FRIENDLY),
                 ft.dropdown.Option(VmStartStop.SHUTDOWN_FRIENDLY),
-                ft.dropdown.Option(VmStartStop.SHUTDOWN_FRIENDLY),
+                ft.dropdown.Option(VmStartStop.POWEROFF_FRIENDLY),
             ],
             disabled=(not bool(strtobool(self.session.get('job_options')['vm_start_stop_enabled']))) if 'vm_start_stop_enabled' in self.session.get('job_options') else False,
         )
