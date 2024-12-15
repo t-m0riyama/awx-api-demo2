@@ -27,6 +27,11 @@ class AWXApiHelper:
     JOB_LAUNCH_CONNECTION_FAILED = -4
     JOB_STATUS_CONNECTION_FAILED = -5
 
+    API_SUCCEEDED = "AWX_API_SUCCEEDED"
+    API_FAILED_STATUS = "AWX_API_FAILED_STATUS"
+    API_FAILED_TO_CONNECT = "AWX_API_FAILED_TO_CONNECT"
+    API_FAILED_OTHER = "AWX_API_FAILED_OTHER"
+
     @classmethod
     @Logging.func_logger
     def login(cls, uri_base, loginid, password):
@@ -38,12 +43,13 @@ class AWXApiHelper:
             Logging.info(f'AWX_LOGIN_URL: {request_url}')
             Logging.info(f'AWX_LOGIN_STATUS: {str(response.status_code)} / {request_url}')
             if response.status_code == 200:
-                return True
+                return True, cls.API_SUCCEEDED
             else:
-                return False
+                return False, cls.API_FAILED_STATUS
         except Exception as e:
+            Logging.error(f'{cls.API_FAILED_TO_CONNECT}: {request_url}')
             Logging.error(e)
-            return False
+            return False, cls.API_FAILED_TO_CONNECT
 
     @classmethod
     @Logging.func_logger

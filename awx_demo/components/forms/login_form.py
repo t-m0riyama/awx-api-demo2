@@ -65,7 +65,7 @@ class LoginForm(ft.Card):
         self.txtLoginMessage = ft.Text(
             "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。",
             size=16,
-            color=ft.colors.ERROR,
+            color=ft.Colors.ERROR,
             visible=False,
         )
         self.btnLogin = ft.FilledButton("ログイン", on_click=self.on_click_login)
@@ -117,10 +117,17 @@ class LoginForm(ft.Card):
             e.page.go("/latest_requests")
 
     @Logging.func_logger
-    def show_login_failed_message(self):
-        self.txtLoginMessage.value = (
-            "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。"
-        )
+    def show_login_failed_message(self, reason):
+        message = ''
+        match reason:
+            case AWXApiHelper.API_FAILED_STATUS:
+                message = "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。"
+            case AWXApiHelper.API_FAILED_TO_CONNECT:
+                message = "ログイン失敗: AWXサーバーに接続できません。AWX URLを確認して下さい。"
+            case _:
+                message = "ログイン失敗: AWXサーバーに接続できません。管理者に連絡し、ログを確認してください。"
+
+        self.txtLoginMessage.value = message
         self.txtLoginMessage.visible = True
         self.txtLoginMessage.update()
 
@@ -132,32 +139,42 @@ class LoginForm(ft.Card):
 
     @Logging.func_logger
     def login_auth(self, awx_url, loginid, password):
-        login_result = AWXApiHelper.login(awx_url, loginid, password)
+        login_result, reason = AWXApiHelper.login(awx_url, loginid, password)
         if not login_result:
+            summary = ''
+            match reason:
+                case AWXApiHelper.API_FAILED_STATUS:
+                    summary = "ログインに失敗しました。認証に失敗しました。ログインIDとパスワードを確認して下さい。"
+                case AWXApiHelper.API_FAILED_TO_CONNECT:
+                    summary = "ログインに失敗しました。AWXサーバーに接続できません。AWX URLを確認して下さい。"
+                case _:
+                    summary = "ログインに失敗しました。AWXサーバーに接続できません。管理者に連絡し、ログを確認してください。"
+
             activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
                 activity_type=EventType.LOGIN,
                 status=EventStatus.FAILED,
-                summary="ログインに失敗しました。認証に失敗しました。ログインIDとパスワードを確認して下さい。",
+                summary=summary,
                 detail="",
             )
             EventManager.emit_event(
                 activity_spec=activity_spec,
                 notification_specs=[],
             )
-            self.show_login_failed_message()
+            self.show_login_failed_message(reason)
             return False
         teams = AWXApiHelper.get_teams_user_belong(awx_url, loginid, password)
         role = self.check_role(teams)
 
         if role is None:
+            summary = "ログインに失敗しました。指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。"
             activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
                 request_id="",
                 activity_type=EventType.LOGIN,
                 status=EventStatus.FAILED,
-                summary="ログインに失敗しました。指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。",
+                summary=summary,
                 detail="",
             )
             EventManager.emit_event(

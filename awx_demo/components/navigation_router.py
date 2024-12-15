@@ -20,7 +20,7 @@ class NavigationRouter:
     コントロールの再作成を行う。
     """
 
-    def __init__(self, session, page: ft.Page, app_title_base, dlgLogin):
+    def __init__(self, session, page: ft.Page, app_title_base, dlgLogin: ft.AlertDialog):
         self.session = session
         self.page = page
         self.app_title_base = app_title_base
