@@ -28,9 +28,9 @@ class RequestRowHelper:
     def generate_request_row(request_list_form, row_id, request_data: RequestRowData, shortcut_index: int):
         row_id_content = None
         if shortcut_index <= 9:
-            row_id_content = ft.Text(str(row_id), color=ft.colors.PRIMARY, tooltip=f"Control+Shift+{shortcut_index}")
+            row_id_content = ft.Text(str(row_id), color=ft.Colors.PRIMARY, tooltip=f"Control+Shift+{shortcut_index}")
         else:
-            row_id_content = ft.Text(str(row_id), color=ft.colors.PRIMARY)
+            row_id_content = ft.Text(str(row_id), color=ft.Colors.PRIMARY)
 
         return ft.DataRow(
             cells=[
@@ -51,15 +51,15 @@ class RequestRowHelper:
     def _request_status_to_icon(request_status):
         match request_status:
             case RequestStatus.START:
-                return ft.Icon(name=ft.icons.FIBER_NEW_OUTLINED, color=ft.colors.PRIMARY, tooltip=RequestStatus.START_FRIENDLY)
+                return ft.Icon(name=ft.Icons.FIBER_NEW_OUTLINED, color=ft.Colors.PRIMARY, tooltip=RequestStatus.START_FRIENDLY)
             case RequestStatus.APPROVED:
-                return ft.Icon(name=ft.icons.APPROVAL, color=ft.colors.PRIMARY, tooltip=RequestStatus.APPROVED_FRIENDLY)
+                return ft.Icon(name=ft.Icons.APPROVAL, color=ft.Colors.PRIMARY, tooltip=RequestStatus.APPROVED_FRIENDLY)
             case RequestStatus.APPLYING:
                 return ft.ProgressRing(width=16, height=16, stroke_width=2, tooltip=RequestStatus.APPLYING_FRIENDLY)
             case RequestStatus.APPLYING_FAILED:
-                return ft.Icon(name=ft.icons.RUNNING_WITH_ERRORS_OUTLINED, color=ft.colors.ERROR, tooltip=RequestStatus.APPLYING_FAILED_FRIENDLY)
+                return ft.Icon(name=ft.Icons.RUNNING_WITH_ERRORS_OUTLINED, color=ft.Colors.ERROR, tooltip=RequestStatus.APPLYING_FAILED_FRIENDLY)
             case RequestStatus.COMPLETED:
-                return ft.Icon(name=ft.icons.CHECK_CIRCLE, color=ft.colors.PRIMARY, tooltip=RequestStatus.COMPLETED_FRIENDLY)
+                return ft.Icon(name=ft.Icons.CHECK_CIRCLE, color=ft.Colors.PRIMARY, tooltip=RequestStatus.COMPLETED_FRIENDLY)
 
     @staticmethod
     @Logging.func_logger
@@ -158,18 +158,18 @@ class RequestRowHelper:
 
         if (request_list_form.data_row_offset + 1 + request_list_form.DATA_ROW_MAX) >= request_data_count:
             request_list_form.btnNextPage.disabled = True
-            request_list_form.btnNextPage.icon_color = ft.colors.ON_INVERSE_SURFACE
+            request_list_form.btnNextPage.icon_color = ft.Colors.ON_INVERSE_SURFACE
         else:
             request_list_form.btnNextPage.disabled = False
-            request_list_form.btnNextPage.icon_color = ft.colors.ON_SURFACE_VARIANT
+            request_list_form.btnNextPage.icon_color = ft.Colors.ON_SURFACE_VARIANT
         request_list_form.btnNextPage.update()
 
         if (request_list_form.data_row_offset + 1 - request_list_form.DATA_ROW_MAX) < 0:
             request_list_form.btnPreviousPage.disabled = True
-            request_list_form.btnPreviousPage.icon_color = ft.colors.ON_INVERSE_SURFACE
+            request_list_form.btnPreviousPage.icon_color = ft.Colors.ON_INVERSE_SURFACE
         else:
             request_list_form.btnPreviousPage.disabled = False
-            request_list_form.btnPreviousPage.icon_color = ft.colors.ON_SURFACE_VARIANT
+            request_list_form.btnPreviousPage.icon_color = ft.Colors.ON_SURFACE_VARIANT
         request_list_form.btnPreviousPage.update()
 
     @staticmethod

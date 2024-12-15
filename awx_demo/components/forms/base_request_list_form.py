@@ -66,10 +66,10 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             rows=[],
             show_checkbox_column=True,
             show_bottom_border=True,
-            border=ft.border.all(2, ft.colors.SURFACE_VARIANT),
+            border=ft.border.all(2, ft.Colors.SURFACE_CONTAINER_HIGHEST),
             border_radius=10,
             divider_thickness=1,
-            heading_row_color=ft.colors.SURFACE_VARIANT,
+            heading_row_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             heading_row_height=40,
             data_row_max_height=60,
             column_spacing=15,
@@ -116,7 +116,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self.btnAddRequest = ft.FilledButton(
             text="新規作成",
             tooltip="新規作成 (Cotrol+Shift+N)",
-            icon=ft.icons.ADD_CARD_OUTLINED,
+            icon=ft.Icons.ADD_CARD_OUTLINED,
             style=ft.ButtonStyle(
                 shape=ft.RoundedRectangleBorder(radius=8),
             ),
@@ -137,7 +137,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         for iaas_user in iaas_users:
             iaas_user_items.append(
                 ft.PopupMenuItem(
-                    icon=ft.icons.ACCOUNT_CIRCLE_OUTLINED,
+                    icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED,
                     text=iaas_user["username"],
                     on_click=self.on_change_request_iaas_user,
                 )
@@ -147,29 +147,29 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         match self.session.get("user_role"):
             case UserRole.ADMIN_ROLE:
                 popup_menu_items = [
-                    # ft.PopupMenuItem(icon=ft.icons.ROCKET_LAUNCH, text="実行"),
+                    # ft.PopupMenuItem(icon=ft.Icons.ROCKET_LAUNCH, text="実行"),
                     ft.PopupMenuItem(
                         content=ft.PopupMenuButton(
                             items=[
                                 ft.PopupMenuItem(
-                                    icon=ft.icons.FIBER_NEW,
+                                    icon=ft.Icons.FIBER_NEW,
                                     text=RequestStatus.START_FRIENDLY + " (Alt+Shift+I)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
-                                    icon=ft.icons.APPROVAL,
+                                    icon=ft.Icons.APPROVAL,
                                     text=RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
-                                    icon=ft.icons.CHECK_CIRCLE,
+                                    icon=ft.Icons.CHECK_CIRCLE,
                                     text=RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)",
                                     on_click=self.on_change_request_status,
                                 ),
                             ],
                             content=ft.Row(
                                 [
-                                    ft.Icon(ft.icons.MULTIPLE_STOP),
+                                    ft.Icon(ft.Icons.MULTIPLE_STOP),
                                     ft.Text("状態の変更"),
                                 ],
                             ),
@@ -180,7 +180,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             items=iaas_user_items,
                             content=ft.Row(
                                 [
-                                    ft.Icon(ft.icons.ASSIGNMENT_IND_OUTLINED),
+                                    ft.Icon(ft.Icons.ASSIGNMENT_IND_OUTLINED),
                                     ft.Text("作業担当者の変更"),
                                 ],
                             ),
@@ -188,7 +188,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                     ),
                     ft.PopupMenuItem(),  # divider
                     ft.PopupMenuItem(
-                        icon=ft.icons.DELETE,
+                        icon=ft.Icons.DELETE,
                         text="削除 (Alt+Shift+R)",
                         on_click=self.on_selected_delete,
                     ),
@@ -196,19 +196,19 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
             case UserRole.OPERATOR_ROLE:
                 popup_menu_items = [
-                    # ft.PopupMenuItem(icon=ft.icons.ROCKET_LAUNCH, text="実行"),
+                    # ft.PopupMenuItem(icon=ft.Icons.ROCKET_LAUNCH, text="実行"),
                     ft.PopupMenuItem(
                         content=ft.PopupMenuButton(
                             items=[
                                 ft.PopupMenuItem(
-                                    icon=ft.icons.CHECK_CIRCLE,
+                                    icon=ft.Icons.CHECK_CIRCLE,
                                     text=RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)",
                                     on_click=self.on_change_request_status,
                                 ),
                             ],
                             content=ft.Row(
                                 [
-                                    ft.Icon(ft.icons.MULTIPLE_STOP),
+                                    ft.Icon(ft.Icons.MULTIPLE_STOP),
                                     ft.Text("状態の変更"),
                                 ],
                             ),
@@ -220,7 +220,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
         self.btnActions = ft.PopupMenuButton(
             items=popup_menu_items,
-            icon=ft.icons.ARROW_DROP_DOWN_CIRCLE_OUTLINED,
+            icon=ft.Icons.ARROW_DROP_DOWN_CIRCLE_OUTLINED,
             tooltip="その他のアクション",
             disabled=True,
         )
@@ -231,15 +231,15 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             on_submit=self.on_click_search_request_text,
         )
         self.btnSearchRequestText = ft.IconButton(
-            icon=ft.icons.SEARCH,
-            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            icon=ft.Icons.SEARCH,
+            icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_search_request_text,
             autofocus=True,
             tooltip="検索 (Control+Enter)",
         )
         self.btnReloadRequestList = ft.IconButton(
-            icon=ft.icons.SYNC,
-            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            icon=ft.Icons.SYNC,
+            icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=lambda e: self.refresh(),
             autofocus=True,
             tooltip="申請一覧の再読み込み (Control+R)",
@@ -250,15 +250,15 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         )
         self.btnPreviousPage = ft.IconButton(
             tooltip="前へ (Control+Shift+<)",
-            icon=ft.icons.ARROW_LEFT,
-            icon_color=ft.colors.ON_INVERSE_SURFACE,
+            icon=ft.Icons.ARROW_LEFT,
+            icon_color=ft.Colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
             tooltip="次へ (Control+Shift+>)",
-            icon=ft.icons.ARROW_RIGHT,
-            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            icon=ft.Icons.ARROW_RIGHT,
+            icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
         )
 

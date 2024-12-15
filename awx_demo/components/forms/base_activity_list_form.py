@@ -49,10 +49,10 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             rows=[],
             show_checkbox_column=False,
             show_bottom_border=True,
-            border=ft.border.all(2, ft.colors.SURFACE_VARIANT),
+            border=ft.border.all(2, ft.Colors.SURFACE_CONTAINER_HIGHEST),
             border_radius=10,
             divider_thickness=1,
-            heading_row_color=ft.colors.SURFACE_VARIANT,
+            heading_row_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             heading_row_height=40,
             data_row_max_height=60,
             column_spacing=15,
@@ -164,15 +164,15 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             on_submit=self.on_click_search_summary,
         )
         self.btnSearchSummary = ft.IconButton(
-            icon=ft.icons.SEARCH,
-            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            icon=ft.Icons.SEARCH,
+            icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_search_summary,
             autofocus=True,
             tooltip="検索 (Control+Enter)",
         )
         self.btnReloadRequestList = ft.IconButton(
-            icon=ft.icons.SYNC,
-            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            icon=ft.Icons.SYNC,
+            icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=lambda e: self.refresh(),
             autofocus=True,
             tooltip="操作履歴一覧の再読み込み (Control+R)",
@@ -185,15 +185,15 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         )
         self.btnPreviousPage = ft.IconButton(
             tooltip="前へ (Control+Shift+<)",
-            icon=ft.icons.ARROW_LEFT,
-            icon_color=ft.colors.ON_INVERSE_SURFACE,
+            icon=ft.Icons.ARROW_LEFT,
+            icon_color=ft.Colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
             tooltip="次へ (Control+Shift+>)",
-            icon=ft.icons.ARROW_RIGHT,
-            icon_color=ft.colors.ON_SURFACE_VARIANT,
+            icon=ft.Icons.ARROW_RIGHT,
+            icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
         )
 

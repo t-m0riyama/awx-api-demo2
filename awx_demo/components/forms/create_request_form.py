@@ -92,11 +92,11 @@ class CreateRequestForm(BaseWizardCard):
             value=(f"リリース希望日(＊): {self.session.get('request_deadline').strftime('%Y/%m/%d')}"
                    ) if self.session.contains_key('request_deadline') else f"リリース希望日(＊): {start_date.strftime('%Y/%m/%d')}",
             theme_style=ft.TextThemeStyle.BODY_LARGE,
-            color=ft.colors.PRIMARY,
+            color=ft.Colors.PRIMARY,
         )
         self.btnRequestDeadline = ft.FilledTonalButton(
             '希望日の指定',
-            icon=ft.icons.CALENDAR_MONTH,
+            icon=ft.Icons.CALENDAR_MONTH,
             # autofocus=True,
             on_click=lambda _: self.page.open(
                 self.dpRequestDeadline

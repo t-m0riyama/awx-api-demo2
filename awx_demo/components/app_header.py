@@ -41,7 +41,7 @@ class AppHeader(ft.Row):
             actions_alignment=ft.MainAxisAlignment.END,
         )
         self.help_icon = ft.IconButton(
-            icon=ft.icons.HELP_OUTLINE_ROUNDED,
+            icon=ft.Icons.HELP_OUTLINE_ROUNDED,
             tooltip="ヘルプ",
             on_click=self.on_click_context_help,
         )
@@ -67,17 +67,17 @@ class AppHeader(ft.Row):
         ]
         # appbarフィールドの設定
         self.page.appbar = ft.AppBar(
-            leading=ft.Icon(ft.icons.HANDYMAN_OUTLINED),
+            leading=ft.Icon(ft.Icons.HANDYMAN_OUTLINED),
             leading_width=100,
             title=ft.Text(
                 value=self.app_title,
-                color=ft.colors.PRIMARY,
+                color=ft.Colors.PRIMARY,
                 size=28,
                 text_align=ft.TextAlign.CENTER,
             ),
             center_title=False,
             toolbar_height=46,
-            bgcolor=ft.colors.SURFACE_VARIANT,
+            bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             actions=[
                 ft.Container(
                     content=ft.Row(
@@ -85,7 +85,7 @@ class AppHeader(ft.Row):
                             self.help_icon,
                             self.toggle_dark_light_icon,
                             ft.PopupMenuButton(
-                                icon=ft.icons.ACCOUNT_CIRCLE,
+                                icon=ft.Icons.ACCOUNT_CIRCLE,
                                 items=self.appbar_items,
                                 tooltip="アカウント設定",
                             ),

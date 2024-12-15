@@ -25,38 +25,38 @@ class Sidebar(ft.Container):
         if self.session.get('user_role') == UserRole.USER_ROLE:
             self.main_nav_rail_items = [
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.FIBER_NEW, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.FIBER_NEW, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "最新",
                         tooltip="最新の申請 (Cotrol+Shift+L)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.WARNING_AMBER, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.WARNING_AMBER, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "リリース希望日",
                         tooltip="リリース希望日 (Cotrol+Shift+D)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(ft.icons.LIST, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.LIST_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(ft.Icons.LIST, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.LIST_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "全て",
                         tooltip="全て (Cotrol+Shift+A)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.CHECK_OUTLINED, size=self.ICON_SIZE),
-                    selected_icon=ft.Icon(ft.icons.CHECK, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.CHECK_OUTLINED, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(ft.Icons.CHECK, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "完了",
                         tooltip="完了 (Cotrol+Shift+E)",
@@ -66,48 +66,48 @@ class Sidebar(ft.Container):
         else:
             self.main_nav_rail_items = [
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.FIBER_NEW, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.FIBER_NEW, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "最新",
                         tooltip="最新の申請 (Cotrol+Shift+L)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.WARNING_AMBER, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.WARNING_AMBER, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "リリース希望日",
                         tooltip="リリース希望日 (Cotrol+Shift+D)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.ACCOUNT_BOX, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.ACCOUNT_BOX_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.ACCOUNT_BOX, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.ACCOUNT_BOX_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "自身の申請",
                         tooltip="自身の申請 (Cotrol+Shift+M)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(ft.icons.LIST, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.LIST_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(ft.Icons.LIST, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.LIST_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "全て",
                         tooltip="全て (Cotrol+Shift+A)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.CHECK_OUTLINED, size=self.ICON_SIZE),
-                    selected_icon=ft.Icon(ft.icons.CHECK, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.CHECK_OUTLINED, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(ft.Icons.CHECK, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "完了",
                         tooltip="完了 (Cotrol+Shift+E)",
@@ -118,10 +118,10 @@ class Sidebar(ft.Container):
         if self.session.get('user_role') == UserRole.USER_ROLE:
             self.option_nav_rail_items = [
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.HISTORY_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.HISTORY_OUTLINED, size=self.ICON_SIZE),
                     selected_icon=ft.Icon(
-                        ft.icons.HISTORY, size=self.ICON_SIZE),
+                        ft.Icons.HISTORY, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "操作履歴",
                         tooltip="操作履歴 (Cotrol+Shift+H)",
@@ -131,20 +131,20 @@ class Sidebar(ft.Container):
         else:
             self.option_nav_rail_items = [
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.HISTORY_OUTLINED, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.HISTORY_OUTLINED, size=self.ICON_SIZE),
                     selected_icon=ft.Icon(
-                        ft.icons.HISTORY, size=self.ICON_SIZE),
+                        ft.Icons.HISTORY, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "操作履歴",
                         tooltip="操作履歴 (Cotrol+Shift+H)",
                     )
                 ),
                 ft.NavigationRailDestination(
-                    icon_content=ft.Icon(
-                        ft.icons.SETTINGS_OUTLINED, size=self.ICON_SIZE),
-                    selected_icon_content=ft.Icon(
-                        ft.icons.SETTINGS, size=self.ICON_SIZE),
+                    icon=ft.Icon(
+                        ft.Icons.SETTINGS_OUTLINED, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.SETTINGS, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "設定",
                         tooltip="設定 (Cotrol+Shift+C)",
@@ -157,8 +157,8 @@ class Sidebar(ft.Container):
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=self.RAIL_MIN_WIDTH,
             min_extended_width=self.RAIL_MAX_WIDTH,
-            # leading=ft.FloatingActionButton(icon=ft.icons.CREATE, text="ダッシュボード"),
-            bgcolor=ft.colors.TRANSPARENT,
+            # leading=ft.FloatingActionButton(icon=ft.Icons.CREATE, text="ダッシュボード"),
+            bgcolor=ft.Colors.TRANSPARENT,
             group_alignment=-0.9,
             destinations=self.main_nav_rail_items,
             on_change=self.on_click_main_navigation_item,
@@ -169,18 +169,18 @@ class Sidebar(ft.Container):
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=self.RAIL_MIN_WIDTH,
             min_extended_width=self.RAIL_MAX_WIDTH,
-            # leading=ft.FloatingActionButton(icon=ft.icons.CREATE, text="ダッシュボード"),
-            bgcolor=ft.colors.TRANSPARENT,
-            indicator_color=ft.colors.TRANSPARENT,
+            # leading=ft.FloatingActionButton(icon=ft.Icons.CREATE, text="ダッシュボード"),
+            bgcolor=ft.Colors.TRANSPARENT,
+            indicator_color=ft.Colors.TRANSPARENT,
             group_alignment=0,
             destinations=self.option_nav_rail_items,
             on_change=self.on_click_option_navigation_item,
         )
         self.toggle_nav_rail_button = ft.IconButton(
-            icon=ft.icons.KEYBOARD_DOUBLE_ARROW_LEFT,
-            icon_color=ft.colors.BLUE_GREY_400,
+            icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT,
+            icon_color=ft.Colors.BLUE_GREY_400,
             selected=False,
-            selected_icon=ft.icons.KEYBOARD_DOUBLE_ARROW_RIGHT,
+            selected_icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT,
             on_click=self.toggle_nav_rail,
             tooltip="サイドバーを非表示",
         )
@@ -193,7 +193,7 @@ class Sidebar(ft.Container):
                 ]),
                 # divider
                 ft.Container(
-                    bgcolor=ft.colors.BLACK26,
+                    bgcolor=ft.Colors.BLACK26,
                     border_radius=ft.border_radius.all(30),
                     height=1,
                     alignment=ft.alignment.center_right,
@@ -202,7 +202,7 @@ class Sidebar(ft.Container):
                 self.main_nav_rail,
                 # divider
                 ft.Container(
-                    bgcolor=ft.colors.BLACK26,
+                    bgcolor=ft.Colors.BLACK26,
                     border_radius=ft.border_radius.all(30),
                     height=1,
                     alignment=ft.alignment.center_right,
@@ -213,7 +213,7 @@ class Sidebar(ft.Container):
             padding=ft.padding.all(15),
             margin=ft.margin.all(0),
             # width=self.CONTENT_WIDTH,
-            bgcolor=ft.colors.SURFACE_VARIANT,
+            bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             border_radius=ft.border_radius.all(5),
         )
         self.register_key_shortcuts()

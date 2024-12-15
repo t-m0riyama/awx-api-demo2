@@ -9,7 +9,7 @@ class AppTitle(ft.Container):
                 title,
                 theme_style=ft.TextThemeStyle.DISPLAY_MEDIUM,
                 weight=ft.FontWeight.BOLD,
-                color=ft.colors.PRIMARY,
+                color=ft.Colors.PRIMARY,
                 width=width,
                 text_align=ft.TextAlign.CENTER),
             margin=ft.margin.only(bottom=20),

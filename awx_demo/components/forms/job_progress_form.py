@@ -52,11 +52,11 @@ class JobProgressForm(BaseWizardCard):
         self.lvProgressLog.controls.append(
             ft.Row(
                 [
-                    ft.Icon(ft.icons.INFO_OUTLINED, color=ft.colors.BLUE_500),
+                    ft.Icon(ft.Icons.INFO_OUTLINED, color=ft.Colors.BLUE_500),
                     ft.Text(
                         value=f'{JobProgressForm._get_timestamp()} 処理を開始しました。',
                         theme_style=ft.TextThemeStyle.BODY_LARGE,
-                        color=ft.colors.SECONDARY
+                        color=ft.Colors.SECONDARY
                     ),
                 ]
             )
@@ -194,12 +194,12 @@ class JobProgressForm(BaseWizardCard):
             self.lvProgressLog.controls.append(
                 ft.Row(
                     [
-                        ft.Icon(ft.icons.THUMB_UP_OUTLINED,
-                                color=ft.colors.BLUE_500),
+                        ft.Icon(ft.Icons.THUMB_UP_OUTLINED,
+                                color=ft.Colors.BLUE_500),
                         ft.Text(
                             value=f'{JobProgressForm._get_timestamp()} 処理は正常終了しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.colors.SECONDARY
+                            color=ft.Colors.SECONDARY
                         ),
                     ]
                 )
@@ -217,12 +217,12 @@ class JobProgressForm(BaseWizardCard):
             self.lvProgressLog.controls.append(
                 ft.Row(
                     [
-                        ft.Icon(ft.icons.ERROR_OUTLINED,
-                                color=ft.colors.ERROR),
+                        ft.Icon(ft.Icons.ERROR_OUTLINED,
+                                color=ft.Colors.ERROR),
                         ft.Text(
                             value=f'{JobProgressForm._get_timestamp()} 処理は異常終了しました。実行可能な時間を超過した可能性があります。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.colors.SECONDARY
+                            color=ft.Colors.SECONDARY
                         ),
                     ]
                 )
@@ -237,12 +237,12 @@ class JobProgressForm(BaseWizardCard):
         self.lvProgressLog.controls.append(
             ft.Row(
                 [
-                    ft.Icon(ft.icons.ERROR_OUTLINED,
-                            color=ft.colors.ERROR),
+                    ft.Icon(ft.Icons.ERROR_OUTLINED,
+                            color=ft.Colors.ERROR),
                     ft.Text(
                         value=f'{JobProgressForm._get_timestamp()} ジョブの実行可能時間を超過しました。',
                         theme_style=ft.TextThemeStyle.BODY_LARGE,
-                        color=ft.colors.SECONDARY
+                        color=ft.Colors.SECONDARY
                     ),
                 ]
             )
@@ -257,12 +257,12 @@ class JobProgressForm(BaseWizardCard):
         self.lvProgressLog.controls.append(
                 ft.Row(
                     [
-                        ft.Icon(ft.icons.ERROR_OUTLINED,
-                                color=ft.colors.ERROR),
+                        ft.Icon(ft.Icons.ERROR_OUTLINED,
+                                color=ft.Colors.ERROR),
                         ft.Text(
                             value=f'{JobProgressForm._get_timestamp()} 処理に失敗しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.colors.SECONDARY
+                            color=ft.Colors.SECONDARY
                         ),
                     ]
                 )
@@ -285,12 +285,12 @@ class JobProgressForm(BaseWizardCard):
         self.lvProgressLog.controls.append(
                 ft.Row(
                     [
-                        ft.Icon(ft.icons.ERROR_OUTLINED,
-                                color=ft.colors.ERROR),
+                        ft.Icon(ft.Icons.ERROR_OUTLINED,
+                                color=ft.Colors.ERROR),
                         ft.Text(
                             value=f'{JobProgressForm._get_timestamp()} ジョブの実行要求に失敗しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.colors.SECONDARY
+                            color=ft.Colors.SECONDARY
                         ),
                     ]
                 )
@@ -306,12 +306,12 @@ class JobProgressForm(BaseWizardCard):
         self.lvProgressLog.controls.append(
                 ft.Row(
                     [
-                        ft.Icon(ft.icons.ERROR_OUTLINED,
-                                color=ft.colors.ERROR),
+                        ft.Icon(ft.Icons.ERROR_OUTLINED,
+                                color=ft.Colors.ERROR),
                         ft.Text(
                             value=f'{JobProgressForm._get_timestamp()} ジョブの実行中にエラーが発生しました。',
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.colors.SECONDARY
+                            color=ft.Colors.SECONDARY
                         ),
                     ]
                 )

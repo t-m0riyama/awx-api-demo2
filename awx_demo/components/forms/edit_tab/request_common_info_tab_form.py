@@ -50,19 +50,19 @@ class RequestCommonInfoTabForm(ft.Card):
         self.textRequestId = ft.Text(
             value=('申請ID: ' + self.session.get('request_id')),
             theme_style=ft.TextThemeStyle.BODY_LARGE,
-            color=ft.colors.PRIMARY,
+            color=ft.Colors.PRIMARY,
         )
         self.textRequestDate = ft.Text(
             value=('申請日: ' + self.session.get('request_date').strftime('%Y/%m/%d %H:%M')
                    ) if self.session.contains_key('request_date') else '申請日:(未指定)',
             theme_style=ft.TextThemeStyle.BODY_LARGE,
-            color=ft.colors.PRIMARY,
+            color=ft.Colors.PRIMARY,
         )
         self.textUpdated = ft.Text(
             value=('最終更新日: ' + self.session.get('updated').strftime('%Y/%m/%d %H:%M')
                    ) if self.session.contains_key('updated') else '最終更新日:(未指定)',
             theme_style=ft.TextThemeStyle.BODY_LARGE,
-            color=ft.colors.PRIMARY,
+            color=ft.Colors.PRIMARY,
         )
         self.tfRequestText = ParameterInputText(
             value=self.session.get('request_text') if self.session.contains_key(
@@ -97,11 +97,11 @@ class RequestCommonInfoTabForm(ft.Card):
             value=('リリース希望日(＊): ' + self.session.get('request_deadline').strftime('%Y/%m/%d')
                    ) if self.session.contains_key('request_deadline') else 'リリース希望日(＊):(未指定)',
             theme_style=ft.TextThemeStyle.BODY_LARGE,
-            color=ft.colors.PRIMARY,
+            color=ft.Colors.PRIMARY,
         )
         self.btnRequestDeadline = ft.FilledTonalButton(
             '希望日の指定',
-            icon=ft.icons.CALENDAR_MONTH,
+            icon=ft.Icons.CALENDAR_MONTH,
             on_click=lambda _: self.page.open(
                 self.dpRequestDeadline
             ),

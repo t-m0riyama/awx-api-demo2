@@ -22,11 +22,11 @@ class FormTitle(ft.Column):
                                 # theme_style=ft.TextThemeStyle.DISPLAY_MEDIUM,
                                 size=self.title_font_sizes[0],
                                 weight=ft.FontWeight.BOLD,
-                                color=ft.colors.ON_SECONDARY,
+                                color=ft.Colors.ON_SECONDARY,
                                 text_align=ft.TextAlign.CENTER
                             ),
                             col={"sm": 12},
-                            bgcolor=ft.colors.SECONDARY,
+                            bgcolor=ft.Colors.SECONDARY,
                         ),
                     ],
                 ),
@@ -55,11 +55,11 @@ class FormTitle(ft.Column):
                                 # theme_style=ft.TextThemeStyle.DISPLAY_MEDIUM,
                                 size=self.title_font_sizes[0],
                                 weight=ft.FontWeight.BOLD,
-                                color=ft.colors.ON_SECONDARY,
+                                color=ft.Colors.ON_SECONDARY,
                                 text_align=ft.TextAlign.CENTER,
                             ),
                             col={"sm": 12},
-                            bgcolor=ft.colors.SECONDARY,
+                            bgcolor=ft.Colors.SECONDARY,
                         ),
                     ]
                 )

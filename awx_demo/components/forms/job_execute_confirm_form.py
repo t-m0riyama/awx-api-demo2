@@ -40,7 +40,7 @@ class JobExecuteConfirmForm(BaseWizardCard):
         formDescription = FormDescription('以下の内容で、変更を適用します。')
         self.tfConfirmText = ft.TextField(
             value=self.session.get('confirm_text'),
-            color=ft.colors.PRIMARY,
+            color=ft.Colors.PRIMARY,
             multiline=True,
             max_lines=4,
             read_only=True,

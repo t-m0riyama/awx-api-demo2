@@ -39,11 +39,11 @@ class ActivityRowHelper:
     def _activity_status_to_icon(activity_status):
         match activity_status:
             case EventStatus.SUCCEED:
-                return ft.Icon(name=ft.icons.CHECK_CIRCLE, color=ft.colors.PRIMARY, tooltip=EventStatus.SUCCEED_FRIENDLY)
+                return ft.Icon(name=ft.Icons.CHECK_CIRCLE, color=ft.Colors.PRIMARY, tooltip=EventStatus.SUCCEED_FRIENDLY)
             case EventStatus.FAILED:
-                return ft.Icon(name=ft.icons.ERROR_OUTLINED, color=ft.colors.ERROR, tooltip=EventStatus.FAILED_FRIENDLY)
+                return ft.Icon(name=ft.Icons.ERROR_OUTLINED, color=ft.Colors.ERROR, tooltip=EventStatus.FAILED_FRIENDLY)
             case EventStatus.UNKNOWN:
-                return ft.Icon(name=ft.icons.QUESTION_MARK, color=ft.colors.PRIMARY, tooltip=EventStatus.UNKNOWN_FRIENDLY)
+                return ft.Icon(name=ft.Icons.QUESTION_MARK, color=ft.Colors.PRIMARY, tooltip=EventStatus.UNKNOWN_FRIENDLY)
 
     @staticmethod
     @Logging.func_logger
@@ -81,18 +81,18 @@ class ActivityRowHelper:
 
         if (activity_list_form.data_row_offset + 1 + activity_list_form.DATA_ROW_MAX) >= request_data_count:
             activity_list_form.btnNextPage.disabled = True
-            activity_list_form.btnNextPage.icon_color = ft.colors.ON_INVERSE_SURFACE
+            activity_list_form.btnNextPage.icon_color = ft.Colors.ON_INVERSE_SURFACE
         else:
             activity_list_form.btnNextPage.disabled = False
-            activity_list_form.btnNextPage.icon_color = ft.colors.ON_SURFACE_VARIANT
+            activity_list_form.btnNextPage.icon_color = ft.Colors.ON_SURFACE_VARIANT
         activity_list_form.btnNextPage.update()
 
         if (activity_list_form.data_row_offset + 1 - activity_list_form.DATA_ROW_MAX) < 0:
             activity_list_form.btnPreviousPage.disabled = True
-            activity_list_form.btnPreviousPage.icon_color = ft.colors.ON_INVERSE_SURFACE
+            activity_list_form.btnPreviousPage.icon_color = ft.Colors.ON_INVERSE_SURFACE
         else:
             activity_list_form.btnPreviousPage.disabled = False
-            activity_list_form.btnPreviousPage.icon_color = ft.colors.ON_SURFACE_VARIANT
+            activity_list_form.btnPreviousPage.icon_color = ft.Colors.ON_SURFACE_VARIANT
         activity_list_form.btnPreviousPage.update()
 
     @staticmethod
