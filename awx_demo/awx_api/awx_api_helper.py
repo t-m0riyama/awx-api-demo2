@@ -109,6 +109,30 @@ class AWXApiHelper:
 
     @classmethod
     @Logging.func_logger
+    def get_user(cls, uri_base, loginid, password, user_name, filtered_users=None):
+        request_url = uri_base + '/api/v2/users/'
+        headers = {'Content-Type': 'application/json'}
+        if not filtered_users:
+            filtered_users = []
+
+        try:
+            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
+                loginid, password), verify=False)
+            if response.status_code == 200:
+                result_users = jmespath.search('results', response.json())
+                for user in result_users:
+                    if user['username'] in filtered_users:
+                        continue
+                    if user['username'] == user_name:
+                        return user
+            else:
+                return None
+        except Exception as e:
+            Logging.error(e)
+            return None
+
+    @classmethod
+    @Logging.func_logger
     def start_job(cls, uri_base, loginid, password, job_template_name, request, job_options, session):
         headers = {'Content-Type': 'application/json'}
         vars_json = cls.generate_vars(job_options)
