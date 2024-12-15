@@ -12,7 +12,7 @@ class KeyboardShortcutManager(SingletonComponent):
     UNREGISTERED_SUCCEED = 10
     UNREGISTERED_FAILED_KEY_SET_NOT_FOUND = 11
 
-    def __init__(self, page):
+    def __init__(self, page: ft.Page):
         # key_shortcuts:
         # [
         #   {"key_set": {"key": "N", "shift": True, "ctrl": False, "alt": False, "meta": False},
@@ -23,7 +23,9 @@ class KeyboardShortcutManager(SingletonComponent):
             self.key_shortcuts: list[dict] = []
         if not hasattr(self, "old_key_shortcuts"):
             self.old_key_shortcuts = None
-        page.on_keyboard_event = self.on_keyboard_press
+        # キーボードショートカットのハンドラを初期化
+        if page is not None:
+            page.on_keyboard_event = self.on_keyboard_press
 
     @Logging.func_logger
     def register_key_shortcut(self, key_set, func) -> int:
