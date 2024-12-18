@@ -66,12 +66,6 @@ class BaseWizardCard(ft.Card):
                 key="N", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
-        # 次へ / Enter
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key="Enter", shift=False, ctrl=False, alt=False, meta=False
-            ),
-        )
         # 前へ
         keybord_shortcut_manager.unregister_key_shortcut(
             key_set=keybord_shortcut_manager.create_key_set(
@@ -119,12 +113,18 @@ class BaseWizardCard(ft.Card):
 
     @Logging.func_logger
     def _lock_form_controls(self):
-        # クリック連打対策
-        self.controls.disabled = True
-        self.controls.update()
+        try:
+            # クリック連打対策
+            self.controls.disabled = True
+            self.controls.update()
+        except:
+            pass
 
     @Logging.func_logger
     def _unlock_form_controls(self):
-        # クリック連打対策解除
-        self.controls.disabled = False
-        self.controls.update()
+        try:
+            # クリック連打対策解除
+            self.controls.disabled = False
+            self.controls.update()
+        except:
+            pass
