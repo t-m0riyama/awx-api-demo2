@@ -13,6 +13,11 @@
       "type": "image/png"
     },
     {
+      "src": "/icons/icon-50.png",
+      "sizes": "50x50",
+      "type": "image/png"
+    },
+    {
       "src": "/icons/icon-55.png",
       "sizes": "55x55",
       "type": "image/png"
@@ -25,6 +30,11 @@
     {
       "src": "/icons/icon-71.png",
       "sizes": "71x71",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-150.png",
+      "sizes": "150x150",
       "type": "image/png"
     },
     {
