@@ -65,14 +65,14 @@ class BaseWizard(metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def _save_keyboard_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-        keybord_shortcut_manager.save_key_shortcuts()
-        keybord_shortcut_manager.clear_key_shortcuts()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.save_key_shortcuts()
+        keyboard_shortcut_manager.clear_key_shortcuts()
 
     @Logging.func_logger
     def _restore_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-        keybord_shortcut_manager.restore_key_shortcuts()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.restore_key_shortcuts()
 
     @Logging.func_logger
     def _duplicate_request(self):

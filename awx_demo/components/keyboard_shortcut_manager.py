@@ -65,7 +65,8 @@ class KeyboardShortcutManager(SingletonComponent):
         for key_shortcut in self.key_shortcuts:
             Logging.info(f"KEY_SHORTCUTS: {self.get_key_shortcut_description(key_shortcut)}")
 
-    def get_key_shortcut_description(self, key_shortcut):
+    @staticmethod
+    def get_key_shortcut_description(key_shortcut):
         if hasattr(key_shortcut["func"], "__name__"):
             # function or lambda
             if key_shortcut['func'].__name__ == "<lambda>":

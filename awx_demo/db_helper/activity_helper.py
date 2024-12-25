@@ -53,11 +53,11 @@ class ActivityHelper:
 
     @staticmethod
     @Logging.func_logger
-    def get_activities(db_session, filters, orderspec, offset_row, limit_rows):
+    def get_activities(db_session, filters, order_spec, offset_row, limit_rows):
         # filters中のNoneなど無効な要素を削除
         filters = list(filter(lambda x: x is not None, filters))
         requests_data = db_session.query(base.Activity).filter(
-            *filters).order_by(orderspec).offset(offset_row).limit(limit_rows).all()
+            *filters).order_by(order_spec).offset(offset_row).limit(limit_rows).all()
         return requests_data
 
     @staticmethod
@@ -89,30 +89,30 @@ class ActivityHelper:
 
     @staticmethod
     @Logging.func_logger
-    def get_orderspec_activity_type(is_asc):
+    def get_order_spec_activity_type(is_asc):
         return asc(base.Activity.activity_type) if is_asc else desc(base.Activity.activity_type)
 
     @staticmethod
     @Logging.func_logger
-    def get_orderspec_request_id(is_asc):
+    def get_order_spec_request_id(is_asc):
         return asc(base.Activity.request_id) if is_asc else desc(base.Activity.request_id)
 
     @staticmethod
     @Logging.func_logger
-    def get_orderspec_created(is_asc):
+    def get_order_spec_created(is_asc):
         return asc(base.Activity.created) if is_asc else desc(base.Activity.created)
 
     @staticmethod
     @Logging.func_logger
-    def get_orderspec_user(is_asc):
+    def get_order_spec_user(is_asc):
         return asc(base.Activity.user) if is_asc else desc(base.Activity.user)
 
     @staticmethod
     @Logging.func_logger
-    def get_orderspec_summary(is_asc):
+    def get_order_spec_summary(is_asc):
         return asc(base.Activity.summary) if is_asc else desc(base.Activity.summary)
 
     @staticmethod
     @Logging.func_logger
-    def get_orderspec_detail(is_asc):
+    def get_order_spec_detail(is_asc):
         return asc(base.Activity.detail) if is_asc else desc(base.Activity.detail)

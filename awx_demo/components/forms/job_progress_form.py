@@ -123,8 +123,12 @@ class JobProgressForm(BaseWizardCard):
     def refresh_progress(self):
         if self.session.get('job_id') is None:
             self._on_job_request_failed()
-            IaasRequestHelper.update_request_status(db.get_db(), self.session.get('document_id'),
-                RequestStatus.APPLYING_FAILED, self.session)
+            IaasRequestHelper.update_request_status(
+                db.get_db(),
+                self.session.get('document_id'),
+                RequestStatus.APPLYING_FAILED,
+                self.session
+            )
             return
 
         db_session = db.get_db()
@@ -141,8 +145,12 @@ class JobProgressForm(BaseWizardCard):
 
         if job_status == AWXApiHelper.JOB_STATUS_SUCCEEDED:
             self._on_job_status_completed()
-            IaasRequestHelper.update_request_status(db.get_db(), self.session.get('document_id'),
-                RequestStatus.COMPLETED, self.session)
+            IaasRequestHelper.update_request_status(
+                db.get_db(),
+                self.session.get('document_id'),
+                RequestStatus.COMPLETED,
+                self.session
+            )
             self.pbJob.update()
             return
         elif job_status == AWXApiHelper.JOB_STATUS_RUNNING:
@@ -151,8 +159,12 @@ class JobProgressForm(BaseWizardCard):
             self.pbJob.update()
         elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
             self._on_job_status_request_failed()
-            IaasRequestHelper.update_request_status(db.get_db(), self.session.get('document_id'),
-                RequestStatus.APPLYING_FAILED, self.session)
+            IaasRequestHelper.update_request_status(
+                db.get_db(),
+                self.session.get('document_id'),
+                RequestStatus.APPLYING_FAILED,
+                self.session
+            )
             self.pbJob.update()
             return
 

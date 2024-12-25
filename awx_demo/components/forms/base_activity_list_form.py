@@ -261,31 +261,31 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def register_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 操作履歴一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key=">", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_next_page,
         )
         # 操作履歴一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="<", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_previous_page,
         )
         # 操作履歴一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_next_page,
         )
         # 操作履歴一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_previous_page,
@@ -293,28 +293,28 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def unregister_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 操作履歴一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key=">", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 操作履歴一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="<", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 操作履歴一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 操作履歴一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )

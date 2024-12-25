@@ -5,7 +5,6 @@ from awx_demo.db.base_class import Base
 # from sqlalchemy.dialects.mysql import MEDIUMTEXT
 
 
-
 class Configuration(Base):
     __tablename__ = "configurations"
     # __table_args__ = {'mysql_engine':'InnoDB', 'mysql_charset':'utf8mb4','mysql_collate':'utf8mb4_bin'}

@@ -7,6 +7,7 @@ from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.awx_api.job_options_helper import JobOptionsHelper
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.types.user_role import UserRole
 from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.db import db
@@ -185,6 +186,8 @@ class SendRequestConfirmForm(BaseWizardCard):
 
         self._unlock_form_controls()
         self.step_change_next(e)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.restore_key_shortcuts()
 
     @Logging.func_logger
     def on_change_shutdown_before_change(self, e):

@@ -5,9 +5,8 @@ from sqlalchemy.sql.sqltypes import DateTime
 
 from awx_demo.db.base_class import Base
 
+
 # from sqlalchemy.dialects.mysql import MEDIUMTEXT
-
-
 
 class Activity(Base):
     __tablename__ = "activities"

@@ -100,34 +100,34 @@ class AppHeader(ft.Row):
 
     @Logging.func_logger
     def register_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # ダークモード/ライトモードのテーマ切り替え
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="T", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.toggle_thema_mode,
         )
         # ログアウト
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Q", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.logout_clicked,
         )
         # ログへのセッションダンプ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="V", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
         # ログへのキーボードショートカット一覧出力
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Z", shift=True, ctrl=True, alt=False, meta=False,
             ),
-            func=lambda e: keybord_shortcut_manager.dump_key_shortcuts(),
+            func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )
 
     @Logging.func_logger
@@ -183,11 +183,11 @@ class AppHeader(ft.Row):
 
     @Logging.func_logger
     def _save_keyboard_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-        keybord_shortcut_manager.save_key_shortcuts()
-        keybord_shortcut_manager.clear_key_shortcuts()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.save_key_shortcuts()
+        keyboard_shortcut_manager.clear_key_shortcuts()
 
     @Logging.func_logger
     def _restore_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-        keybord_shortcut_manager.restore_key_shortcuts()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.restore_key_shortcuts()

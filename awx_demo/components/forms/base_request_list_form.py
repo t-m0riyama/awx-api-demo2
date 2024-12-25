@@ -345,76 +345,76 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def register_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 申請の新規作成
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="N", shift=True, ctrl=True, alt=False, meta=False
             ),
             func=self.on_click_add_request,
         )
         # 依頼内容に含まれる文字の検索を実行
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Enter", shift=False, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_search_request_text,
         )
         # 申請一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key=">", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_next_page,
         )
         # 申請一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="<", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_previous_page,
         )
         # 申請一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_next_page,
         )
         # 申請一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_previous_page,
         )
         # 申請の状態の変更 => 申請中
         status_text = RequestStatus.START_FRIENDLY + " (Alt+Shift+I)"
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="I", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の状態の変更 => 承認済み
         status_text = RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)"
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="P", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の状態の変更 => 作業完了
         status_text = RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)"
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="E", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の削除
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="R", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=self.on_selected_delete,
@@ -422,16 +422,16 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # 申請の編集
         for row_index in range(0, 10):
             request_id = self.dtRequests.rows[row_index].cells[self.REQUEST_ID_COLUMN_NUMBER].content.value
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key=f"{row_index}", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=lambda e, request_id=request_id: self.on_request_edit_open(request_id=request_id),
             )
         # 申請の選択・選択解除
         for selected_index in range(0, 10):
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key=f"{selected_index}", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=lambda e, selected_index=selected_index: self.on_request_row_select(selected_index=selected_index),
@@ -439,81 +439,81 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def unregister_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 申請の新規作成
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="N", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
         # 依頼内容に含まれる文字の検索を実行
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Enter", shift=False, ctrl=True, alt=False, meta=False,
             ),
         )
         # 申請一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key=">", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 申請一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="<", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 申請一覧のページ送り / 次のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 申請一覧のページ送り / 前のページへ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 申請の状態の変更 => 申請中
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="I", shift=True, ctrl=False, alt=True, meta=False,
             ),
         )
         # 申請の状態の変更 => 承認済み
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="P", shift=True, ctrl=False, alt=True, meta=False,
             ),
         )
         # 申請の状態の変更 => 作業完了
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="E", shift=True, ctrl=False, alt=True, meta=False,
             ),
         )
         # 申請の削除
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="R", shift=True, ctrl=False, alt=True, meta=False,
             ),
         )
         # 申請の編集
         for row_index in range(0, 10):
-            keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key=str(row_index), shift=True, ctrl=True, alt=False, meta=False,
-            ),
-        )
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=str(row_index), shift=True, ctrl=True, alt=False, meta=False,
+                ),
+            )
         # 申請の選択・選択解除
         for row_index in range(0, 10):
-            keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
-                key=str(row_index), shift=True, ctrl=False, alt=True, meta=False,
-            ),
-        )
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=str(row_index), shift=True, ctrl=False, alt=True, meta=False,
+                ),
+            )
 
     @abc.abstractmethod
     def get_query_filters(self):
@@ -630,17 +630,17 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         if self.btnActions.disabled: return
         self._save_keyboard_shortcuts()
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 削除確認時に”はい”を選択
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Y", shift=True, ctrl=True, alt=False, meta=False
             ),
             func=self.on_click_delete_request_yes,
         )
         # 削除確認時に”キャンセル”を選択
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Escape", shift=False, ctrl=False, alt=False, meta=False
             ),
             func=self.on_click_delete_request_cancel,
@@ -729,11 +729,11 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def _save_keyboard_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-        keybord_shortcut_manager.save_key_shortcuts()
-        keybord_shortcut_manager.clear_key_shortcuts()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.save_key_shortcuts()
+        keyboard_shortcut_manager.clear_key_shortcuts()
 
     @Logging.func_logger
     def _restore_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-        keybord_shortcut_manager.restore_key_shortcuts()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.restore_key_shortcuts()

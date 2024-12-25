@@ -111,9 +111,9 @@ class SelectTargetForm(BaseWizardCard):
 
     # @Logging.func_logger
     # def register_key_shortcuts(self):
-    #     keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-    #     keybord_shortcut_manager.register_key_shortcut(
-    #         key_set=keybord_shortcut_manager.create_key_set(
+    #     keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+    #     keyboard_shortcut_manager.register_key_shortcut(
+    #         key_set=keyboard_shortcut_manager.create_key_set(
     #             key="N", shift=True, ctrl=True, alt=False, meta=False
     #         ),
     #         func=self.on_click_next,
@@ -121,9 +121,9 @@ class SelectTargetForm(BaseWizardCard):
 
     # @Logging.func_logger
     # def unregister_key_shortcuts(self):
-    #     keybord_shortcut_manager = KeyboardShortcutManager(self.page)
-    #     keybord_shortcut_manager.unregister_key_shortcut(
-    #         key_set=keybord_shortcut_manager.create_key_set(
+    #     keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+    #     keyboard_shortcut_manager.unregister_key_shortcut(
+    #         key_set=keyboard_shortcut_manager.create_key_set(
     #             key="N", shift=True, ctrl=True, alt=False, meta=False
     #         ),
     #     )

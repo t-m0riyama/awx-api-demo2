@@ -122,7 +122,7 @@ class TeamsAdaptiveCardNotificator:
                             .add_items(body) \
                             .create()
         # Teamsメッセージの横幅を最大限利用する設定を付加する
-        content =  {
+        content = {
             "msteams": {
                     "width": "Full"
             }
@@ -130,7 +130,7 @@ class TeamsAdaptiveCardNotificator:
         content |= dict(json.loads(card.to_json()))
         payload = {
             "type": "message",
-            "attachments" : [
+            "attachments": [
                 {
                     "contentType": "application/vnd.microsoft.card.adaptive",
                     "content": content
@@ -144,10 +144,11 @@ class TeamsAdaptiveCardNotificator:
             data_json = json.dumps(payload)
             asyncio.new_event_loop().run_in_executor(
                                         None,
-                                        partial(requests.post,
-                                                teams_webhook_url,
-                                                data=data_json,
-                                                headers=headers
+                                        partial(
+                                            requests.post,
+                                            teams_webhook_url,
+                                            data=data_json,
+                                            headers=headers
                                         )
             )
             Logging.info('TEAMS_MESSAGE_SENT_SUCCESS: ' + notification_spec.title)

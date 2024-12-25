@@ -13,86 +13,86 @@ class BaseWizardCard(ft.Card):
 
     @Logging.func_logger
     def register_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 次へ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="N", shift=True, ctrl=True, alt=False, meta=False
             ),
             func=self.on_click_next,
         )
         # 前へ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="P", shift=True, ctrl=True, alt=False, meta=False
             ),
             func=self.on_click_previous,
         )
         # キャンセル
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="X", shift=True, ctrl=True, alt=False, meta=False
             ),
             func=self.on_click_cancel,
         )
         # キャンセル / ESC
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Escape", shift=False, ctrl=False, alt=False, meta=False
             ),
             func=self.on_click_cancel,
         )
         # ログへのセッションダンプ
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="V", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
         # ログへのキーボードショートカット一覧出力
-        keybord_shortcut_manager.register_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Z", shift=True, ctrl=True, alt=False, meta=False,
             ),
-            func=lambda e: keybord_shortcut_manager.dump_key_shortcuts(),
+            func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )
 
     @Logging.func_logger
     def unregister_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 次へ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="N", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
         # 前へ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="P", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
         # キャンセル
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="X", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
         # キャンセル / ESC
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Escape", shift=False, ctrl=False, alt=False, meta=False
             ),
         )
         # ログへのセッションダンプ
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="V", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
         # ログへのキーボードショートカット一覧出力
-        keybord_shortcut_manager.unregister_key_shortcut(
-            key_set=keybord_shortcut_manager.create_key_set(
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Z", shift=True, ctrl=True, alt=False, meta=False
             ),
         )

@@ -221,82 +221,82 @@ class Sidebar(ft.Container):
 
     @Logging.func_logger
     def register_key_shortcuts(self):
-        keybord_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         if self.session.get('user_role') == UserRole.USER_ROLE:
             # 最新の申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="L", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=0),
             )
             # リリース希望日順
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="D", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=1),
             )
             # 自身の申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="M", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=2),
             )
             # 全ての申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="A", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=3),
             )
             # 完了済みの申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="H", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_option_navigation_item, item_index=0),
             )
         else:
             # 最新の申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="L", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=0),
             )
             # リリース希望日順
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="D", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=1),
             )
             # 自身の申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="M", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=2),
             )
             # 全ての申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="A", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=3),
             )
             # 完了済みの申請
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="E", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=4),
             )
             # 操作履歴
-            keybord_shortcut_manager.register_key_shortcut(
-                key_set=keybord_shortcut_manager.create_key_set(
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
                     key="H", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_option_navigation_item, item_index=0),

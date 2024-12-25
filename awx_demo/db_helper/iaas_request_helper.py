@@ -255,11 +255,11 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def get_requests(cls, db_session, filters, orderspec, offset_row, limit_rows):
+    def get_requests(cls, db_session, filters, order_spec, offset_row, limit_rows):
         # filters中のNoneなど無効な要素を削除
         filters = list(filter(lambda x: x is not None, filters))
         requests_data = db_session.query(base.IaasRequest).filter(
-            *filters).order_by(orderspec).offset(offset_row).limit(limit_rows).all()
+            *filters).order_by(order_spec).offset(offset_row).limit(limit_rows).all()
         return requests_data
 
     @classmethod
@@ -303,37 +303,37 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def get_orderspec_request_id(cls, is_asc):
+    def get_order_spec_request_id(cls, is_asc):
         return asc(base.IaasRequest.request_id) if is_asc else desc(base.IaasRequest.request_id)
 
     @classmethod
     @Logging.func_logger
-    def get_orderspec_request_deadline(cls, is_asc):
+    def get_order_spec_request_deadline(cls, is_asc):
         return asc(base.IaasRequest.request_deadline) if is_asc else desc(base.IaasRequest.request_deadline)
 
     @classmethod
     @Logging.func_logger
-    def get_orderspec_updated(cls, is_asc):
+    def get_order_spec_updated(cls, is_asc):
         return asc(base.IaasRequest.updated) if is_asc else desc(base.IaasRequest.updated)
 
     @classmethod
     @Logging.func_logger
-    def get_orderspec_request_user(cls, is_asc):
+    def get_order_spec_request_user(cls, is_asc):
         return asc(base.IaasRequest.request_user) if is_asc else desc(base.IaasRequest.request_user)
 
     @classmethod
     @Logging.func_logger
-    def get_orderspec_iaas_user(cls, is_asc):
+    def get_order_spec_iaas_user(cls, is_asc):
         return asc(base.IaasRequest.iaas_user) if is_asc else desc(base.IaasRequest.iaas_user)
 
     @classmethod
     @Logging.func_logger
-    def get_orderspec_request_operation(cls, is_asc):
+    def get_order_spec_request_operation(cls, is_asc):
         return asc(base.IaasRequest.request_operation) if is_asc else desc(base.IaasRequest.request_operation)
 
     @classmethod
     @Logging.func_logger
-    def get_orderspec_request_text(cls, is_asc):
+    def get_order_spec_request_text(cls, is_asc):
         return asc(base.IaasRequest.request_text) if is_asc else desc(base.IaasRequest.request_text)
 
     @classmethod

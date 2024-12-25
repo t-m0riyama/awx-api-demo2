@@ -31,6 +31,7 @@ class RequestCategory:
         formal_map = {v: k for k, v in RequestCategory.FRIENDLY_MAP.items()}
         return formal_map[status_friendly]
 
+
 class RequestOperation:
 
     # const

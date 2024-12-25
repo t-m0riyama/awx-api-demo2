@@ -21,7 +21,12 @@ def main(page: ft.Page):
         modal=True,
         content=formLogin,
     )
-    router = NavigationRouter(page.session, page, page.session.get("app_title_base"), dlgLogin)
+    router = NavigationRouter(
+        session=page.session,
+        page=page,
+        app_title_base=page.session.get("app_title_base"),
+        dlg_login=dlgLogin
+    )
 
     # Page レイアウト
     page.title = page.session.get("app_title_base")

@@ -188,35 +188,35 @@ class RequestRowHelper:
     @Logging.func_logger
     def query_request_all(request_list_form):
         db_session = db.get_db()
-        orderspec = None
+        order_spec = None
         filters = request_list_form.get_query_filters()
         match request_list_form.session.get('sort_target_column'):
             case '依頼ID':
-                orderspec = IaasRequestHelper.get_orderspec_request_id(
+                order_spec = IaasRequestHelper.get_order_spec_request_id(
                     request_list_form.dtRequests.sort_ascending)
             case 'リリース希望日':
-                orderspec = IaasRequestHelper.get_orderspec_request_deadline(
+                order_spec = IaasRequestHelper.get_order_spec_request_deadline(
                     request_list_form.dtRequests.sort_ascending)
             case '最終更新日':
-                orderspec = IaasRequestHelper.get_orderspec_updated(
+                order_spec = IaasRequestHelper.get_order_spec_updated(
                     request_list_form.dtRequests.sort_ascending)
             case '申請者':
-                orderspec = IaasRequestHelper.get_orderspec_request_user(
+                order_spec = IaasRequestHelper.get_order_spec_request_user(
                     request_list_form.dtRequests.sort_ascending)
             case '作業担当者':
-                orderspec = IaasRequestHelper.get_orderspec_iaas_user(
+                order_spec = IaasRequestHelper.get_order_spec_iaas_user(
                     request_list_form.dtRequests.sort_ascending)
             case '申請項目':
-                orderspec = IaasRequestHelper.get_orderspec_request_operation(
+                order_spec = IaasRequestHelper.get_order_spec_request_operation(
                     request_list_form.dtRequests.sort_ascending)
             case '依頼内容':
-                orderspec = IaasRequestHelper.get_orderspec_request_text(
+                order_spec = IaasRequestHelper.get_order_spec_request_text(
                     request_list_form.dtRequests.sort_ascending)
 
         requests_data = IaasRequestHelper.get_requests(
             db_session=db_session,
             filters=filters,
-            orderspec=orderspec,
+            order_spec=order_spec,
             offset_row=request_list_form.data_row_offset,
             limit_rows=request_list_form.DATA_ROW_MAX
         )

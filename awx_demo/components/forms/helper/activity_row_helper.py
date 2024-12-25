@@ -112,29 +112,29 @@ class ActivityRowHelper:
     def query_activity_all(activity_list_form):
         db_session = db.get_db()
         activities_data = None
-        orderspec = None
+        order_spec = None
         filters = activity_list_form.get_query_filters()
         match activity_list_form.session.get('sort_target_column'):
             case '時刻':
-                orderspec = ActivityHelper.get_orderspec_created(
+                order_spec = ActivityHelper.get_order_spec_created(
                     activity_list_form.dtActivities.sort_ascending)
             case 'ユーザ名':
-                orderspec = ActivityHelper.get_orderspec_user(
+                order_spec = ActivityHelper.get_order_spec_user(
                     activity_list_form.dtActivities.sort_ascending)
             case '操作種別':
-                orderspec = ActivityHelper.get_orderspec_activity_type(
+                order_spec = ActivityHelper.get_order_spec_activity_type(
                     activity_list_form.dtActivities.sort_ascending)
             case '依頼ID':
-                orderspec = ActivityHelper.get_orderspec_request_id(
+                order_spec = ActivityHelper.get_order_spec_request_id(
                     activity_list_form.dtActivities.sort_ascending)
             case '概要':
-                orderspec = ActivityHelper.get_orderspec_summary(
+                order_spec = ActivityHelper.get_order_spec_summary(
                     activity_list_form.dtActivities.sort_ascending)
 
         activities_data = ActivityHelper.get_activities(
             db_session=db_session,
             filters=filters,
-            orderspec=orderspec,
+            order_spec=order_spec,
             offset_row=activity_list_form.data_row_offset,
             limit_rows=activity_list_form.DATA_ROW_MAX
         )

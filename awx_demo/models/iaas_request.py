@@ -8,7 +8,6 @@ from awx_demo.db.base_class import Base
 # from sqlalchemy.dialects.mysql import MEDIUMTEXT
 
 
-
 class IaasRequest(Base):
     __tablename__ = "iaas_requests"
     # __table_args__ = {'mysql_engine':'InnoDB', 'mysql_charset':'utf8mb4','mysql_collate':'utf8mb4_bin'}
