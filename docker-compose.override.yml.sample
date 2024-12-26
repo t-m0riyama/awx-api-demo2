@@ -4,8 +4,14 @@ services:
       # アプリケーションのタイトル
       - RMX_APP_TITLE="申請マネージャ"
 
-      # AWXのURL(ex. https://awx.example.com)
+      # AWX/AAPのURL(ex. https://awx.example.com)
       - RMX_AWX_URL=<YOUR AWX URL>
+
+      # AWX/AAPを利用する際、HTTPプロキシを利用する 有効/無効
+      - RMX_AWX_PROXY_ENABLED=False
+
+      # AWX/AAPを利用する際、利用するHTTPプロキシサーバの指定 (ex. http://proxy.example.com:8080)
+      - RMX_AWX_HTTP_PROXY=<YOUR PROXY URL>
 
       # リリース希望日として指定可能な開始日（7を指定した場合、1週間後以降の日を指定可能とする）
       - RMX_DEADLINE_START_DATE_DAYS=7
@@ -48,6 +54,12 @@ services:
 
       # Teams Webhookを利用した通知を行う際、送信後の待ち時間（msec）
       - RMX_TEAMS_WEB_HOOK_MESSAGE_DELAY_MSEC=300
+
+      # Teams Webhookを利用した通知を行う際、HTTPプロキシを利用する 有効/無効
+      - RMX_TEAMS_PROXY_ENABLED=False
+
+      # Teams Webhookを利用した通知を行う際、利用するHTTPプロキシサーバの指定 (ex. http://proxy.example.com:8080)
+      - RMX_TEAMS_HTTP_PROXY=<YOUR PROXY URL>
 
       # Teams Webhookを利用した通知を行う際のメッセージ形式 (adaptive_card, message_card)
       - RMX_TEAMS_MESSAGE_FORMAT=message_card

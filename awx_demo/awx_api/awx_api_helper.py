@@ -1,5 +1,7 @@
 import datetime
 import json
+import os
+from distutils.util import strtobool
 
 import jmespath
 import requests
@@ -32,14 +34,43 @@ class AWXApiHelper:
     API_FAILED_TO_CONNECT = "AWX_API_FAILED_TO_CONNECT"
     API_FAILED_OTHER = "AWX_API_FAILED_OTHER"
 
+    HTTP_PROXY_DEFAULT  = "http://proxy.example.com:8080"
+    HTTPS_PROXY_DEFAULT = "http://proxy.example.com:8080"
+    AWX_PROXIES = {
+        "http"  : os.getenv("RMX_AWX_HTTP_PROXY", HTTP_PROXY_DEFAULT),
+        "https" : os.getenv("RMX_AWX_HTTPS_PROXY", os.getenv("RMX_AWX_HTTP_PROXY", HTTPS_PROXY_DEFAULT)),
+    }
+    AWX_PROXY_ENABLED = bool(strtobool(os.getenv("RMX_AWX_PROXY_ENABLED", "False")))
+
+    @classmethod
+    @Logging.func_logger
+    def _request_get(cls, request_url, headers, loginid, password, verify, proxy_enabled):
+        if proxy_enabled:
+            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
+                loginid, password), verify=verify, proxies=cls.AWX_PROXIES)
+        else:
+            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
+                loginid, password), verify=verify)
+        return response
+
+    @classmethod
+    @Logging.func_logger
+    def _request_post(cls, request_url, headers, loginid, password, verify, data, proxy_enabled):
+        if proxy_enabled:
+            response = requests.post(request_url, headers=headers, auth=HTTPBasicAuth(
+                loginid, password), verify=verify, data=data, proxies=cls.AWX_PROXIES)
+        else:
+            response = requests.post(request_url, headers=headers, auth=HTTPBasicAuth(
+                loginid, password), verify=verify, data=data)
+        return response
+
     @classmethod
     @Logging.func_logger
     def login(cls, uri_base, loginid, password):
         request_url = uri_base + '/api/v2/me/'
         headers = {'Content-Type': 'application/json'}
         try:
-            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
-                loginid, password), verify=False)
+            response = cls._request_get(request_url=request_url, headers=headers, loginid=loginid, password=password, verify=False, proxy_enabled=cls.AWX_PROXY_ENABLED)
             Logging.info(f'AWX_LOGIN_URL: {request_url}')
             Logging.info(f'AWX_LOGIN_STATUS: {str(response.status_code)} / {request_url}')
             if response.status_code == 200:
@@ -57,8 +88,7 @@ class AWXApiHelper:
         request_url = uri_base + '/api/v2/me/'
         headers = {'Content-Type': 'application/json'}
         try:
-            response_me = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
-                loginid, password), verify=False)
+            response_me = cls._request_get(request_url=request_url, headers=headers, loginid=loginid, password=password, verify=False, proxy_enabled=cls.AWX_PROXY_ENABLED)
             if response_me.status_code != 200:
                 Logging.error("Failed to retrieve information for user")
                 return False
@@ -66,8 +96,7 @@ class AWXApiHelper:
             teams_url = uri_base + \
                 jmespath.search("results[0].related.teams", response_me.json())
             Logging.info(f'AWX_TEAMS_URL: {teams_url}')
-            response_teams = requests.get(
-                teams_url, headers=headers, auth=HTTPBasicAuth(loginid, password), verify=False)
+            response_teams = cls._request_get(request_url=teams_url, headers=headers, loginid=loginid, password=password, verify=False, proxy_enabled=cls.AWX_PROXY_ENABLED)
 
             if response_teams.status_code != 200:
                 Logging.error(f'AWX_TEAMS_STATUS: {response_teams.status_code} / {teams_url}')
@@ -92,8 +121,7 @@ class AWXApiHelper:
             filtered_users = []
 
         try:
-            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
-                loginid, password), verify=False)
+            response = cls._request_get(request_url=request_url, headers=headers, loginid=loginid, password=password, verify=False, proxy_enabled=cls.AWX_PROXY_ENABLED)
             if response.status_code == 200:
                 users = []
                 result_users = jmespath.search('results', response.json())
@@ -116,8 +144,7 @@ class AWXApiHelper:
             filtered_users = []
 
         try:
-            response = requests.get(request_url, headers=headers, auth=HTTPBasicAuth(
-                loginid, password), verify=False)
+            response = cls._request_get(request_url=request_url, headers=headers, loginid=loginid, password=password, verify=False, proxy_enabled=cls.AWX_PROXY_ENABLED)
             if response.status_code == 200:
                 result_users = jmespath.search('results', response.json())
                 for user in result_users:
@@ -149,8 +176,8 @@ class AWXApiHelper:
             Logging.info(f'AWX_LAUNCH_URL: {launch_url}')
             Logging.info(f'AWX_LAUNCH_VARS: {vars_json} / {launch_url}')
             detail = IaasRequestReportHelper.generate_request_detail(request, job_options)
-            response = requests.post(launch_url, headers=headers, auth=HTTPBasicAuth(
-                loginid, password), verify=False, data=vars_json)
+            response = cls._request_post(
+                request_url=launch_url, headers=headers, loginid=loginid, password=password, verify=False, data=vars_json, proxy_enabled=cls.AWX_PROXY_ENABLED)
             if response.status_code == 201:
                 response_results = jmespath.search('job', response.json())
                 cls._emit_event_on_start_job(
@@ -199,8 +226,7 @@ class AWXApiHelper:
         headers = {'Content-Type': 'application/json'}
         try:
             Logging.info(f'AWX_JOB_TEMPLATE_URL: {job_templates_url}')
-            response = requests.get(job_templates_url, headers=headers, auth=HTTPBasicAuth(
-                loginid, password), verify=False)
+            response = cls._request_get(request_url=job_templates_url, headers=headers, loginid=loginid, password=password, verify=False, proxy_enabled=cls.AWX_PROXY_ENABLED)
             if response.status_code == 200:
                 Logging.info(f'AWX_JOB_TEMPLATE_STATUS: {response.status_code} / {job_templates_url}')
                 Logging.info(f'AWX_JOB_TEMPLATE_ID: {(response.json())["id"]} / {job_templates_url}')
@@ -220,8 +246,8 @@ class AWXApiHelper:
         Logging.info(f'AWX_JOB_STATUS_URL: {job_status_url}')
         detail = IaasRequestReportHelper.generate_request_detail(request)
         try:
-            response = requests.get(job_status_url, headers=headers, auth=HTTPBasicAuth(
-                loginid, password), verify=False)
+            response = cls._request_get(
+                request_url=job_status_url, headers=headers, loginid=loginid, password=password, verify=False, proxy_enabled=cls.AWX_PROXY_ENABLED)
             Logging.info(f'AWX_JOB_STATUS_STATUS: {str(response.status_code)} / {job_status_url}')
             if response.status_code == 200:
                 job_status = jmespath.search('status', response.json())

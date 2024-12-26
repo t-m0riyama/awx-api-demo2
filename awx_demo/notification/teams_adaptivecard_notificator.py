@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import os
+from distutils.util import strtobool
 from functools import partial
 
 import adaptive_cards.card_types as types
@@ -22,6 +23,23 @@ class TeamsAdaptiveCardNotificator:
     # const
     APP_TITLE_DEFAULT = "AWX API Demo"
     ADAPTIVECARD_VERSION = "1.3"
+
+    HTTP_PROXY_DEFAULT  = "http://proxy.example.com:8080"
+    HTTPS_PROXY_DEFAULT = "http://proxy.example.com:8080"
+    AWX_PROXIES = {
+        "http"  : os.getenv("RMX_TEAMS_HTTP_PROXY", HTTP_PROXY_DEFAULT),
+        "https" : os.getenv("RMX_TEAMS_HTTPS_PROXY", os.getenv("RMX_TEAMS_HTTP_PROXY", HTTPS_PROXY_DEFAULT)),
+    }
+    TEAMS_PROXY_ENABLED = bool(strtobool(os.getenv("RMX_TEAMS_PROXY_ENABLED", "False")))
+
+    @classmethod
+    @Logging.func_logger
+    def _request_post(cls, request_url, headers, verify, data, proxy_enabled):
+        if proxy_enabled:
+            response = requests.post(request_url, headers=headers, verify=verify, data=data, proxies=cls.AWX_PROXIES)
+        else:
+            response = requests.post(request_url, headers=headers, verify=verify, data=data)
+        return response
 
     @classmethod
     @Logging.func_logger
@@ -145,10 +163,12 @@ class TeamsAdaptiveCardNotificator:
             asyncio.new_event_loop().run_in_executor(
                                         None,
                                         partial(
-                                            requests.post,
-                                            teams_webhook_url,
+                                            cls._request_post,
+                                            request_url=teams_webhook_url,
                                             data=data_json,
-                                            headers=headers
+                                            headers=headers,
+                                            verify=False,
+                                            proxy_enabled=cls.TEAMS_PROXY_ENABLED
                                         )
             )
             Logging.info('TEAMS_MESSAGE_SENT_SUCCESS: ' + notification_spec.title)
