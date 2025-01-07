@@ -122,14 +122,19 @@ class LoginForm(ft.Card):
         match reason:
             case AWXApiHelper.API_FAILED_STATUS:
                 message = "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。"
+                title_suffix = "認証エラー"
             case AWXApiHelper.API_FAILED_TO_CONNECT:
                 message = "ログイン失敗: AWXサーバーに接続できません。AWX URLを確認して下さい。"
+                title_suffix = "接続エラー"
             case _:
                 message = "ログイン失敗: AWXサーバーに接続できません。管理者に連絡し、ログを確認してください。"
+                title_suffix = "接続エラー"
 
         self.txtLoginMessage.value = message
         self.txtLoginMessage.visible = True
-        self.txtLoginMessage.update()
+        app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
+        self.page.title = f"{app_title} - {title_suffix}"
+        self.page.update()
 
     @Logging.func_logger
     def show_lack_authority_message(self):
