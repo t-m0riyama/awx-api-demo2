@@ -122,6 +122,13 @@ class AppHeader(ft.Row):
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
+        # Semantics Debuggerの有効化/無効化
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="Y", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.toggle_show_semantics_debugger,
+        )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
@@ -134,6 +141,11 @@ class AppHeader(ft.Row):
     def toggle_thema_mode(self, e):
         self.page.theme_mode = "dark" if self.page.theme_mode == "light" else "light"
         self.toggle_dark_light_icon.selected = not self.toggle_dark_light_icon.selected
+        self.page.update()
+
+    @Logging.func_logger
+    def toggle_show_semantics_debugger(self, e):
+        self.page.show_semantics_debugger = not self.page.show_semantics_debugger
         self.page.update()
 
     @Logging.func_logger

@@ -261,6 +261,11 @@ class EditRequestForm(BaseWizardCard):
         return confirm_text
 
     @Logging.func_logger
+    def toggle_show_semantics_debugger(self, e):
+        self.page.show_semantics_debugger = not self.page.show_semantics_debugger
+        self.page.update()
+
+    @Logging.func_logger
     def register_key_shortcuts(self):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 次のページへ
@@ -363,6 +368,13 @@ class EditRequestForm(BaseWizardCard):
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
+        # Semantics Debuggerの有効化/無効化
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="Y", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=self.toggle_show_semantics_debugger,
+        )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
@@ -458,6 +470,12 @@ class EditRequestForm(BaseWizardCard):
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="V", shift=True, ctrl=True, alt=False, meta=False
+            ),
+        )
+        # Semantics Debuggerの有効化/無効化
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="Y", shift=True, ctrl=True, alt=False, meta=False
             ),
         )
         # ログへのキーボードショートカット一覧出力
