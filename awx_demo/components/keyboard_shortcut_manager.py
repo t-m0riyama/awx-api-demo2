@@ -25,7 +25,8 @@ class KeyboardShortcutManager(SingletonComponent):
             self.old_key_shortcuts = None
         # キーボードショートカットのハンドラを初期化
         if page is not None:
-            page.on_keyboard_event = self.on_keyboard_press
+            self.page = page
+            self.page.on_keyboard_event = self.on_keyboard_press
 
     @Logging.func_logger
     def register_key_shortcut(self, key_set, func) -> int:
@@ -56,7 +57,6 @@ class KeyboardShortcutManager(SingletonComponent):
     def clear_key_shortcuts(self) -> None:
         self.key_shortcuts = []
 
-    @Logging.func_logger
     def create_key_set(self, key: str, shift: bool=False, ctrl: bool=False, alt: bool=False, meta: bool=False) -> dict:
         return {"key": key, "shift": shift, "ctrl": ctrl, "alt": alt, "meta": meta}
 
@@ -91,7 +91,16 @@ class KeyboardShortcutManager(SingletonComponent):
 
     @Logging.func_logger
     def on_keyboard_press(self, e: ft.KeyboardEvent):
+        keyboard_press_locked = self.page.session.get('keyboard_press_locked') if self.page.session.contains_key('keyboard_press_locked') else False
+        if keyboard_press_locked:
+            import time
+            time.sleep(0.2)
+            Logging.warning("KEY_SHORTCUT_CALLED_BUT_LOCKED: " + str(e))
+            return
+        self.page.session.set('keyboard_press_locked', True)
         for key_shortcut in self.key_shortcuts:
             if key_shortcut["key_set"] == self.create_key_set(e.key, e.shift, e.ctrl, e.alt, e.meta):
                 Logging.info("KEY_SHORTCUT_CALLED: " + self.get_key_shortcut_description(key_shortcut))
                 key_shortcut["func"](e=e)
+                break
+        self.page.session.set('keyboard_press_locked', False)

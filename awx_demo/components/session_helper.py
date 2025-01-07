@@ -20,6 +20,7 @@ class SessionHelper:
         cls._remove_session_key(session, "awx_password")
         cls._remove_session_key(session, "user_role")
         cls._remove_session_key(session, "request_text_search_string")
+        cls._remove_session_key(session, "keyboard_press_locked")
 
     @staticmethod
     @Logging.func_logger
