@@ -29,6 +29,7 @@ class NavigationRouter:
 
     def route_change(self):
         template_route = ft.TemplateRoute(self.page.route)
+        page_title_new = self.page.title
 
         # 遷移前のフォームのショートカットキーを登録解除
         if self.formRequests is not None:
@@ -48,27 +49,27 @@ class NavigationRouter:
                     case '/latest_requests':
                         self.formRequests = LatestRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - 最新の申請"
+                        page_title_new = f"{self.app_title_base} - 最新の申請"
                         navigation_selected_index = 0
                     case '/deadline_requests':
                         self.formRequests = DeadlineRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - リリース希望日順"
+                        page_title_new = f"{self.app_title_base} - リリース希望日順"
                         navigation_selected_index = 1
                     case '/all_requests':
                         self.formRequests = AllRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - すべての申請"
+                        page_title_new = f"{self.app_title_base} - すべての申請"
                         navigation_selected_index = 2
                     case '/completed_requests':
                         self.formRequests = CompletedRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - 完了済みの申請"
+                        page_title_new = f"{self.app_title_base} - 完了済みの申請"
                         navigation_selected_index = 3
                     case '/my_activities':
                         self.formRequests = MyActivityListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - 操作履歴"
+                        page_title_new = f"{self.app_title_base} - 操作履歴"
                         navigation_selected_index = 0
                     case _:
                         Logging.error("error undefined route")
@@ -78,32 +79,32 @@ class NavigationRouter:
                     case '/latest_requests':
                         self.formRequests = LatestRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - 最新の申請"
+                        page_title_new = f"{self.app_title_base} - 最新の申請"
                         navigation_selected_index = 0
                     case '/deadline_requests':
                         self.formRequests = DeadlineRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - リリース希望日順"
+                        page_title_new = f"{self.app_title_base} - リリース希望日順"
                         navigation_selected_index = 1
                     case '/my_requests':
                         self.formRequests = MyRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - 自身の申請"
+                        page_title_new = f"{self.app_title_base} - 自身の申請"
                         navigation_selected_index = 2
                     case '/all_requests':
                         self.formRequests = AllRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - すべての申請"
+                        page_title_new = f"{self.app_title_base} - すべての申請"
                         navigation_selected_index = 3
                     case '/completed_requests':
                         self.formRequests = CompletedRequestListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - 完了済みの申請"
+                        page_title_new = f"{self.app_title_base} - 完了済みの申請"
                         navigation_selected_index = 4
                     case '/all_activities':
                         self.formRequests = AllActivityListForm(
                             self.session, self.page)
-                        self.page.title = f"{self.app_title_base} - 操作履歴"
+                        page_title_new = f"{self.app_title_base} - 操作履歴"
                         navigation_selected_index = 0
                     case _:
                         Logging.error("error undefined route")
@@ -126,5 +127,6 @@ class NavigationRouter:
 
             AppHeader(self.session, self.page, self.app_title_base)
             self.session.set('request_text_search_string', '')
+            self.page.title = page_title_new
             self.page.add(layout)
             self.page.update()
