@@ -26,15 +26,22 @@ class SetVmCpuMemoryWizard(BaseWizard):
         self.wizard_dialog = wizard_dialog
         self.parent_wizard = parent_wizard
         self.parent_refresh_func = parent_refresh_func
+        self.formStep = None
         super().__init__()
 
     @Logging.func_logger
     def on_click_next(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
+
+        # 遷移前のフォームのショートカットキーを登録解除
+        if self.formStep is not None:
+            self.formStep.unregister_key_shortcuts()
+
         match self.session.get("new_request_wizard_step"):
             case "create_request":
                 self.session.set("new_request_wizard_step", "select_target")
-                formStep = SelectTargetForm(
+                self.formStep = SelectTargetForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -44,12 +51,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
                 self.page.open(self.wizard_dialog)
             case "select_target":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
-                formStep = SetVmCpuForm(
+                self.formStep = SetVmCpuForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -59,12 +66,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - CPUの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "set_vm_memory")
-                formStep = SetVmMemoryForm(
+                self.formStep = SetVmMemoryForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -74,12 +81,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - メモリの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "send_request_confirm")
-                formStep = SendRequestConfirmForm(
+                self.formStep = SendRequestConfirmForm(
                     session=self.session,
                     page=self.page,
                     title=self.CONFIRM_FORM_TITLE,
@@ -90,13 +97,13 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 変更内容の確認"
                 self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 if self.session.get("execute_job_immediately"):
                     self.session.set("new_request_wizard_step", "job_progress")
-                    formStep = JobProgressForm(
+                    self.formStep = JobProgressForm(
                         session=self.session,
                         page=self.page,
                         request_id=self.session.get("request_id"),
@@ -105,7 +112,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                         body_height=self.BODY_HEIGHT,
                         step_change_exit=self.on_click_cancel,
                     )
-                    self.wizard_dialog.content = formStep
+                    self.wizard_dialog.content = self.formStep
                     self.page.title = f"{self.session.get('app_title_base')} - 処理の進捗"
                     self.page.open(self.wizard_dialog)
                 else:
@@ -121,12 +128,18 @@ class SetVmCpuMemoryWizard(BaseWizard):
     @Logging.func_logger
     def on_click_previous(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
+
+        # 遷移前のフォームのショートカットキーを登録解除
+        if self.formStep is not None:
+            self.formStep.unregister_key_shortcuts()
+
         match self.session.get("new_request_wizard_step"):
             case "select_target":
                 self.parent_wizard.on_click_previous(e)
             case "set_vm_cpu":
                 self.session.set("new_request_wizard_step", "select_target")
-                formStep = SelectTargetForm(
+                self.formStep = SelectTargetForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -136,12 +149,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
                 self.page.open(self.wizard_dialog)
             case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
-                formStep = SetVmCpuForm(
+                self.formStep = SetVmCpuForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -151,12 +164,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - CPUの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 self.session.set("new_request_wizard_step", "set_vm_memory")
-                formStep = SetVmMemoryForm(
+                self.formStep = SetVmMemoryForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -166,7 +179,7 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - メモリの割り当て変更"
                 self.page.open(self.wizard_dialog)
             case _:

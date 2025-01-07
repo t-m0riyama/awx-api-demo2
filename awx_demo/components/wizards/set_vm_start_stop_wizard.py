@@ -25,6 +25,7 @@ class SetVmStartStopWizard(BaseWizard):
         self.wizard_dialog = wizard_dialog
         self.parent_wizard = parent_wizard
         self.parent_refresh_func = parent_refresh_func
+        self.formStep = None
         super().__init__()
 
     @Logging.func_logger
@@ -33,7 +34,7 @@ class SetVmStartStopWizard(BaseWizard):
         match self.session.get("new_request_wizard_step"):
             case "create_request":
                 self.session.set("new_request_wizard_step", "select_target")
-                formStep = SelectTargetForm(
+                self.formStep = SelectTargetForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -43,12 +44,12 @@ class SetVmStartStopWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
                 self.page.open(self.wizard_dialog)
             case "select_target":
                 self.session.set("new_request_wizard_step", "select_start_stop_operation")
-                formStep = SetVmStartStopForm(
+                self.formStep = SetVmStartStopForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -58,12 +59,12 @@ class SetVmStartStopWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 仮想マシンの起動/停止"
                 self.page.open(self.wizard_dialog)
             case "select_start_stop_operation":
                 self.session.set("new_request_wizard_step", "send_request_confirm")
-                formStep = SendRequestConfirmForm(
+                self.formStep = SendRequestConfirmForm(
                     session=self.session,
                     page=self.page,
                     title=self.CONFIRM_FORM_TITLE,
@@ -74,13 +75,13 @@ class SetVmStartStopWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 変更内容の確認"
                 self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 if self.session.get("execute_job_immediately"):
                     self.session.set("new_request_wizard_step", "job_progress")
-                    formStep = JobProgressForm(
+                    self.formStep = JobProgressForm(
                         session=self.session,
                         page=self.page,
                         request_id=self.session.get("request_id"),
@@ -89,7 +90,7 @@ class SetVmStartStopWizard(BaseWizard):
                         body_height=self.BODY_HEIGHT,
                         step_change_cancel=self.on_click_cancel,
                     )
-                    self.wizard_dialog.content = formStep
+                    self.wizard_dialog.content = self.formStep
                     self.page.title = f"{self.session.get('app_title_base')} - 処理の進捗"
                     self.page.open(self.wizard_dialog)
                 else:
@@ -110,7 +111,7 @@ class SetVmStartStopWizard(BaseWizard):
                 self.parent_wizard.on_click_previous(e)
             case "select_start_stop_operation":
                 self.session.set("new_request_wizard_step", "select_target")
-                formStep = SelectTargetForm(
+                self.formStep = SelectTargetForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -120,12 +121,12 @@ class SetVmStartStopWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
                 self.page.open(self.wizard_dialog)
             case "send_request_confirm":
                 self.session.set("new_request_wizard_step", "select_start_stop_operation")
-                formStep = SetVmStartStopForm(
+                self.formStep = SetVmStartStopForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -135,7 +136,7 @@ class SetVmStartStopWizard(BaseWizard):
                     step_change_previous=self.on_click_previous,
                     step_change_cancel=self.on_click_cancel,
                 )
-                self.wizard_dialog.content = formStep
+                self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 仮想マシンの起動/停止"
                 self.page.open(self.wizard_dialog)
             case _:

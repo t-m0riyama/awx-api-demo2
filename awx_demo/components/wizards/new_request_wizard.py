@@ -51,8 +51,13 @@ class NewRequestWizard(BaseWizard):
     @Logging.func_logger
     def on_click_next(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
-        Logging.warning("step: " + self.session.get("new_request_wizard_step"))
-        Logging.warning("op: " + self.session.get("request_operation"))
+        Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
+        Logging.warning("REQUEST_OPERATION: " + self.session.get("request_operation"))
+
+        # 遷移前のフォームのショートカットキーを登録解除
+        if self.formStep is not None:
+            self.formStep.unregister_key_shortcuts()
+
         match self.session.get("new_request_wizard_step"):
             case "create_request":
                 match self.session.get("request_operation"):
