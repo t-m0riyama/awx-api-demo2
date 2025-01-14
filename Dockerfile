@@ -9,7 +9,6 @@ RUN mkdir /root/.pip
 RUN mkdir /app
 COPY ./main.py ./requirements.txt ./alembic.ini /app/
 COPY ./awx_demo /app/awx_demo/
-COPY ./images /app/images/
 COPY ./assets /app/assets/
 COPY ./migrations /app/migrations/
 COPY ./pip.conf /root/.pip/pip.conf

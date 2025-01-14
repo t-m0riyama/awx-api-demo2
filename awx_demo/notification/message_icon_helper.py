@@ -8,9 +8,9 @@ from awx_demo.utils.logging import Logging
 class MessageIconHelper:
 
     # const
-    INFORMATION_ICON_FILE = 'images/information-icon.png'
-    WARNING_ICON_FILE = 'images/warning-icon.png'
-    ERROR_ICON_FILE = 'images/error-icon.png'
+    INFORMATION_ICON_FILE = 'assets/images/information-icon.png'
+    WARNING_ICON_FILE = 'assets/images/warning-icon.png'
+    ERROR_ICON_FILE = 'assets/images/error-icon.png'
 
     @classmethod
     @Logging.func_logger
