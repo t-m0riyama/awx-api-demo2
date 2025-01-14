@@ -346,6 +346,13 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def register_key_shortcuts(self):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="F", shift=True, ctrl=True, alt=False, meta=False
+            ),
+            func=lambda e: self.tfSearchRequestText.focus()
+        )
         # 申請の新規作成
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
@@ -440,6 +447,12 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def unregister_key_shortcuts(self):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="F", shift=True, ctrl=True, alt=False, meta=False
+            ),
+        )
         # 申請の新規作成
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(

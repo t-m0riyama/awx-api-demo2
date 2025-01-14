@@ -5,6 +5,7 @@ import flet as ft
 
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.utils.logging import Logging
 
@@ -96,6 +97,42 @@ class SetVmMemoryForm(BaseWizardCard):
             padding=30,
         )
         super().__init__(self.controls)
+
+    # @Logging.func_logger
+    # def register_key_shortcuts(self):
+    #     keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+    #     # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+    #     keyboard_shortcut_manager.register_key_shortcut(
+    #         key_set=keyboard_shortcut_manager.create_key_set(
+    #             key="F", shift=True, ctrl=True, alt=False, meta=False
+    #         ),
+    #         func=lambda e: self.checkChangeVmMemoryEnabled.focus() # fletのcheckboxにfocus()が未実装のため見送り
+    #     )
+    #     # ログへのキーボードショートカット一覧出力
+    #     keyboard_shortcut_manager.register_key_shortcut(
+    #         key_set=keyboard_shortcut_manager.create_key_set(
+    #             key="Z", shift=True, ctrl=True, alt=False, meta=False,
+    #         ),
+    #         func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
+    #     )
+    #     super().register_key_shortcuts()
+
+    # @Logging.func_logger
+    # def unregister_key_shortcuts(self):
+    #     keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+    #     # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+    #     keyboard_shortcut_manager.unregister_key_shortcut(
+    #         key_set=keyboard_shortcut_manager.create_key_set(
+    #             key="F", shift=True, ctrl=True, alt=False, meta=False
+    #         ),
+    #     )
+    #     # ログへのキーボードショートカット一覧出力
+    #     keyboard_shortcut_manager.unregister_key_shortcut(
+    #         key_set=keyboard_shortcut_manager.create_key_set(
+    #             key="Z", shift=True, ctrl=True, alt=False, meta=False
+    #         ),
+    #     )
+    #     super().unregister_key_shortcuts()
 
     @Logging.func_logger
     def generate_confirm_text(self):

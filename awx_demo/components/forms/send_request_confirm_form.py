@@ -139,6 +139,42 @@ class SendRequestConfirmForm(BaseWizardCard):
         db_session.close()
 
     @Logging.func_logger
+    def register_key_shortcuts(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="F", shift=True, ctrl=True, alt=False, meta=False
+            ),
+            func=lambda e: self.tfConfirmText.focus()
+        )
+        # ログへのキーボードショートカット一覧出力
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="Z", shift=True, ctrl=True, alt=False, meta=False,
+            ),
+            func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
+        )
+        super().register_key_shortcuts()
+
+    @Logging.func_logger
+    def unregister_key_shortcuts(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="F", shift=True, ctrl=True, alt=False, meta=False
+            ),
+        )
+        # ログへのキーボードショートカット一覧出力
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="Z", shift=True, ctrl=True, alt=False, meta=False
+            ),
+        )
+        super().unregister_key_shortcuts()
+
+    @Logging.func_logger
     def on_click_next(self, e):
         self._lock_form_controls()
 

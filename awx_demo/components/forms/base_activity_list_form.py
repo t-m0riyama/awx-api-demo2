@@ -128,6 +128,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             # width=150,
             expand=True,
             dense=True,
+            autofocus=True,
             disabled=user_change_disabled,
         )
         self.dropActivityType = ft.Dropdown(
@@ -155,6 +156,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             # width=200,
             expand=True,
             dense=True,
+            autofocus=True,
         )
 
         self.tfSearchSummary = ParameterInputText(
@@ -188,6 +190,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             icon=ft.Icons.ARROW_LEFT,
             icon_color=ft.Colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
+            autofocus=True,
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
@@ -195,6 +198,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             icon=ft.Icons.ARROW_RIGHT,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
+            autofocus=True,
         )
 
         # Content
@@ -262,6 +266,13 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def register_key_shortcuts(self):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="F", shift=True, ctrl=True, alt=False, meta=False
+            ),
+            func=lambda e: self.dropUser.focus()
+        )
         # 操作履歴一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
@@ -294,6 +305,12 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def unregister_key_shortcuts(self):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="F", shift=True, ctrl=True, alt=False, meta=False
+            ),
+        )
         # 操作履歴一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
