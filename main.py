@@ -25,7 +25,8 @@ def main(page: ft.Page):
         session=page.session,
         page=page,
         app_title_base=page.session.get("app_title_base"),
-        dlg_login=dlgLogin
+        dlg_login=dlgLogin,
+        formLogin=formLogin,
     )
 
     # Page レイアウト

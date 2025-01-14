@@ -21,6 +21,8 @@ class SessionHelper:
         cls._remove_session_key(session, "user_role")
         cls._remove_session_key(session, "request_text_search_string")
         cls._remove_session_key(session, "keyboard_press_locked")
+        cls._remove_session_key(session, "key_shortcuts")
+        cls._remove_session_key(session, "old_key_shortcuts")
 
     @staticmethod
     @Logging.func_logger

@@ -20,11 +20,12 @@ class NavigationRouter:
     コントロールの再作成を行う。
     """
 
-    def __init__(self, session, page: ft.Page, app_title_base, dlg_login: ft.AlertDialog):
+    def __init__(self, session, page: ft.Page, app_title_base, dlg_login: ft.AlertDialog, formLogin):
         self.session = session
         self.page = page
         self.app_title_base = app_title_base
         self.dlgLogin = dlg_login
+        self.formLogin = formLogin
         self.formRequests = None
 
     def route_change(self):
@@ -39,6 +40,7 @@ class NavigationRouter:
         if template_route.match('/login'):
             self.page.open(self.dlgLogin)
             self.dlgLogin.open = True
+            self.formLogin.register_key_shortcuts()
             self.page.update()
         else:
             if SessionHelper.logout_if_session_expired(self.page, self.session): return
