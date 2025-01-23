@@ -117,6 +117,7 @@ class JobExecuteConfirmForm(BaseWizardCard):
         db_session = db.get_db()
         IaasRequestHelper.add_request(
             db_session=db_session,
+            session=self.session,
             request_id=self.session.get('document_id'),
             request_deadline=self.session.get('request_deadline'),
             request_user=self.session.get('awx_loginid'),
@@ -125,7 +126,6 @@ class JobExecuteConfirmForm(BaseWizardCard):
             request_text=self.session.get('request_text'),
             job_options=json.dumps(job_options),
             request_status=request_status,
-            session=self.session,
         )
         db_session.close()
 
@@ -183,7 +183,11 @@ class JobExecuteConfirmForm(BaseWizardCard):
         )
 
         IaasRequestHelper.update_request_iaas_user(
-            db_session, self.session.get('document_id'), self.session.get('awx_loginid'), self.session)
+            db_session=db_session,
+            session=self.session,
+            request_id=self.session.get('document_id'),
+            iaas_user=self.session.get('awx_loginid'),
+        )
         if job_id > 0:
             self.session.set('job_id', job_id)
             IaasRequestHelper.update_job_id(

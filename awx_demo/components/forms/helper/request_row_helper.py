@@ -69,7 +69,10 @@ class RequestRowHelper:
             if row.selected:
                 request_id = row.cells[1].content.value
                 IaasRequestHelper.delete_request(
-                    db_session, request_id, request_list_form.session)
+                    db_session=db_session,
+                    session=request_list_form.session,
+                    request_id=request_id,
+                )
         db_session.close()
         request_list_form.refresh()
         request_list_form.btnActions.disabled = True
@@ -81,13 +84,13 @@ class RequestRowHelper:
         db_session = db.get_db()
         IaasRequestHelper.update_request(
             db_session=db_session,
+            session=session,
             request_id=session.get('request_id'),
             request_deadline=session.get('request_deadline'),
             request_text=session.get('request_text'),
             job_options=json.dumps(session.get('job_options')),
             request_status=session.get('request_status'),
             iaas_user=session.get('iaas_user'),
-            session=session,
         )
         db_session.close()
 
@@ -99,7 +102,11 @@ class RequestRowHelper:
             if row.selected:
                 request_id = row.cells[1].content.value
                 IaasRequestHelper.update_request_status(
-                    db_session, request_id, request_status, request_list_form.session)
+                    db_session=db_session,
+                    session=request_list_form.session,
+                    request_id=request_id,
+                    request_status=request_status,
+                )
         db_session.close()
         RequestRowHelper.refresh_data_rows(request_list_form)
         request_list_form.btnActions.disabled = True
@@ -113,7 +120,11 @@ class RequestRowHelper:
             if row.selected:
                 request_id = row.cells[1].content.value
                 IaasRequestHelper.update_request_iaas_user(
-                    db_session, request_id, iaas_user, request_list_form.session)
+                    db_session=db_session,
+                    session=request_list_form.session,
+                    request_id=request_id,
+                    iaas_user=iaas_user,
+                )
         db_session.close()
         RequestRowHelper.refresh_data_rows(request_list_form)
         request_list_form.btnActions.disabled = True

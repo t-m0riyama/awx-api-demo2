@@ -64,6 +64,30 @@ services:
       # Teams Webhookを利用した通知を行う際のメッセージ形式 (adaptive_card, message_card)
       - RMX_TEAMS_MESSAGE_FORMAT=message_card
 
+      # メール通知に利用する、SMTPサーバのホスト名/IP (ex. smtp.example.com)
+      - RMX_MAIL_SMTP_HOST=<YOUR SMTP HOST>
+
+      # メール通知に利用する、SMTPサーバのポート番号 (ex. 587)
+      - RMX_MAIL_SMTP_PORT=<YOUR SMTP PORT>
+
+      # メール通知を行う際、SMTP AUTHを利用する 有効/無効
+      - RMX_MAIL_SMTP_AUTH_ENABLED=True
+
+      # メール通知を行う際、SMTP AUTH有効化時のユーザ名
+      - RMX_MAIL_SMTP_AUTH_USERNAME=<YOUR SMTP AUTH USERNAME>
+
+      # メール通知を行う際、SMTP AUTH有効化時のパスワード
+      - RMX_MAIL_SMTP_AUTH_PASSWORD=<YOUR SMTP AUTH PASSWORD>
+
+      # メール通知を行う際、STARTTLSを利用する 有効/無効
+      - RMX_MAIL_SMTP_STARTTLS_ENABLED=True
+
+      # メール通知を行う際、送信元のメールアドレス (ex. user01@example.com)
+      - RMX_MAIL_FROM_ADDRESS=<MAIL FROM ADDRESS>
+
+      # メール通知を行う際、メッセージテンプレートを格納するディレクトリ
+      - RMX_MAIL_MESSAGE_TEMPLATE=SimpleMessage
+
       # ジョブのステータスチェックのタイムアウト（sec）
       - RMX_JOB_STATUS_CHECK_TIMEOUT_SECS=3600
 

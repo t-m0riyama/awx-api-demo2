@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Language" content="ja">
+  <meta http-equiv="content-type" content="text/html;
+charset=iso-2022-jp">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" width=device-width" />
+    <title>{{ title }}</title>
+
+  </head>
+  <body style="-webkit-text-size-adjust:100% ">
+    <table width="100% " border="0 " cellpadding="0" cellspacing="0" style="border: none; border-collapse: collapse; margin: 0 auto; max-width: 600px; width: 100%; ">
+    <tbody>
+    <tr>
+      <td colspan="2" style="padding: 8px; ">このメールは、「{{ app_title }}」をご利用いただいた利用者様へ送信しています。</td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding: 8px; "><h3>{{ title }}</h3></td>
+    </tr>
+    <tr>
+      <td rowspan="2" style="padding: 8px; "><img src="cid:{{ icon_file }}" alt="{{ icon_file }}" style="display:block; margin:auto; "></td>
+      <td style="padding: 8px; ">{{ sub_title }}</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; ">{{ posted_by }}</td>
+    </tr>
+    </tbody></table>
+
+    <parameters>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border: none; border-collapse: collapse; margin: 0 auto; max-width: 600px; width: 100%; ">
+    <tbody>
+    <tr>
+      <td colspan="2" style="padding: 8px; "><hr></td>
+    </tr>
+    {% if timestamp -%}
+    <tr style="background: #efefef; ">
+      <td style="padding: 8px; ">時刻:</td><td style="padding: 8px; ">{{ timestamp }}</td>
+    </tr>
+    {% endif -%}
+    {% if user -%}
+    <tr>
+      <td style="padding: 8px; ">ユーザ名:</td><td style="padding: 8px; ">{{ user }}</td>
+    </tr>
+    {% endif -%}
+    {% if event_type -%}
+    <tr style="background: #efefef; ">
+      <td style="padding: 8px; ">イベント種別:</td><td style="padding: 8px; ">{{ event_type }}</td>
+    </tr>
+    {% endif -%}
+    {% if status -%}
+    <tr>
+      <td style="padding: 8px; ">ステータス:</td><td style="padding: 8px; ">{{ status }}</td>
+    </tr>
+    {% endif -%}
+    {% if request_id -%}
+    <tr style="background: #efefef; ">
+      <td style="padding: 8px; ">依頼ID:</td><td style="padding: 8px; ">{{ request_id }}</td>
+    </tr>
+    {% endif -%}
+    {% if request_text -%}
+    <tr>
+      <td style="padding: 8px; ">依頼内容:</td><td style="padding: 8px; ">{{ request_text }}</td>
+    </tr>
+    {% endif -%}
+    {% if request_deadline -%}
+    <tr style="background: #efefef; ">
+      <td style="padding: 8px; ">リリース希望日:</td><td style="padding: 8px; ">{{ request_deadline }}</td>
+    </tr>
+    {% endif -%}
+    {% if summary -%}
+    <tr>
+      <td style="padding: 8px; ">概要:</td><td style="padding: 8px; ">{{ summary }}</td>
+    </tr>
+    {% endif -%}
+    {% if detail -%}
+    <tr style="background: #efefef; ">
+      <td style="padding: 8px; ">詳細:</td><td style="padding: 8px; "></td>
+    <tr>
+      <td colspan="2" style="padding: 8px; ">
+<pre style="font-size: 120%; ">
+{{ detail }}
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" style="padding: 8px; ">本メールは送信専用であるため、お問い合わせは「xxx@example.com」にお送りください。</td>
+    </tr>
+    {% endif -%}
+
+    </tbody></table>
+    </parameters>
+
+</body></html>
+

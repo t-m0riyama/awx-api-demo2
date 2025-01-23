@@ -1,6 +1,7 @@
 import os
 import time
 
+from awx_demo.notification.mail_notificator import MailNotificator
 from awx_demo.notification.notification_spec import NotificationSpec
 from awx_demo.notification.teams_adaptivecard_notificator import TeamsAdaptiveCardNotificator
 from awx_demo.notification.teams_messagecard_notificator import TeamsMessageCardNotificator
@@ -29,5 +30,5 @@ class Notificator:
                         TeamsAdaptiveCardNotificator.notify(notification_spec)
                 teams_webhook_message_delay_msec = int(os.getenv("RMX_TEAMS_WEB_HOOK_MESSAGE_DELAY_MSEC", 500))
                 time.sleep(teams_webhook_message_delay_msec * 0.001)
-            # case Notificator.MAIL_NOTIFICATION:
-            #     MailNotificator.notify(notification_spec)
+            case Notificator.MAIL_NOTIFICATION:
+                MailNotificator.notify(notification_spec)

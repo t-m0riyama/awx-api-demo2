@@ -1,0 +1,38 @@
+このメールは、「{{ app_title }}」をご利用いただいた利用者様へ送信しています。
+
+{{ title }}
+{{ sub_title }} / {{ posted_by }}
+
+=====================================================================
+{% if timestamp -%}
+時刻:          {{ timestamp }}
+{% endif -%}
+{% if user -%}
+ユーザ名:      {{ user }}
+{% endif -%}
+{% if event_type -%}
+イベント種別:   {{ event_type }}
+{% endif -%}
+{% if status -%}
+ステータス:     {{ status }}
+{% endif -%}
+{% if request_id -%}
+依頼ID:        {{ request_id }}
+{% endif -%}
+{% if request_text -%}
+依頼内容:       {{ request_text }}
+{% endif -%}
+{% if request_deadline -%}
+リリース希望日:  {{ request_deadline }}
+{% endif -%}
+{% if summary -%}
+概要:          {{ summary }}
+{% endif -%}
+{% if detail -%}
+
+詳細:
+{{ detail }}
+{% endif -%}
+=====================================================================
+
+本メールは送信専用であるため、お問い合わせは「xxx@example.com」にお送りください。

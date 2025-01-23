@@ -79,9 +79,9 @@ class BaseWizard(metaclass=abc.ABCMeta):
         db_session = db.get_db()
         IaasRequestHelper.duplicate_request(
             db_session=db_session,
+            session=self.session,
             request_id=self.session.get("request_id"),
             new_request_id=DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH),
-            session=self.session,
         )
         db_session.close()
 
@@ -93,12 +93,12 @@ class BaseWizard(metaclass=abc.ABCMeta):
         db_session = db.get_db()
         IaasRequestHelper.update_request(
             db_session=db_session,
+            session=self.session,
             request_id=request_id,
             request_deadline=self.session.get("request_deadline"),
             request_text=self.session.get("request_text"),
             job_options=json.dumps(self.session.get("job_options")),
             request_status=self.session.get("request_status"),
             iaas_user=self.session.get("iaas_user"),
-            session=self.session,
         )
         db_session.close()

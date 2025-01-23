@@ -126,6 +126,7 @@ class SendRequestConfirmForm(BaseWizardCard):
         db_session = db.get_db()
         IaasRequestHelper.add_request(
             db_session=db_session,
+            session=self.session,
             request_id=self.session.get('document_id'),
             request_deadline=self.session.get('request_deadline'),
             request_user=self.session.get('awx_loginid'),
@@ -134,7 +135,6 @@ class SendRequestConfirmForm(BaseWizardCard):
             request_text=self.session.get('request_text'),
             job_options=json.dumps(job_options),
             request_status=request_status,
-            session=self.session,
         )
         db_session.close()
 
@@ -206,8 +206,12 @@ class SendRequestConfirmForm(BaseWizardCard):
             )
 
             db_session = db.get_db()
-            IaasRequestHelper.update_request_iaas_user(db_session, self.session.get(
-                'document_id'), self.session.get('awx_loginid'), self.session)
+            IaasRequestHelper.update_request_iaas_user(
+                db_session=db_session,
+                session=self.session,
+                request_id=self.session.get('document_id'),
+                iaas_user=self.session.get('awx_loginid'),
+            )
             if job_id > 0:
                 self.session.set('job_id', job_id)
                 IaasRequestHelper.update_job_id(
@@ -217,7 +221,7 @@ class SendRequestConfirmForm(BaseWizardCard):
             try:
                 self._add_request(job_options, RequestStatus.START)
             except Exception as ex:
-                Logging.error('failed to insert record ')
+                Logging.error('failed to insert record 2')
                 Logging.error(ex)
 
         self._unlock_form_controls()

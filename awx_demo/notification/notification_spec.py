@@ -3,7 +3,8 @@ from enum import IntEnum, auto
 
 class NotificationSpec:
 
-    def __init__(self, notification_type, title, sub_title, sub_title2=None, user=None, request_id=None, event_type=None, status=None, summary=None, detail=None, request_text=None, request_deadline=None, icon=None):
+    def __init__(self, notification_type, title, sub_title, sub_title2=None, user=None, request_id=None, event_type=None, status=None,
+                 summary=None, detail=None, request_text=None, request_deadline=None, icon=None, mail_to_address=None):
         self.notification_type = notification_type
         self.title = title
         self.sub_title = sub_title
@@ -17,6 +18,7 @@ class NotificationSpec:
         self.request_text = request_text
         self.request_deadline = request_deadline
         self.icon = icon
+        self.mail_to_address = mail_to_address
 
 
 class NotificationMethod(IntEnum):

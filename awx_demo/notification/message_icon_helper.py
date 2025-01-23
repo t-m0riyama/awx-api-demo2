@@ -36,3 +36,18 @@ class MessageIconHelper:
         icon_base64: str = icon_base64_byte.decode('ascii')
 
         return icon_base64
+
+    @classmethod
+    @Logging.func_logger
+    def get_icon_file_name(cls, notification_spec: NotificationSpec):
+        if notification_spec.icon:
+            return notification_spec.icon
+        else:
+            # 明示的にアイコンのPNGファイルを指定しなかった場合、ステータスをもとにアイコンを決定
+            match notification_spec.status:
+                case EventStatus.SUCCEED:
+                    return cls.INFORMATION_ICON_FILE
+                case EventStatus.WARNING:
+                    return cls.WARNING_ICON_FILE
+                case EventStatus.FAILED:
+                    return cls.ERROR_ICON_FILE

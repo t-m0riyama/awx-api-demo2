@@ -3,6 +3,7 @@ import datetime
 
 from sqlalchemy import and_, asc, desc
 
+from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.db import base
 from awx_demo.db_helper.activity_helper import ActivityHelper
 from awx_demo.db_helper.iaas_request_report_helper import IaasRequestReportHelper
@@ -19,7 +20,7 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def add_request(cls, db_session, request_id, request_deadline, request_user, request_category, request_operation, request_text, job_options, request_status, session):
+    def add_request(cls, db_session, session, request_id, request_deadline, request_user, request_category, request_operation, request_text, job_options, request_status):
         request = base.IaasRequest(
             request_id=request_id,
             request_date=datetime.datetime.now(),
@@ -37,6 +38,7 @@ class IaasRequestHelper:
 
         cls._emit_event_on_insert(
             db_session=db_session,
+            session=session,
             user=session.get('awx_loginid'),
             request_id=request_id,
             request_category=request_category,
@@ -49,7 +51,7 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def duplicate_request(cls, db_session, request_id, new_request_id, session):
+    def duplicate_request(cls, db_session, session, request_id, new_request_id):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
 
@@ -65,6 +67,7 @@ class IaasRequestHelper:
 
         cls._emit_event_on_duplicate(
             db_session=db_session,
+            session=session,
             user=session.get('awx_loginid'),
             request_id=request_id,
             request_id_new=new_request_id,
@@ -78,7 +81,7 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def update_request(cls, db_session, request_id, request_deadline, request_text, job_options, request_status, iaas_user, session):
+    def update_request(cls, db_session, session, request_id, request_deadline, request_text, job_options, request_status, iaas_user):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
 
@@ -111,6 +114,7 @@ class IaasRequestHelper:
             if diff_changed_except_request_status_and_iaas_user:
                 cls._emit_event_on_update(
                     db_session=db_session,
+                    session=session,
                     user=session.get('awx_loginid'),
                     request_id=request_report.request_id,
                     request_category=request_report.request_category,
@@ -124,6 +128,7 @@ class IaasRequestHelper:
             if iaas_user != iaas_user_old:
                 cls._emit_event_on_update_iaas_user(
                     db_session=db_session,
+                    session=session,
                     user=session.get('awx_loginid'),
                     request_id=request_report.request_id,
                     request_category=request_report.request_category,
@@ -140,6 +145,7 @@ class IaasRequestHelper:
                 notification_method = NotificationMethod.NOTIFY_TEAMS_AND_MAIL if request_report.request_status == RequestStatus.COMPLETED else NotificationMethod.NOTIFY_TEAMS_ONLY
                 cls._emit_event_on_update_request_status(
                     db_session=db_session,
+                    session=session,
                     user=session.get('awx_loginid'),
                     request_id=request_report.request_id,
                     request_category=request_report.request_category,
@@ -158,7 +164,7 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def update_request_status(cls, db_session, request_id, request_status, session):
+    def update_request_status(cls, session, db_session, request_id, request_status):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
         # 更新前のステータスを取得
@@ -175,6 +181,7 @@ class IaasRequestHelper:
 
             cls._emit_event_on_update_request_status(
                 db_session=db_session,
+                session=session,
                 user=session.get('awx_loginid'),
                 request_id=request_report.request_id,
                 request_category=request_report.request_category,
@@ -192,7 +199,7 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def update_request_iaas_user(cls, db_session, request_id, iaas_user, session):
+    def update_request_iaas_user(cls, db_session, session, request_id, iaas_user):
         request = db_session.query(base.IaasRequest).filter(
             base.IaasRequest.request_id == request_id).first()
         # 更新前のIaaS作業担当者を取得
@@ -205,6 +212,7 @@ class IaasRequestHelper:
 
             cls._emit_event_on_update_iaas_user(
                 db_session=db_session,
+                session=session,
                 user=session.get('awx_loginid'),
                 request_id=request_id,
                 request_category=request.request_category,
@@ -236,6 +244,7 @@ class IaasRequestHelper:
         db_session.commit()
         cls._emit_event_on_delete(
             db_session=db_session,
+            session=session,
             user=session.get('awx_loginid'),
             request_id=request_id,
             request_category=request.request_category,
@@ -337,7 +346,8 @@ class IaasRequestHelper:
         return asc(base.IaasRequest.request_text) if is_asc else desc(base.IaasRequest.request_text)
 
     @classmethod
-    def _emit_event(cls, db_session, notification_method: NotificationMethod, title, sub_title, sub_title2, user, request_id, event_type, status, summary, detail='', request_text=None, request_deadline=None, icon=None):
+    def _emit_event(cls, db_session, session, notification_method: NotificationMethod, title, sub_title, sub_title2,
+                    user, request_id, event_type, status, summary, detail='', request_text=None, request_deadline=None, icon=None):
         activity_spec = ActivityHelper.ActivitySpec(
             db_session=db_session,
             user=user,
@@ -370,12 +380,19 @@ class IaasRequestHelper:
             )
         # メール通知を指定された場合
         if notification_method == NotificationMethod.NOTIFY_MAIL_ONLY or notification_method == NotificationMethod.NOTIFY_TEAMS_AND_MAIL:
+            # AWX/AAPのユーザ情報を取得
+            user_info = AWXApiHelper.get_user(
+                session.get("awx_url"),
+                session.get("awx_loginid"),
+                session.get("awx_password"),
+                user_name=user,
+            )
             notification_specs.append(
                 NotificationSpec(
                     notification_type=Notificator.MAIL_NOTIFICATION,
-                    title=summary,
-                    sub_title="",
-                    sub_title2="",
+                    title=title,
+                    sub_title=sub_title,
+                    sub_title2=sub_title2,
                     user=user,
                     request_id=request_id,
                     event_type=event_type,
@@ -384,6 +401,7 @@ class IaasRequestHelper:
                     detail=detail,
                     request_text=request_text,
                     request_deadline=request_deadline,
+                    mail_to_address=user_info["email"],
                 )
             )
         EventManager.emit_event(
@@ -392,12 +410,13 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_insert(cls, db_session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+    def _emit_event_on_insert(cls, db_session, session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_SENT_FRIENDLY, is_succeeded, request_text, request_deadline)
         sub_title = "新しい申請({} / {})が作成されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
+            session=session,
             notification_method=NotificationMethod.NOTIFY_TEAMS_AND_MAIL,
             title=title,
             sub_title=sub_title,
@@ -413,12 +432,13 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_duplicate(cls, db_session, user, request_id, request_id_new, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+    def _emit_event_on_duplicate(cls, db_session, session, user, request_id, request_id_new, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_DUPLICATE_FRIENDLY, is_succeeded, request_text, request_deadline)
         sub_title = "申請({} / {})が複製されました。({} -> {})".format(request_category, request_operation, request_id, request_id_new)
         sub_title2 = "複製した申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id_new)
         cls._emit_event(
             db_session=db_session,
+            session=session,
             notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
@@ -434,6 +454,7 @@ class IaasRequestHelper:
         )
         cls._emit_event_on_insert(
             db_session=db_session,
+            session=session,
             user=user,
             request_id=request_id_new,
             request_category=request_category,
@@ -445,12 +466,13 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_update(cls, db_session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+    def _emit_event_on_update(cls, db_session, session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_CHANGED_FRIENDLY, is_succeeded, request_text, request_deadline)
         sub_title = "申請({} / {})の内容が変更されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
+            session=session,
             notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
@@ -466,12 +488,13 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_update_request_status(cls, db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded, notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY):
+    def _emit_event_on_update_request_status(cls, db_session, session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded, notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_STATUS_CHANGED_FRIENDLY, is_succeeded, request_text, request_deadline, additional_info)
         sub_title = "申請({} / {})の状態が変更されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
+            session=session,
             notification_method=notification_method,
             title=title,
             sub_title=sub_title,
@@ -487,12 +510,13 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_update_iaas_user(cls, db_session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded):
+    def _emit_event_on_update_iaas_user(cls, db_session, session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_IAAS_USER_ASSIGNED_FRIENDLY, is_succeeded, request_text, request_deadline, additional_info)
         sub_title = "申請({} / {})の作業担当者が変更されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
         cls._emit_event(
             db_session=db_session,
+            session=session,
             notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,
@@ -508,12 +532,13 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_delete(cls, db_session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
+    def _emit_event_on_delete(cls, db_session, session, user, request_id, request_category, request_operation, request_text, request_deadline, detail, is_succeeded):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_DELETED_FRIENDLY, is_succeeded, request_text, request_deadline)
         sub_title = "申請({} / {})が削除されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} が削除されました。".format(request_id)
         cls._emit_event(
             db_session=db_session,
+            session=session,
             notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY,
             title=title,
             sub_title=sub_title,

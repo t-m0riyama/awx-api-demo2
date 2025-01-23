@@ -354,7 +354,7 @@ class AWXApiHelper:
     def generate_common_fields(cls, request_id, event_type_friendly, is_succeeded, request_text=None, request_deadline=None, additional_info=None):
         ok_ng = 'OK' if is_succeeded else 'NG'
         status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
-        title = "[Teams申請通知 / {}({}) / {}]".format(event_type_friendly, request_id, ok_ng)
+        title = "[申請通知 / {}({}) / {}]".format(event_type_friendly, request_id, ok_ng)
         summary = '{}に{}しました。'.format(
                 event_type_friendly, EventStatus.to_friendly(status))
         if request_text:

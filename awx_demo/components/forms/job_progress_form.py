@@ -124,10 +124,10 @@ class JobProgressForm(BaseWizardCard):
         if self.session.get('job_id') is None:
             self._on_job_request_failed()
             IaasRequestHelper.update_request_status(
-                db.get_db(),
-                self.session.get('document_id'),
-                RequestStatus.APPLYING_FAILED,
-                self.session
+                db_session=db.get_db(),
+                session=self.session,
+                request_id=self.session.get('document_id'),
+                request_status=RequestStatus.APPLYING_FAILED,
             )
             return
 
@@ -146,10 +146,10 @@ class JobProgressForm(BaseWizardCard):
         if job_status == AWXApiHelper.JOB_STATUS_SUCCEEDED:
             self._on_job_status_completed()
             IaasRequestHelper.update_request_status(
-                db.get_db(),
-                self.session.get('document_id'),
-                RequestStatus.COMPLETED,
-                self.session
+                db_session=db.get_db(),
+                session=self.session,
+                request_id=self.session.get('document_id'),
+                request_status=RequestStatus.COMPLETED,
             )
             self.pbJob.update()
             return
@@ -160,10 +160,10 @@ class JobProgressForm(BaseWizardCard):
         elif job_status == AWXApiHelper.JOB_STATUS_FAILED:
             self._on_job_status_request_failed()
             IaasRequestHelper.update_request_status(
-                db.get_db(),
-                self.session.get('document_id'),
-                RequestStatus.APPLYING_FAILED,
-                self.session
+                db_session=db.get_db(),
+                session=self.session,
+                request_id=self.session.get('document_id'),
+                request_status=RequestStatus.APPLYING_FAILED,
             )
             self.pbJob.update()
             return
