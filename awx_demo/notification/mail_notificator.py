@@ -49,13 +49,17 @@ class MailNotificator:
     @classmethod
     @Logging.func_logger
     def _send_message(cls, notification_spec, smtp_host, smtp_port, smtp_auth_enabled, smtp_auth_username, smtp_auth_password, smtp_starttls_enabled, message):
-        with smtplib.SMTP(smtp_host, smtp_port) as smtp:
-            if smtp_starttls_enabled:
-                smtp.starttls()
-            if smtp_auth_enabled:
-                smtp.login(smtp_auth_username, smtp_auth_password)
-            smtp.send_message(message)
-        Logging.info('MAIL_MESSAGE_SENT_SUCCESS: ' + notification_spec.title)
+        try:
+            with smtplib.SMTP(smtp_host, smtp_port) as smtp:
+                if smtp_starttls_enabled:
+                    smtp.starttls()
+                if smtp_auth_enabled:
+                    smtp.login(smtp_auth_username, smtp_auth_password)
+                smtp.send_message(message)
+                Logging.info(f'MAIL_MESSAGE_SEND_SUCCESS: メール送信に成功しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
+        except Exception as e:
+            Logging.error(f'MAIL_MESSAGE_SEND_FAILED: メール送信に失敗しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
+            Logging.error(e)
 
     @classmethod
     @Logging.func_logger
@@ -127,22 +131,17 @@ class MailNotificator:
                 part.add_header('Content-ID', f'{icon_file_basename}')
 
         # Logging.warning(message.get_body())
-        try:
-            asyncio.new_event_loop().run_in_executor(
-                None,
-                partial(
-                    cls._send_message,
-                    notification_spec=notification_spec,
-                    smtp_host=smtp_host,
-                    smtp_port=smtp_port,
-                    smtp_auth_enabled=smtp_auth_enabled,
-                    smtp_auth_username=smtp_auth_username,
-                    smtp_auth_password=smtp_auth_password,
-                    smtp_starttls_enabled=smtp_starttls_enabled,
-                    message=message
-                )
+        asyncio.new_event_loop().run_in_executor(
+            None,
+            partial(
+                cls._send_message,
+                notification_spec=notification_spec,
+                smtp_host=smtp_host,
+                smtp_port=smtp_port,
+                smtp_auth_enabled=smtp_auth_enabled,
+                smtp_auth_username=smtp_auth_username,
+                smtp_auth_password=smtp_auth_password,
+                smtp_starttls_enabled=smtp_starttls_enabled,
+                message=message
             )
-        except Exception as e:
-            Logging.error('MAIL_MESSAGE_SENT_FAILED: Teamsメッセージの通知に失敗しました。')
-            Logging.error(e)
-
+        )
