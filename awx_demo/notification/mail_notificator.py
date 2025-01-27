@@ -56,9 +56,9 @@ class MailNotificator:
                 if smtp_auth_enabled:
                     smtp.login(smtp_auth_username, smtp_auth_password)
                 smtp.send_message(message)
-                Logging.info(f'MAIL_MESSAGE_SEND_SUCCESS: メール送信に成功しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
+                Logging.info(f'MAIL_MESSAGE_SEND_SUCCESS: メール通知の送信に成功しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
         except Exception as e:
-            Logging.error(f'MAIL_MESSAGE_SEND_FAILED: メール送信に失敗しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
+            Logging.error(f'MAIL_MESSAGE_SEND_FAILED: メール通知の送信に失敗しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
             Logging.error(e)
 
     @classmethod
