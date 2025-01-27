@@ -34,12 +34,16 @@ class TeamsAdaptiveCardNotificator:
 
     @classmethod
     @Logging.func_logger
-    def _request_post(cls, request_url, headers, verify, data, proxy_enabled):
-        if proxy_enabled:
-            response = requests.post(request_url, headers=headers, verify=verify, data=data, proxies=cls.AWX_PROXIES)
-        else:
-            response = requests.post(request_url, headers=headers, verify=verify, data=data)
-        return response
+    def _request_post(cls, notification_spec, request_url, headers, verify, data, proxy_enabled):
+        try:
+            if proxy_enabled:
+                requests.post(request_url, headers=headers, verify=verify, data=data, proxies=cls.AWX_PROXIES)
+            else:
+                requests.post(request_url, headers=headers, verify=verify, data=data)
+            Logging.info(f'TEAMS_MESSAGE_SEND_SUCCESS: Teamsメッセージの通知に成功しました。 {notification_spec.title}')
+        except Exception as e:
+            Logging.error(f'TEAMS_MESSAGE_SEND_FAILED: Teamsメッセージの通知に失敗しました。 {notification_spec.title}')
+            Logging.error(e)
 
     @classmethod
     @Logging.func_logger
@@ -157,21 +161,17 @@ class TeamsAdaptiveCardNotificator:
         }
 
         # Logging.warning(card.to_json())
-        try:
-            headers = {'content-type': 'application/json'}
-            data_json = json.dumps(payload)
-            asyncio.new_event_loop().run_in_executor(
-                                        None,
-                                        partial(
-                                            cls._request_post,
-                                            request_url=teams_webhook_url,
-                                            data=data_json,
-                                            headers=headers,
-                                            verify=False,
-                                            proxy_enabled=cls.TEAMS_PROXY_ENABLED
-                                        )
-            )
-            Logging.info('TEAMS_MESSAGE_SENT_SUCCESS: ' + notification_spec.title)
-        except Exception as e:
-            Logging.error('TEAMS_MESSAGE_SENT_FAILED: Teamsメッセージの通知に失敗しました。')
-            Logging.error(e)
+        headers = {'content-type': 'application/json'}
+        data_json = json.dumps(payload)
+        asyncio.new_event_loop().run_in_executor(
+                                    None,
+                                    partial(
+                                        cls._request_post,
+                                        notification_spec=notification_spec,
+                                        request_url=teams_webhook_url,
+                                        data=data_json,
+                                        headers=headers,
+                                        verify=False,
+                                        proxy_enabled=cls.TEAMS_PROXY_ENABLED
+                                    )
+        )
