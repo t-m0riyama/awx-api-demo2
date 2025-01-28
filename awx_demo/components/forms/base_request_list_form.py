@@ -104,10 +104,12 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             shortcut_index += 1
         self.rowRequests = ft.ResponsiveRow(
             [
-                ft.Column(
-                    col={"sm": 12},
-                    controls=[self.dtRequests],
-                    scroll=ft.ScrollMode.AUTO,
+                ft.SelectionArea(
+                    content=ft.Column(
+                        col={"sm": 12},
+                        controls=[self.dtRequests],
+                        scroll=ft.ScrollMode.AUTO,
+                    )
                 )
             ],
             expand=1,

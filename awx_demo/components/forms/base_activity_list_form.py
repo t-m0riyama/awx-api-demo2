@@ -81,12 +81,14 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
                     activity_row_data,
                 )
             )
-        self.rowRequests = ft.ResponsiveRow(
+        self.rowActivities = ft.ResponsiveRow(
             [
-                ft.Column(
-                    col={"sm": 12},
-                    controls=[self.dtActivities],
-                    scroll=ft.ScrollMode.AUTO,
+                ft.SelectionArea(
+                    content=ft.Column(
+                        col={"sm": 12},
+                        controls=[self.dtActivities],
+                        scroll=ft.ScrollMode.AUTO,
+                    )
                 )
             ],
             expand=1,
@@ -238,7 +240,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
                     ],
                     vertical_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
-                self.rowRequests,
+                self.rowActivities,
             ],
             height=self.BODY_HEIGHT,
         )

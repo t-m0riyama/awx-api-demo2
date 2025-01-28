@@ -94,23 +94,23 @@ class EditRequestForm(BaseWizardCard):
                     tabs=[
                         ft.Tab(
                             tab_content=ft.Text('共通', tooltip='共通 (Cotrol+Shift+G)'),
-                            content=self.formCommonInfo,
+                            content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
                             tab_content=ft.Text('変更対象', tooltip='変更対象 (Cotrol+Shift+T)'),
-                            content=self.formSelectTarget,
+                            content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
                             tab_content=ft.Text('CPU', tooltip='CPU (Cotrol+Shift+C)'),
-                            content=self.formSetVmCpu,
+                            content=ft.SelectionArea(content=self.formSetVmCpu),
                         ),
                         ft.Tab(
                             tab_content=ft.Text('メモリ', tooltip='メモリ (Cotrol+Shift+M)'),
-                            content=self.formSetVmMemory,
+                            content=ft.SelectionArea(content=self.formSetVmMemory),
                         ),
                         ft.Tab(
                             tab_content=ft.Text('管理情報', tooltip='管理情報 (Cotrol+Shift+A)'),
-                            content=self.formManageInfo,
+                            content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
                     scrollable=True,
@@ -148,19 +148,19 @@ class EditRequestForm(BaseWizardCard):
                     tabs=[
                         ft.Tab(
                             tab_content=ft.Text('共通', tooltip='共通 (Cotrol+Shift+G)'),
-                            content=self.formCommonInfo,
+                            content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
                             tab_content=ft.Text('変更対象', tooltip='変更対象 (Cotrol+Shift+T)'),
-                            content=self.formSelectTarget,
+                            content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
                             tab_content=ft.Text('起動/停止', tooltip='変更対象 (Cotrol+Shift+B)'),
-                            content=self.formStartStop,
+                            content=ft.SelectionArea(content=self.formStartStop),
                         ),
                         ft.Tab(
                             tab_content=ft.Text('管理情報', tooltip='管理情報 (Cotrol+Shift+A)'),
-                            content=self.formManageInfo,
+                            content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
                     scrollable=True,
