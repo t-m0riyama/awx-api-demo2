@@ -162,7 +162,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         )
 
         self.tfSearchSummary = ParameterInputText(
-            label="概要を検索",
+            label="概要または依頼IDを検索",
             # width=220,
             expand=True,
             on_submit=self.on_click_search_summary,

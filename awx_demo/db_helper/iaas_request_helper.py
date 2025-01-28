@@ -1,7 +1,7 @@
 import copy
 import datetime
 
-from sqlalchemy import and_, asc, desc
+from sqlalchemy import and_, asc, desc, or_
 
 from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.db import base
@@ -302,7 +302,8 @@ class IaasRequestHelper:
     @Logging.func_logger
     def get_filter_request_text(cls, request_text_contains):
         if request_text_contains:
-            return and_(base.IaasRequest.request_text.contains(request_text_contains))
+            return or_(and_(base.IaasRequest.request_text.contains(request_text_contains)),
+                and_(base.IaasRequest.request_id.contains(request_text_contains)))
         else:
             return None
 

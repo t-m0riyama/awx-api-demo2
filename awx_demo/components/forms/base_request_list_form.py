@@ -226,7 +226,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             disabled=True,
         )
         self.tfSearchRequestText = ParameterInputText(
-            label="依頼内容に含まれる文字を検索",
+            label="依頼内容または依頼IDに含まれる文字を検索",
             # width=340,
             expand=True,
             on_submit=self.on_click_search_request_text,

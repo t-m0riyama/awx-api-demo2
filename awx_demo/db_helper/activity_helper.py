@@ -1,4 +1,4 @@
-from sqlalchemy import and_, asc, desc
+from sqlalchemy import and_, asc, desc, or_
 
 from awx_demo.db import base, db
 from awx_demo.utils.logging import Logging
@@ -80,7 +80,11 @@ class ActivityHelper:
     @staticmethod
     @Logging.func_logger
     def get_filter_summary(summary_contains):
-        return and_(base.Activity.summary.contains(summary_contains)) if summary_contains else None
+        if summary_contains:
+            return or_(and_(base.Activity.summary.contains(summary_contains)),
+                    and_(base.Activity.request_id.contains(summary_contains)))
+        else:
+            return None
 
     @staticmethod
     @Logging.func_logger
