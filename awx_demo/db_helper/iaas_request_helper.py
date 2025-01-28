@@ -152,6 +152,8 @@ class IaasRequestHelper:
                     request_operation=request_report.request_operation,
                     request_text=request_text,
                     request_deadline=request_deadline,
+                    request_status_new=request_status,
+                    request_status_old=request_status_old,
                     additional_info='({} -> {})'.format(RequestStatus.to_friendly(
                         request_status_old), RequestStatus.to_friendly(request_status)),
                     detail=detail,
@@ -188,6 +190,8 @@ class IaasRequestHelper:
                 request_operation=request_report.request_operation,
                 request_text=request_report.request_text,
                 request_deadline=request_report.request_deadline,
+                request_status_new=request_status,
+                request_status_old=request_status_current,
                 additional_info='({} -> {})'.format(RequestStatus.to_friendly(
                     request_status_current), RequestStatus.to_friendly(request_status)),
                 detail=detail,
@@ -488,10 +492,16 @@ class IaasRequestHelper:
         )
 
     @classmethod
-    def _emit_event_on_update_request_status(cls, db_session, session, user, request_id, request_category, request_operation, request_text, request_deadline, additional_info, detail, is_succeeded, notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY):
+    def _emit_event_on_update_request_status(cls, db_session, session, user, request_id, request_category, request_operation, request_text, request_deadline,
+                                             request_status_new, request_status_old, additional_info, detail, is_succeeded, notification_method=NotificationMethod.NOTIFY_TEAMS_ONLY):
         title, status, summary = IaasRequestReportHelper.generate_common_fields(request_id, EventType.REQUEST_STATUS_CHANGED_FRIENDLY, is_succeeded, request_text, request_deadline, additional_info)
-        sub_title = "申請({} / {})の状態が変更されました。".format(request_category, request_operation)
+        if request_status_new == RequestStatus.COMPLETED:
+            title = title.replace("申請状態の変更", "申請の完了")
+            sub_title = "申請({} / {})の対応が完了しました。".format(request_category, request_operation)
+        else:
+            sub_title = "申請({} / {})の状態が変更されました。".format(request_category, request_operation)
         sub_title2 = "申請 {} の内容を確認し、必要であれば変更を行なった上で承認し、作業を実施してください。".format(request_id)
+
         cls._emit_event(
             db_session=db_session,
             session=session,
