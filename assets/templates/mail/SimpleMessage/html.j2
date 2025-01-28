@@ -39,43 +39,38 @@ charset=iso-2022-jp">
       <td style="padding: 8px; ">時刻:</td><td style="padding: 8px; ">{{ timestamp }}</td>
     </tr>
     {% endif -%}
-    {% if user -%}
-    <tr>
-      <td style="padding: 8px; ">ユーザ名:</td><td style="padding: 8px; ">{{ user }}</td>
-    </tr>
-    {% endif -%}
     {% if event_type -%}
-    <tr style="background: #efefef; ">
+    <tr>
       <td style="padding: 8px; ">イベント種別:</td><td style="padding: 8px; ">{{ event_type }}</td>
     </tr>
     {% endif -%}
     {% if status -%}
-    <tr>
+    <tr style="background: #efefef; ">
       <td style="padding: 8px; ">ステータス:</td><td style="padding: 8px; ">{{ status }}</td>
     </tr>
     {% endif -%}
     {% if request_id -%}
-    <tr style="background: #efefef; ">
+    <tr>
       <td style="padding: 8px; ">依頼ID:</td><td style="padding: 8px; ">{{ request_id }}</td>
     </tr>
     {% endif -%}
     {% if request_text -%}
-    <tr>
+    <tr style="background: #efefef; ">
       <td style="padding: 8px; ">依頼内容:</td><td style="padding: 8px; ">{{ request_text }}</td>
     </tr>
     {% endif -%}
     {% if request_deadline -%}
-    <tr style="background: #efefef; ">
+    <tr>
       <td style="padding: 8px; ">リリース希望日:</td><td style="padding: 8px; ">{{ request_deadline }}</td>
     </tr>
     {% endif -%}
     {% if summary -%}
-    <tr>
+    <tr style="background: #efefef; ">
       <td style="padding: 8px; ">概要:</td><td style="padding: 8px; ">{{ summary }}</td>
     </tr>
     {% endif -%}
     {% if detail -%}
-    <tr style="background: #efefef; ">
+    <tr>
       <td style="padding: 8px; ">詳細:</td><td style="padding: 8px; "></td>
     <tr>
       <td colspan="2" style="padding: 8px; ">
