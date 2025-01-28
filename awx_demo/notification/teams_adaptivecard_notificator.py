@@ -37,10 +37,16 @@ class TeamsAdaptiveCardNotificator:
     def _request_post(cls, notification_spec, request_url, headers, verify, data, proxy_enabled):
         try:
             if proxy_enabled:
-                requests.post(request_url, headers=headers, verify=verify, data=data, proxies=cls.AWX_PROXIES)
+                response = requests.post(request_url, headers=headers, verify=verify, data=data, proxies=cls.AWX_PROXIES)
             else:
-                requests.post(request_url, headers=headers, verify=verify, data=data)
-            Logging.info(f'TEAMS_MESSAGE_SEND_SUCCESS: Teamsメッセージの通知に成功しました。 {notification_spec.title}')
+                response = requests.post(request_url, headers=headers, verify=verify, data=data)
+
+            # HTTPステータスコードが200以外の場合はエラー発生
+            Logging.info(f'TEAMS_MESSAGE_SEND_STATUS: {response.status_code} {notification_spec.title}')
+            if response.status_code == 200:
+                Logging.info(f'TEAMS_MESSAGE_SEND_SUCCESS: Teamsメッセージの通知に成功しました。 {notification_spec.title}')
+            else:
+                Logging.error(f'TEAMS_MESSAGE_SEND_FAILED: Teamsメッセージの通知に失敗しました。 {notification_spec.title}')
         except Exception as e:
             Logging.error(f'TEAMS_MESSAGE_SEND_FAILED: Teamsメッセージの通知に失敗しました。 {notification_spec.title}')
             Logging.error(e)
