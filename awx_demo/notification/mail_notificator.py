@@ -34,7 +34,6 @@ class MailNotificator:
     def _generate_message_part(cls, template_dir, template_type, parameters, encoding):
         jinja_env = Environment(loader=FileSystemLoader(
                                 f"{cls.TEMPLATE_DIR_BASE}/{template_dir}", encoding=encoding))
-
         try:
             template = jinja_env.get_template(f"{template_type}.j2")
             rendered = template.render(parameters)
@@ -109,6 +108,11 @@ class MailNotificator:
         template_params["detail"] = notification_spec.detail
         message_text_part = cls._generate_message_part(mail_template_directory, "text", template_params, "utf-8")
         message_html_part = cls._generate_message_part(mail_template_directory, "html", template_params, "utf-8")
+
+        # メッセージ本文の生成に失敗した場合は、エラー終了
+        if message_text_part is None or message_html_part is None:
+            Logging.error('メッセージ本文の生成に失敗しました。')
+            return
 
         # マルチパートメッセージを組み立てる
         #   part 0: メール本文
