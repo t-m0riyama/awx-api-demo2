@@ -117,7 +117,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         )
         self.btnAddRequest = ft.FilledButton(
             text="新規作成",
-            tooltip="新規作成 (Cotrol+Shift+N)",
+            tooltip="新規作成 (Shift+Alt+N)",
             icon=ft.Icons.ADD_CARD_OUTLINED,
             style=ft.ButtonStyle(
                 shape=ft.RoundedRectangleBorder(radius=8),
@@ -358,7 +358,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # 申請の新規作成
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=True, alt=False, meta=False
+                key="N", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_add_request,
         )
@@ -467,7 +467,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # 申請の新規作成
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=True, alt=False, meta=False
+                key="N", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 依頼内容に含まれる文字の検索を実行
