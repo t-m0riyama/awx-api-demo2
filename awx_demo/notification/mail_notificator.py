@@ -58,6 +58,7 @@ class MailNotificator:
                 Logging.info(f'MAIL_MESSAGE_SEND_SUCCESS: メール通知の送信に成功しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
         except Exception as e:
             Logging.error(f'MAIL_MESSAGE_SEND_FAILED: メール通知の送信に失敗しました。 {smtp_host}:{smtp_port} {notification_spec.title}')
+            Logging.error(f'FROM: {message["From"]}, TO: {message["To"]}')
             Logging.error(e)
 
     @classmethod
