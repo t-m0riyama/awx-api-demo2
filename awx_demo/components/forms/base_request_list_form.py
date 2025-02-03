@@ -353,7 +353,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="F", shift=True, ctrl=True, alt=False, meta=False
             ),
-            func=lambda e: self.tfSearchRequestText.focus()
+            func=lambda e: self.tfSearchRequestText.focus(),
         )
         # 申請の新規作成
         keyboard_shortcut_manager.register_key_shortcut(
@@ -368,6 +368,13 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                 key="Enter", shift=False, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_search_request_text,
+        )
+        # 申請一覧の再読み込み
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="R", shift=False, ctrl=True, alt=False, meta=False,
+            ),
+            func=lambda e: self.refresh(),
         )
         # 申請一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
