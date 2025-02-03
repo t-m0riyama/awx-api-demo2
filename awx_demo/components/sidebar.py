@@ -244,14 +244,14 @@ class Sidebar(ft.Container):
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=2),
             )
-            # 全ての申請
+            # 完了済みの申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="A", shift=True, ctrl=True, alt=False, meta=False,
+                    key="E", shift=True, ctrl=True, alt=False, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=3),
             )
-            # 完了済みの申請
+            # 操作履歴
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
                     key="H", shift=True, ctrl=True, alt=False, meta=False,
