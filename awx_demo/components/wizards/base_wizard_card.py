@@ -22,7 +22,7 @@ class BaseWizardCard(ft.Card):
         # 次へ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=True, alt=False, meta=False
+                key="N", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_next,
         )
@@ -75,7 +75,7 @@ class BaseWizardCard(ft.Card):
         # 次へ
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=True, alt=False, meta=False
+                key="N", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 前へ

@@ -170,7 +170,7 @@ class EditRequestForm(BaseWizardCard):
         is_execute_disabled = self.session.get('request_status') not in [
             RequestStatus.APPROVED, RequestStatus.COMPLETED]
         self.btnExecute = ft.ElevatedButton(
-            '実行', tooltip='実行 (Cotrol+Shift+N)', on_click=self.on_click_next, disabled=(is_execute_disabled or change_disabled))
+            '実行', tooltip='実行 (Shift+Alt+N)', on_click=self.on_click_next, disabled=(is_execute_disabled or change_disabled))
         self.btnSave = ft.ElevatedButton(
             '保存', tooltip='保存 (Cotrol+Shift+S)', on_click=self.on_click_save, disabled=change_disabled)
         self.btnDuplicate = ft.ElevatedButton(
@@ -271,7 +271,7 @@ class EditRequestForm(BaseWizardCard):
         # 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=True, alt=False, meta=False
+                key="N", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_next,
         )
@@ -394,7 +394,7 @@ class EditRequestForm(BaseWizardCard):
         # 次のページへ
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=True, alt=False, meta=False
+                key="N", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 申請の保存
