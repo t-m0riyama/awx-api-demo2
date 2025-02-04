@@ -138,14 +138,16 @@ class CreateRequestForm(BaseWizardCard):
         )
 
         controls = ft.Container(
-            ft.Column(
-                [
-                    header,
-                    body,
-                    ft.Divider(),
-                    footer,
-                ],
-                alignment=ft.MainAxisAlignment.CENTER,
+            ft.SelectionArea(
+                content=ft.Column(
+                    [
+                        header,
+                        body,
+                        ft.Divider(),
+                        footer,
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                )
             ),
             width=self.content_width,
             height=self.content_height,
