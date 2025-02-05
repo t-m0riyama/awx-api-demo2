@@ -179,7 +179,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=lambda e: self.refresh(),
             autofocus=True,
-            tooltip="操作履歴一覧の再読み込み (Control+R)",
+            tooltip="操作履歴一覧の再読み込み (Control+Alt+R)",
         )
         range_min, range_max, request_data_count = ActivityRowHelper.get_page_range(
             self
@@ -275,6 +275,13 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             ),
             func=lambda e: self.dropUser.focus()
         )
+        # 操作履歴一覧の再読み込み
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="R", shift=False, ctrl=True, alt=True, meta=False,
+            ),
+            func=lambda e: self.refresh(),
+        )
         # 操作履歴一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
@@ -311,6 +318,12 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="F", shift=True, ctrl=True, alt=False, meta=False
+            ),
+        )
+        # 操作履歴一覧の再読み込み
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="R", shift=False, ctrl=True, alt=True, meta=False,
             ),
         )
         # 操作履歴一覧のページ送り / 次のページへ
