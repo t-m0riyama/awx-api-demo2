@@ -243,7 +243,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=lambda e: self.refresh(),
             autofocus=True,
-            tooltip="申請一覧の再読み込み (Control+R)",
+            tooltip="申請一覧の再読み込み (Control+Alt+R)",
         )
         range_min, range_max, request_data_count = RequestRowHelper.get_page_range(self)
         self.textRequestsRange = ft.Text(
@@ -372,7 +372,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # 申請一覧の再読み込み
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="R", shift=False, ctrl=True, alt=False, meta=False,
+                key="R", shift=False, ctrl=True, alt=True, meta=False,
             ),
             func=lambda e: self.refresh(),
         )
@@ -474,6 +474,12 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+            ),
+        )
+        # 申請一覧の再読み込み
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="R", shift=False, ctrl=True, alt=True, meta=False,
             ),
         )
         # 申請一覧のページ送り / 次のページへ
