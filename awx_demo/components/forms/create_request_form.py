@@ -104,9 +104,9 @@ class CreateRequestForm(BaseWizardCard):
             ),
         )
         self.btnNext = ft.FilledButton(
-            '次へ', tooltip='次へ (Cotrol+Shift+N)', on_click=self.on_click_next)
+            '次へ', tooltip='次へ (Shift+Alt+N)', on_click=self.on_click_next)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', tooltip='キャンセル (Cotrol+Shift+X)', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Control+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(

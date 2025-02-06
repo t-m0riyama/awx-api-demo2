@@ -52,11 +52,11 @@ class SetVmCpuForm(BaseWizardCard):
             disabled=(not bool(strtobool(self.session.get('job_options')['change_vm_cpu_enabled']))) if 'change_vm_cpu_enabled' in self.session.get('job_options') else False,
         )
         self.btnNext = ft.FilledButton(
-            '次へ', tooltip='次へ (Cotrol+Shift+N)', on_click=self.on_click_next)
+            '次へ', tooltip='次へ (Shift+Alt+N)', on_click=self.on_click_next)
         self.btnPrev = ft.ElevatedButton(
-            '戻る', tooltip='戻る (Cotrol+Shift+P)', on_click=self.on_click_previous)
+            '戻る', tooltip='戻る (Control+Shift+P)', on_click=self.on_click_previous)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', tooltip='キャンセル (Cotrol+Shift+X)', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Control+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(

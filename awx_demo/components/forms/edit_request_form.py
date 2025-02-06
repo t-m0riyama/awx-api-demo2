@@ -93,23 +93,23 @@ class EditRequestForm(BaseWizardCard):
                     animation_duration=300,
                     tabs=[
                         ft.Tab(
-                            tab_content=ft.Text('共通', tooltip='共通 (Cotrol+Shift+G)'),
+                            tab_content=ft.Text('共通', tooltip='共通 (Control+Shift+G)'),
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Cotrol+Shift+T)'),
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Control+Shift+T)'),
                             content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('CPU', tooltip='CPU (Cotrol+Shift+C)'),
+                            tab_content=ft.Text('CPU', tooltip='CPU (Control+Shift+C)'),
                             content=ft.SelectionArea(content=self.formSetVmCpu),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('メモリ', tooltip='メモリ (Cotrol+Shift+M)'),
+                            tab_content=ft.Text('メモリ', tooltip='メモリ (Control+Shift+M)'),
                             content=ft.SelectionArea(content=self.formSetVmMemory),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Cotrol+Shift+A)'),
+                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Control+Shift+A)'),
                             content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
@@ -147,19 +147,19 @@ class EditRequestForm(BaseWizardCard):
                     animation_duration=300,
                     tabs=[
                         ft.Tab(
-                            tab_content=ft.Text('共通', tooltip='共通 (Cotrol+Shift+G)'),
+                            tab_content=ft.Text('共通', tooltip='共通 (Control+Shift+G)'),
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Cotrol+Shift+T)'),
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Control+Shift+T)'),
                             content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('起動/停止', tooltip='変更対象 (Cotrol+Shift+B)'),
+                            tab_content=ft.Text('起動/停止', tooltip='変更対象 (Control+Shift+B)'),
                             content=ft.SelectionArea(content=self.formStartStop),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Cotrol+Shift+A)'),
+                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Control+Shift+A)'),
                             content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
@@ -172,11 +172,11 @@ class EditRequestForm(BaseWizardCard):
         self.btnExecute = ft.ElevatedButton(
             '実行', tooltip='実行 (Shift+Alt+N)', on_click=self.on_click_next, disabled=(is_execute_disabled or change_disabled))
         self.btnSave = ft.ElevatedButton(
-            '保存', tooltip='保存 (Cotrol+Shift+S)', on_click=self.on_click_save, disabled=change_disabled)
+            '保存', tooltip='保存 (Control+Shift+S)', on_click=self.on_click_save, disabled=change_disabled)
         self.btnDuplicate = ft.ElevatedButton(
-            '複製', tooltip='複製 (Cotrol+Shift+D)', on_click=self.on_click_duplicate, disabled=change_disabled)
+            '複製', tooltip='複製 (Control+Shift+D)', on_click=self.on_click_duplicate, disabled=change_disabled)
         self.btnCancel = ft.FilledButton(
-            '閉じる', tooltip='閉じる (Cotrol+Shift+X)', on_click=self.on_click_cancel)
+            '閉じる', tooltip='閉じる (Control+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(

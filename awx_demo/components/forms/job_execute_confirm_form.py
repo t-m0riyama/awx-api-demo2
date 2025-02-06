@@ -57,11 +57,11 @@ class JobExecuteConfirmForm(BaseWizardCard):
             on_change=self.on_change_startup_after_change,
         )
         self.btnNext = ft.ElevatedButton(
-            '実行', tooltip='実行 (Cotrol+Shift+N)', on_click=self.on_click_next)
+            '実行', tooltip='実行 (Shift+Alt+N)', on_click=self.on_click_next)
         self.btnPrev = ft.ElevatedButton(
-            '戻る', tooltip='戻る (Cotrol+Shift+P)', on_click=self.on_click_previous)
+            '戻る', tooltip='戻る (Control+Shift+P)', on_click=self.on_click_previous)
         self.btnCancel = ft.FilledButton(
-            'キャンセル', tooltip='キャンセル (Cotrol+Shift+X)', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Control+Shift+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
