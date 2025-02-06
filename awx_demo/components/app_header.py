@@ -48,7 +48,7 @@ class AppHeader(ft.Row):
         self.toggle_dark_light_icon = ft.IconButton(
             icon="light_mode",
             selected_icon="dark_mode",
-            tooltip="ライトモード/ダークモードの切り替え (Cotrol+Shift+T)",
+            tooltip="ライトモード/ダークモードの切り替え (Control+Shift+T)",
             on_click=self.toggle_thema_mode,
         )
         role_friendly = UserRole.to_friendly(self.session.get("user_role"))
@@ -59,7 +59,7 @@ class AppHeader(ft.Row):
             ft.PopupMenuItem(),
             ft.PopupMenuItem(
                 content=ft.Text(
-                    "ログアウト (Cotrol+Shift+Q)"
+                    "ログアウト (Control+Shift+Q)"
                 ),
                 on_click=self.logout_clicked
             ),

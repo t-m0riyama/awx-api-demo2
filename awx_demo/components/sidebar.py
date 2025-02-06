@@ -31,7 +31,7 @@ class Sidebar(ft.Container):
                         ft.Icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "最新",
-                        tooltip="最新の申請 (Cotrol+Shift+L)",
+                        tooltip="最新の申請 (Control+Shift+L)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -41,7 +41,7 @@ class Sidebar(ft.Container):
                         ft.Icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "リリース希望日",
-                        tooltip="リリース希望日 (Cotrol+Shift+D)",
+                        tooltip="リリース希望日 (Control+Shift+D)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -50,7 +50,7 @@ class Sidebar(ft.Container):
                         ft.Icons.LIST_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "全て",
-                        tooltip="全て (Cotrol+Shift+A)",
+                        tooltip="全て (Control+Shift+A)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -59,7 +59,7 @@ class Sidebar(ft.Container):
                     selected_icon=ft.Icon(ft.Icons.CHECK, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "完了",
-                        tooltip="完了 (Cotrol+Shift+E)",
+                        tooltip="完了 (Control+Shift+E)",
                     )
                 ),
             ]
@@ -72,7 +72,7 @@ class Sidebar(ft.Container):
                         ft.Icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "最新",
-                        tooltip="最新の申請 (Cotrol+Shift+L)",
+                        tooltip="最新の申請 (Control+Shift+L)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -82,7 +82,7 @@ class Sidebar(ft.Container):
                         ft.Icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "リリース希望日",
-                        tooltip="リリース希望日 (Cotrol+Shift+D)",
+                        tooltip="リリース希望日 (Control+Shift+D)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -92,7 +92,7 @@ class Sidebar(ft.Container):
                         ft.Icons.ACCOUNT_BOX_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "自身の申請",
-                        tooltip="自身の申請 (Cotrol+Shift+M)",
+                        tooltip="自身の申請 (Control+Shift+M)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -101,7 +101,7 @@ class Sidebar(ft.Container):
                         ft.Icons.LIST_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "全て",
-                        tooltip="全て (Cotrol+Shift+A)",
+                        tooltip="全て (Control+Shift+A)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -110,7 +110,7 @@ class Sidebar(ft.Container):
                     selected_icon=ft.Icon(ft.Icons.CHECK, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "完了",
-                        tooltip="完了 (Cotrol+Shift+E)",
+                        tooltip="完了 (Control+Shift+E)",
                     )
                 ),
             ]
@@ -124,7 +124,7 @@ class Sidebar(ft.Container):
                         ft.Icons.HISTORY, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "操作履歴",
-                        tooltip="操作履歴 (Cotrol+Shift+H)",
+                        tooltip="操作履歴 (Control+Shift+H)",
                     )
                 ),
             ]
@@ -137,7 +137,7 @@ class Sidebar(ft.Container):
                         ft.Icons.HISTORY, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "操作履歴",
-                        tooltip="操作履歴 (Cotrol+Shift+H)",
+                        tooltip="操作履歴 (Control+Shift+H)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -147,7 +147,7 @@ class Sidebar(ft.Container):
                         ft.Icons.SETTINGS, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "設定",
-                        tooltip="設定 (Cotrol+Shift+C)",
+                        tooltip="設定 (Control+Shift+C)",
                     )
                 ),
             ]
