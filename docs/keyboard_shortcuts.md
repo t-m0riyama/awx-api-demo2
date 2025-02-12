@@ -8,7 +8,6 @@ AWX API DEMO キーボードショートカット一覧
   - 'R': 'shift':False,'ctrl':True,'alt':True		申請の再読み込み
   - 'ArrowRight': 'shift':True,'ctrl':False,'alt'		次のページへ
   - 'ArrowLeft': 'shift':True,'ctrl':False,'alt'		前のページへ
-
   - 'I': 'shift':True,'ctrl':False,'alt':False		申請の状態変更（申請中）
   - 'P': 'shift':True,'ctrl':False,'alt':False		申請の状態変更（承認済み）
   - 'E': 'shift':True,'ctrl':False,'alt':False		申請の状態変更（完了）
