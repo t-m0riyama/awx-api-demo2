@@ -428,7 +428,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             request_id = self.dtRequests.rows[row_index].cells[self.REQUEST_ID_COLUMN_NUMBER].content.value
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key=f"{row_index}", shift=True, ctrl=True, alt=False, meta=False,
+                    key=f"{row_index}", shift=True, ctrl=False, alt=False, meta=False,
                 ),
                 func=lambda e, request_id=request_id: self.on_request_edit_open(request_id=request_id),
             )
@@ -508,7 +508,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         for row_index in range(0, 10):
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key=str(row_index), shift=True, ctrl=True, alt=False, meta=False,
+                    key=str(row_index), shift=True, ctrl=False, alt=False, meta=False,
                 ),
             )
         # 申請の選択・選択解除

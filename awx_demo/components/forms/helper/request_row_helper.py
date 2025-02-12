@@ -28,7 +28,7 @@ class RequestRowHelper:
     def generate_request_row(request_list_form, row_id, request_data: RequestRowData, shortcut_index: int):
         row_id_content = None
         if shortcut_index <= 9:
-            row_id_content = ft.Text(str(row_id), color=ft.Colors.PRIMARY, tooltip=f"Control+Shift+{shortcut_index}")
+            row_id_content = ft.Text(str(row_id), color=ft.Colors.PRIMARY, tooltip=f"Shift+{shortcut_index}")
         else:
             row_id_content = ft.Text(str(row_id), color=ft.Colors.PRIMARY)
 
