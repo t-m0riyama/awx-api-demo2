@@ -106,7 +106,7 @@ class CreateRequestForm(BaseWizardCard):
         self.btnNext = ft.FilledButton(
             '次へ', tooltip='次へ (Shift+Alt+N)', on_click=self.on_click_next)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', tooltip='キャンセル (Control+Shift+X)', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Shift+Alt+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
@@ -161,7 +161,7 @@ class CreateRequestForm(BaseWizardCard):
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=True, alt=False, meta=False
+                key="F", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e: self.tfRequestText.focus(),
         )
@@ -173,7 +173,7 @@ class CreateRequestForm(BaseWizardCard):
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=True, alt=False, meta=False
+                key="F", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         super().unregister_key_shortcuts()

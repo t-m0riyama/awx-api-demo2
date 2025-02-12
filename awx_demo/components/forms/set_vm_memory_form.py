@@ -56,9 +56,9 @@ class SetVmMemoryForm(BaseWizardCard):
         self.btnNext = ft.FilledButton(
             '次へ', tooltip='次へ (Shift+Alt+N)', on_click=self.on_click_next)
         self.btnPrev = ft.ElevatedButton(
-            '戻る', tooltip='戻る (Control+Shift+P)', on_click=self.on_click_previous)
+            '戻る', tooltip='戻る (Shift+Alt+P)', on_click=self.on_click_previous)
         self.btnCancel = ft.ElevatedButton(
-            'キャンセル', tooltip='キャンセル (Control+Shift+X)', on_click=self.on_click_cancel)
+            'キャンセル', tooltip='キャンセル (Shift+Alt+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
@@ -106,18 +106,10 @@ class SetVmMemoryForm(BaseWizardCard):
     #     # autofocus=Trueである、最初のコントロールにフォーカスを移動する
     #     keyboard_shortcut_manager.register_key_shortcut(
     #         key_set=keyboard_shortcut_manager.create_key_set(
-    #             key="F", shift=True, ctrl=True, alt=False, meta=False
+    #             key="F", shift=True, ctrl=False, alt=True, meta=False
     #         ),
     #         func=lambda e: self.checkChangeVmMemoryEnabled.focus() # fletのcheckboxにfocus()が未実装のため見送り
     #     )
-    #     # ログへのキーボードショートカット一覧出力
-    #     keyboard_shortcut_manager.register_key_shortcut(
-    #         key_set=keyboard_shortcut_manager.create_key_set(
-    #             key="Z", shift=True, ctrl=True, alt=False, meta=False,
-    #         ),
-    #         func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
-    #     )
-    #     super().register_key_shortcuts()
 
     # @Logging.func_logger
     # def unregister_key_shortcuts(self):
@@ -125,16 +117,9 @@ class SetVmMemoryForm(BaseWizardCard):
     #     # autofocus=Trueである、最初のコントロールにフォーカスを移動する
     #     keyboard_shortcut_manager.unregister_key_shortcut(
     #         key_set=keyboard_shortcut_manager.create_key_set(
-    #             key="F", shift=True, ctrl=True, alt=False, meta=False
+    #             key="F", shift=True, ctrl=False, alt=True, meta=False
     #         ),
     #     )
-    #     # ログへのキーボードショートカット一覧出力
-    #     keyboard_shortcut_manager.unregister_key_shortcut(
-    #         key_set=keyboard_shortcut_manager.create_key_set(
-    #             key="Z", shift=True, ctrl=True, alt=False, meta=False
-    #         ),
-    #     )
-    #     super().unregister_key_shortcuts()
 
     @Logging.func_logger
     def generate_confirm_text(self):

@@ -62,7 +62,7 @@ class JobProgressForm(BaseWizardCard):
             )
         )
         self.btnExit = ft.FilledButton(
-            '閉じる', tooltip='閉じる (Control+Shift+X)', on_click=self.on_click_cancel, disabled=True)
+            '閉じる', tooltip='閉じる (Shift+Alt+X)', on_click=self.on_click_cancel, disabled=True)
 
         # Content
         header = ft.Container(

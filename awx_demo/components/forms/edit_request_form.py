@@ -93,23 +93,23 @@ class EditRequestForm(BaseWizardCard):
                     animation_duration=300,
                     tabs=[
                         ft.Tab(
-                            tab_content=ft.Text('共通', tooltip='共通 (Control+Shift+G)'),
+                            tab_content=ft.Text('共通', tooltip='共通 (Shift+Alt+G)'),
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Control+Shift+T)'),
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+T)'),
                             content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('CPU', tooltip='CPU (Control+Shift+C)'),
+                            tab_content=ft.Text('CPU', tooltip='CPU (Shift+Alt+C)'),
                             content=ft.SelectionArea(content=self.formSetVmCpu),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('メモリ', tooltip='メモリ (Control+Shift+M)'),
+                            tab_content=ft.Text('メモリ', tooltip='メモリ (Shift+Alt+M)'),
                             content=ft.SelectionArea(content=self.formSetVmMemory),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Control+Shift+A)'),
+                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Shift+Alt+A)'),
                             content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
@@ -147,19 +147,19 @@ class EditRequestForm(BaseWizardCard):
                     animation_duration=300,
                     tabs=[
                         ft.Tab(
-                            tab_content=ft.Text('共通', tooltip='共通 (Control+Shift+G)'),
+                            tab_content=ft.Text('共通', tooltip='共通 (Shift+Alt+G)'),
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Control+Shift+T)'),
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+T)'),
                             content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('起動/停止', tooltip='変更対象 (Control+Shift+B)'),
+                            tab_content=ft.Text('起動/停止', tooltip='起動/停止 (Shift+Alt+B)'),
                             content=ft.SelectionArea(content=self.formStartStop),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Control+Shift+A)'),
+                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Shift+Alt+A)'),
                             content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
@@ -172,11 +172,11 @@ class EditRequestForm(BaseWizardCard):
         self.btnExecute = ft.ElevatedButton(
             '実行', tooltip='実行 (Shift+Alt+N)', on_click=self.on_click_next, disabled=(is_execute_disabled or change_disabled))
         self.btnSave = ft.ElevatedButton(
-            '保存', tooltip='保存 (Control+Shift+S)', on_click=self.on_click_save, disabled=change_disabled)
+            '保存', tooltip='保存 (Shift+Alt+S)', on_click=self.on_click_save, disabled=change_disabled)
         self.btnDuplicate = ft.ElevatedButton(
-            '複製', tooltip='複製 (Control+Shift+D)', on_click=self.on_click_duplicate, disabled=change_disabled)
+            '複製', tooltip='複製 (Shift+Alt+D)', on_click=self.on_click_duplicate, disabled=change_disabled)
         self.btnCancel = ft.FilledButton(
-            '閉じる', tooltip='閉じる (Control+Shift+X)', on_click=self.on_click_cancel)
+            '閉じる', tooltip='閉じる (Shift+Alt+X)', on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
@@ -278,42 +278,35 @@ class EditRequestForm(BaseWizardCard):
         # 申請の保存
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="S", shift=True, ctrl=True, alt=False, meta=False
+                key="S", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_save,
         )
         # 申請の複製
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="D", shift=True, ctrl=True, alt=False, meta=False
+                key="D", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_duplicate,
         )
         # キャンセル
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=True, alt=False, meta=False
-            ),
-            func=self.on_click_cancel,
-        )
-        # キャンセル / ESC
-        keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Escape", shift=False, ctrl=False, alt=False, meta=False
+                key="X", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_cancel,
         )
         # 共通タブに切り替え
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="G", shift=True, ctrl=True, alt=False, meta=False
+                key="G", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e: self._keyboard_switch_tab(0),
         )
         # 変更対象タブに切り替え
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="T", shift=True, ctrl=True, alt=False, meta=False
+                key="T", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e: self._keyboard_switch_tab(1),
         )
@@ -327,21 +320,21 @@ class EditRequestForm(BaseWizardCard):
                 # CPUタブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="C", shift=True, ctrl=True, alt=False, meta=False
+                        key="C", shift=True, ctrl=False, alt=True, meta=False
                     ),
                     func=lambda e: self._keyboard_switch_tab(2),
                 )
                 # メモリタブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="M", shift=True, ctrl=True, alt=False, meta=False
+                        key="M", shift=True, ctrl=False, alt=True, meta=False
                     ),
                     func=lambda e: self._keyboard_switch_tab(3),
                 )
                 # 管理情報タブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="A", shift=True, ctrl=True, alt=False, meta=False
+                        key="A", shift=True, ctrl=False, alt=True, meta=False
                     ),
                     func=lambda e: self._keyboard_switch_tab(4),
                 )
@@ -349,14 +342,14 @@ class EditRequestForm(BaseWizardCard):
                 # 起動/停止タブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="B", shift=True, ctrl=True, alt=False, meta=False
+                        key="B", shift=True, ctrl=False, alt=True, meta=False
                     ),
                     func=lambda e: self._keyboard_switch_tab(2),
                 )
                 # 管理情報タブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="A", shift=True, ctrl=True, alt=False, meta=False
+                        key="A", shift=True, ctrl=False, alt=True, meta=False
                     ),
                     func=lambda e: self._keyboard_switch_tab(3),
                 )
@@ -364,21 +357,21 @@ class EditRequestForm(BaseWizardCard):
         # ログへのセッションダンプ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=True, alt=False, meta=False,
+                key="V", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
         # Semantics Debuggerの有効化/無効化
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=True, alt=False, meta=False,
+                key="Y", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.toggle_show_semantics_debugger,
         )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=True, alt=False, meta=False,
+                key="Z", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )
@@ -400,37 +393,31 @@ class EditRequestForm(BaseWizardCard):
         # 申請の保存
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="S", shift=True, ctrl=True, alt=False, meta=False
+                key="S", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 申請の複製
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="D", shift=True, ctrl=True, alt=False, meta=False
+                key="D", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # キャンセル
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=True, alt=False, meta=False
-            ),
-        )
-        # キャンセル / ESC
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Escape", shift=False, ctrl=False, alt=False, meta=False
+                key="X", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 共通タブに切り替え
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="G", shift=True, ctrl=True, alt=False, meta=False
+                key="G", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 変更対象タブに切り替え
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="T", shift=True, ctrl=True, alt=False, meta=False
+                key="T", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
 
@@ -443,45 +430,45 @@ class EditRequestForm(BaseWizardCard):
                 # CPUタブに切り替え
                 keyboard_shortcut_manager.unregister_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="C", shift=True, ctrl=True, alt=False, meta=False
+                        key="C", shift=True, ctrl=False, alt=True, meta=False
                     ),
                 )
                 # メモリタブに切り替え
                 keyboard_shortcut_manager.unregister_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="M", shift=True, ctrl=True, alt=False, meta=False
+                        key="M", shift=True, ctrl=False, alt=True, meta=False
                     ),
                 )
             case RequestOperation.VM_START_OR_STOP_FRIENDLY:
                 # 起動/停止タブに切り替え
                 keyboard_shortcut_manager.unregister_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
-                        key="B", shift=True, ctrl=True, alt=False, meta=False
+                        key="B", shift=True, ctrl=False, alt=True, meta=False
                     ),
                 )
 
         # 管理情報タブに切り替え
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="A", shift=True, ctrl=True, alt=False, meta=False
+                key="A", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # ログへのセッションダンプ
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=True, alt=False, meta=False
+                key="V", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # Semantics Debuggerの有効化/無効化
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=True, alt=False, meta=False
+                key="Y", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=True, alt=False, meta=False
+                key="Z", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
 
