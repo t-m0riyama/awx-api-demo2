@@ -97,7 +97,7 @@ class EditRequestForm(BaseWizardCard):
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+T)'),
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+O)'),
                             content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
@@ -151,7 +151,7 @@ class EditRequestForm(BaseWizardCard):
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+T)'),
+                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+O)'),
                             content=ft.SelectionArea(content=self.formSelectTarget),
                         ),
                         ft.Tab(
@@ -306,7 +306,7 @@ class EditRequestForm(BaseWizardCard):
         # 変更対象タブに切り替え
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="T", shift=True, ctrl=False, alt=True, meta=False
+                key="O", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e: self._keyboard_switch_tab(1),
         )
@@ -417,7 +417,7 @@ class EditRequestForm(BaseWizardCard):
         # 変更対象タブに切り替え
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="T", shift=True, ctrl=False, alt=True, meta=False
+                key="O", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
 
