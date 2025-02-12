@@ -154,17 +154,17 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             items=[
                                 ft.PopupMenuItem(
                                     icon=ft.Icons.FIBER_NEW,
-                                    text=RequestStatus.START_FRIENDLY + " (Shift+Alt+I)",
+                                    text=RequestStatus.START_FRIENDLY + " (Shift+I)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
                                     icon=ft.Icons.APPROVAL,
-                                    text=RequestStatus.APPROVED_FRIENDLY + " (Shift+Alt+P)",
+                                    text=RequestStatus.APPROVED_FRIENDLY + " (Shift+P)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
                                     icon=ft.Icons.CHECK_CIRCLE,
-                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Shift+Alt+X)",
+                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Shift+E)",
                                     on_click=self.on_change_request_status,
                                 ),
                             ],
@@ -391,26 +391,26 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             func=self.on_click_previous_page,
         )
         # 申請の状態の変更 => 申請中
-        status_text = RequestStatus.START_FRIENDLY + " (Shift+Alt+I)"
+        status_text = RequestStatus.START_FRIENDLY + " (Shift+I)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="I", shift=True, ctrl=False, alt=True, meta=False,
+                key="I", shift=True, ctrl=False, alt=False, meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の状態の変更 => 承認済み
-        status_text = RequestStatus.APPROVED_FRIENDLY + " (Shift+Alt+P)"
+        status_text = RequestStatus.APPROVED_FRIENDLY + " (Shift+P)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="P", shift=True, ctrl=False, alt=True, meta=False,
+                key="P", shift=True, ctrl=False, alt=False, meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の状態の変更 => 作業完了
-        status_text = RequestStatus.COMPLETED_FRIENDLY + " (Shift+Alt+X)"
+        status_text = RequestStatus.COMPLETED_FRIENDLY + " (Shift+E)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="E", shift=True, ctrl=False, alt=True, meta=False,
+                key="E", shift=True, ctrl=False, alt=False, meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
@@ -602,11 +602,11 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # キーボードショートカットから呼ばれた場合、
         # status_textにセットされている値を変更したいステータスの代わりに利用する
         status_text = status_text if status_text is not None else e.control.text
-        if status_text == RequestStatus.START_FRIENDLY + " (Shift+Alt+I)":
+        if status_text == RequestStatus.START_FRIENDLY + " (Shift+I)":
             request_status = RequestStatus.START
-        elif status_text == RequestStatus.APPROVED_FRIENDLY + " (Shift+Alt+P)":
+        elif status_text == RequestStatus.APPROVED_FRIENDLY + " (Shift+P)":
             request_status = RequestStatus.APPROVED
-        elif status_text == RequestStatus.COMPLETED_FRIENDLY + " (Shift+ALt+X)":
+        elif status_text == RequestStatus.COMPLETED_FRIENDLY + " (Shift+E)":
             request_status = RequestStatus.COMPLETED
         else:
             request_status = ""
