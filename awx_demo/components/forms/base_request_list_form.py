@@ -250,14 +250,14 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             "{}-{} / {}".format(range_min, range_max, request_data_count)
         )
         self.btnPreviousPage = ft.IconButton(
-            tooltip="前へ (Control+Shift+<)",
+            tooltip="前へ (Control+Shift+←)",
             icon=ft.Icons.ARROW_LEFT,
             icon_color=ft.Colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
-            tooltip="次へ (Control+Shift+>)",
+            tooltip="次へ (Control+Shift+→)",
             icon=ft.Icons.ARROW_RIGHT,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
@@ -379,20 +379,6 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # 申請一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key=">", shift=True, ctrl=True, alt=False, meta=False,
-            ),
-            func=self.on_click_next_page,
-        )
-        # 申請一覧のページ送り / 前のページへ
-        keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="<", shift=True, ctrl=True, alt=False, meta=False,
-            ),
-            func=self.on_click_previous_page,
-        )
-        # 申請一覧のページ送り / 次のページへ
-        keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
                 key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
             ),
             func=self.on_click_next_page,
@@ -480,18 +466,6 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="R", shift=False, ctrl=True, alt=True, meta=False,
-            ),
-        )
-        # 申請一覧のページ送り / 次のページへ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key=">", shift=True, ctrl=True, alt=False, meta=False,
-            ),
-        )
-        # 申請一覧のページ送り / 前のページへ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="<", shift=True, ctrl=True, alt=False, meta=False,
             ),
         )
         # 申請一覧のページ送り / 次のページへ
