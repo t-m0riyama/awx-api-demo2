@@ -154,17 +154,17 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             items=[
                                 ft.PopupMenuItem(
                                     icon=ft.Icons.FIBER_NEW,
-                                    text=RequestStatus.START_FRIENDLY + " (Alt+Shift+I)",
+                                    text=RequestStatus.START_FRIENDLY + " (Shift+Alt+I)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
                                     icon=ft.Icons.APPROVAL,
-                                    text=RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)",
+                                    text=RequestStatus.APPROVED_FRIENDLY + " (Shift+Alt+P)",
                                     on_click=self.on_change_request_status,
                                 ),
                                 ft.PopupMenuItem(
                                     icon=ft.Icons.CHECK_CIRCLE,
-                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)",
+                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Shift+Alt+X)",
                                     on_click=self.on_change_request_status,
                                 ),
                             ],
@@ -203,7 +203,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                             items=[
                                 ft.PopupMenuItem(
                                     icon=ft.Icons.CHECK_CIRCLE,
-                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)",
+                                    text=RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+X)",
                                     on_click=self.on_change_request_status,
                                 ),
                             ],
@@ -250,14 +250,14 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             "{}-{} / {}".format(range_min, range_max, request_data_count)
         )
         self.btnPreviousPage = ft.IconButton(
-            tooltip="前へ (Control+Shift+←)",
+            tooltip="前へ (Shift+Alt+←)",
             icon=ft.Icons.ARROW_LEFT,
             icon_color=ft.Colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
-            tooltip="次へ (Control+Shift+→)",
+            tooltip="次へ (Shift+Alt+→)",
             icon=ft.Icons.ARROW_RIGHT,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
@@ -351,7 +351,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=True, alt=False, meta=False
+                key="F", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e: self.tfSearchRequestText.focus(),
         )
@@ -379,19 +379,19 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # 申請一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+                key="Arrow Right", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=self.on_click_next_page,
         )
         # 申請一覧のページ送り / 前のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+                key="Arrow Left", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=self.on_click_previous_page,
         )
         # 申請の状態の変更 => 申請中
-        status_text = RequestStatus.START_FRIENDLY + " (Alt+Shift+I)"
+        status_text = RequestStatus.START_FRIENDLY + " (Shift+Alt+I)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="I", shift=True, ctrl=False, alt=True, meta=False,
@@ -399,7 +399,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の状態の変更 => 承認済み
-        status_text = RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)"
+        status_text = RequestStatus.APPROVED_FRIENDLY + " (Shift+Alt+P)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="P", shift=True, ctrl=False, alt=True, meta=False,
@@ -407,7 +407,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の状態の変更 => 作業完了
-        status_text = RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)"
+        status_text = RequestStatus.COMPLETED_FRIENDLY + " (Shift+Alt+X)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
                 key="E", shift=True, ctrl=False, alt=True, meta=False,
@@ -447,7 +447,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=True, alt=False, meta=False
+                key="F", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 申請の新規作成
@@ -602,11 +602,11 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # キーボードショートカットから呼ばれた場合、
         # status_textにセットされている値を変更したいステータスの代わりに利用する
         status_text = status_text if status_text is not None else e.control.text
-        if status_text == RequestStatus.START_FRIENDLY + " (Alt+Shift+I)":
+        if status_text == RequestStatus.START_FRIENDLY + " (Shift+Alt+I)":
             request_status = RequestStatus.START
-        elif status_text == RequestStatus.APPROVED_FRIENDLY + " (Alt+Shift+P)":
+        elif status_text == RequestStatus.APPROVED_FRIENDLY + " (Shift+Alt+P)":
             request_status = RequestStatus.APPROVED
-        elif status_text == RequestStatus.COMPLETED_FRIENDLY + " (Alt+Shift+E)":
+        elif status_text == RequestStatus.COMPLETED_FRIENDLY + " (Shift+ALt+X)":
             request_status = RequestStatus.COMPLETED
         else:
             request_status = ""

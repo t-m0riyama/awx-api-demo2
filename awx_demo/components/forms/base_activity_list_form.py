@@ -188,7 +188,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             "{}-{} / {}".format(range_min, range_max, request_data_count)
         )
         self.btnPreviousPage = ft.IconButton(
-            tooltip="前へ (Control+Shift+←)",
+            tooltip="前へ (Shift+Alt+←)",
             icon=ft.Icons.ARROW_LEFT,
             icon_color=ft.Colors.ON_INVERSE_SURFACE,
             on_click=self.on_click_previous_page,
@@ -196,7 +196,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             disabled=True,
         )
         self.btnNextPage = ft.IconButton(
-            tooltip="次へ (Control+Shift+→)",
+            tooltip="次へ (Shift+Alt+→)",
             icon=ft.Icons.ARROW_RIGHT,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_next_page,
@@ -271,14 +271,14 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=True, alt=False, meta=False
+                key="F", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=lambda e: self.dropUser.focus()
         )
         # 概要に含まれる文字の検索を実行
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+                key="Enter", shift=False, ctrl=True, alt=False, meta=False
             ),
             func=self.on_click_search_summary,
         )
@@ -292,14 +292,14 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         # 操作履歴一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+                key="Arrow Right", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_next_page,
         )
         # 操作履歴一覧のページ送り / 前のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+                key="Arrow Left", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_previous_page,
         )
@@ -310,31 +310,31 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=True, alt=False, meta=False
+                key="F", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 概要に含まれる文字の検索を実行
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+                key="Enter", shift=False, ctrl=True, alt=False, meta=False
             ),
         )
         # 操作履歴一覧の再読み込み
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="R", shift=False, ctrl=True, alt=True, meta=False,
+                key="R", shift=False, ctrl=True, alt=True, meta=False
             ),
         )
         # 操作履歴一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+                key="Arrow Right", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
         # 操作履歴一覧のページ送り / 前のページへ
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+                key="Arrow Left", shift=True, ctrl=False, alt=True, meta=False
             ),
         )
 
