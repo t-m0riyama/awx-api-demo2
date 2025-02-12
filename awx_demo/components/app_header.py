@@ -118,21 +118,21 @@ class AppHeader(ft.Row):
         # ログへのセッションダンプ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=True, alt=False, meta=False,
+                key="V", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
         # Semantics Debuggerの有効化/無効化
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=True, alt=False, meta=False,
+                key="Y", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=self.toggle_show_semantics_debugger,
         )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=True, alt=False, meta=False,
+                key="Z", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )
