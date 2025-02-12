@@ -31,7 +31,7 @@ class Sidebar(ft.Container):
                         ft.Icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "最新",
-                        tooltip="最新の申請 (Control+Shift+L)",
+                        tooltip="最新の申請 (Shift+Alt+L)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -41,7 +41,7 @@ class Sidebar(ft.Container):
                         ft.Icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "リリース希望日",
-                        tooltip="リリース希望日 (Control+Shift+D)",
+                        tooltip="リリース希望日 (Shift+Alt+D)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -50,7 +50,7 @@ class Sidebar(ft.Container):
                         ft.Icons.LIST_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "全て",
-                        tooltip="全て (Control+Shift+A)",
+                        tooltip="全て (Shift+Alt+A)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -59,7 +59,7 @@ class Sidebar(ft.Container):
                     selected_icon=ft.Icon(ft.Icons.CHECK, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "完了",
-                        tooltip="完了 (Control+Shift+E)",
+                        tooltip="完了 (Shift+Alt+E)",
                     )
                 ),
             ]
@@ -72,7 +72,7 @@ class Sidebar(ft.Container):
                         ft.Icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "最新",
-                        tooltip="最新の申請 (Control+Shift+L)",
+                        tooltip="最新の申請 (Shift+Alt+L)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -82,7 +82,7 @@ class Sidebar(ft.Container):
                         ft.Icons.WARNING_AMBER_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "リリース希望日",
-                        tooltip="リリース希望日 (Control+Shift+D)",
+                        tooltip="リリース希望日 (Shift+Alt+D)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -92,7 +92,7 @@ class Sidebar(ft.Container):
                         ft.Icons.ACCOUNT_BOX_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "自身の申請",
-                        tooltip="自身の申請 (Control+Shift+M)",
+                        tooltip="自身の申請 (Shift+Alt+M)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -101,7 +101,7 @@ class Sidebar(ft.Container):
                         ft.Icons.LIST_OUTLINED, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "全て",
-                        tooltip="全て (Control+Shift+A)",
+                        tooltip="全て (Shift+Alt+A)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -110,7 +110,7 @@ class Sidebar(ft.Container):
                     selected_icon=ft.Icon(ft.Icons.CHECK, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "完了",
-                        tooltip="完了 (Control+Shift+E)",
+                        tooltip="完了 (Shift+Alt+E)",
                     )
                 ),
             ]
@@ -124,7 +124,7 @@ class Sidebar(ft.Container):
                         ft.Icons.HISTORY, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "操作履歴",
-                        tooltip="操作履歴 (Control+Shift+H)",
+                        tooltip="操作履歴 (Shift+Alt+H)",
                     )
                 ),
             ]
@@ -137,7 +137,7 @@ class Sidebar(ft.Container):
                         ft.Icons.HISTORY, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "操作履歴",
-                        tooltip="操作履歴 (Control+Shift+H)",
+                        tooltip="操作履歴 (Shift+Alt+H)",
                     )
                 ),
                 ft.NavigationRailDestination(
@@ -147,7 +147,7 @@ class Sidebar(ft.Container):
                         ft.Icons.SETTINGS, size=self.ICON_SIZE),
                     label_content=ft.Text(
                         "設定",
-                        tooltip="設定 (Control+Shift+C)",
+                        tooltip="設定 (Shift+Alt+C)",
                     )
                 ),
             ]
@@ -226,35 +226,35 @@ class Sidebar(ft.Container):
             # 最新の申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="L", shift=True, ctrl=True, alt=False, meta=False,
+                    key="L", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=0),
             )
             # リリース希望日順
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="D", shift=True, ctrl=True, alt=False, meta=False,
+                    key="D", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=1),
             )
             # 自身の申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="M", shift=True, ctrl=True, alt=False, meta=False,
+                    key="M", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=2),
             )
             # 完了済みの申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="E", shift=True, ctrl=True, alt=False, meta=False,
+                    key="E", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=3),
             )
             # 操作履歴
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="H", shift=True, ctrl=True, alt=False, meta=False,
+                    key="H", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_option_navigation_item, item_index=0),
             )
@@ -262,42 +262,42 @@ class Sidebar(ft.Container):
             # 最新の申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="L", shift=True, ctrl=True, alt=False, meta=False,
+                    key="L", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=0),
             )
             # リリース希望日順
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="D", shift=True, ctrl=True, alt=False, meta=False,
+                    key="D", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=1),
             )
             # 自身の申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="M", shift=True, ctrl=True, alt=False, meta=False,
+                    key="M", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=2),
             )
             # 全ての申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="A", shift=True, ctrl=True, alt=False, meta=False,
+                    key="A", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=3),
             )
             # 完了済みの申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="E", shift=True, ctrl=True, alt=False, meta=False,
+                    key="E", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=4),
             )
             # 操作履歴
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="H", shift=True, ctrl=True, alt=False, meta=False,
+                    key="H", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_option_navigation_item, item_index=0),
             )

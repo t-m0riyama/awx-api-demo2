@@ -36,7 +36,7 @@ class AppHeader(ft.Row):
             modal=True,
             content=formContextHelp,
             actions=[
-                ft.FilledButton("OK", tooltip="OK (Control+Shift+Y)", on_click=self.on_click_context_help_ok),
+                ft.FilledButton("OK", tooltip="OK", on_click=self.on_click_context_help_ok),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
@@ -48,7 +48,7 @@ class AppHeader(ft.Row):
         self.toggle_dark_light_icon = ft.IconButton(
             icon="light_mode",
             selected_icon="dark_mode",
-            tooltip="ライトモード/ダークモードの切り替え (Control+Shift+T)",
+            tooltip="ライトモード/ダークモードの切り替え (Shift+Alt+T)",
             on_click=self.toggle_thema_mode,
         )
         role_friendly = UserRole.to_friendly(self.session.get("user_role"))
@@ -59,7 +59,7 @@ class AppHeader(ft.Row):
             ft.PopupMenuItem(),
             ft.PopupMenuItem(
                 content=ft.Text(
-                    "ログアウト (Control+Shift+Q)"
+                    "ログアウト (Shift+Alt+Q)"
                 ),
                 on_click=self.logout_clicked
             ),
@@ -104,14 +104,14 @@ class AppHeader(ft.Row):
         # ダークモード/ライトモードのテーマ切り替え
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="T", shift=True, ctrl=True, alt=False, meta=False,
+                key="T", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=self.toggle_thema_mode,
         )
         # ログアウト
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Q", shift=True, ctrl=True, alt=False, meta=False,
+                key="Q", shift=True, ctrl=False, alt=True, meta=False,
             ),
             func=self.logout_clicked,
         )
