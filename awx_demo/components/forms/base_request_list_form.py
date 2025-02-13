@@ -422,24 +422,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             func=self.on_selected_delete,
         )
 
-        max_row_shortcuts = min(10, len(self.dtRequests.rows))
-        # 申請の編集
-        for row_index in range(0, max_row_shortcuts):
-            request_id = self.dtRequests.rows[row_index].cells[self.REQUEST_ID_COLUMN_NUMBER].content.value
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key=f"{row_index}", shift=True, ctrl=False, alt=False, meta=False,
-                ),
-                func=lambda e, request_id=request_id: self.on_request_edit_open(request_id=request_id),
-            )
-        # 申請の選択・選択解除
-        for selected_index in range(0, max_row_shortcuts):
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key=f"{selected_index}", shift=True, ctrl=False, alt=True, meta=False,
-                ),
-                func=lambda e, selected_index=selected_index: self.on_request_row_select(selected_index=selected_index),
-            )
+        self._register_key_shortcuts_rows()
 
     @Logging.func_logger
     def unregister_key_shortcuts(self):
@@ -504,6 +487,33 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
                 key="R", shift=True, ctrl=False, alt=True, meta=False,
             ),
         )
+        self._unregister_key_shortcuts_rows()
+
+    @Logging.func_logger
+    def _register_key_shortcuts_rows(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        max_row_shortcuts = min(10, len(self.dtRequests.rows))
+        # 申請の編集
+        for row_index in range(0, max_row_shortcuts):
+            request_id = self.dtRequests.rows[row_index].cells[self.REQUEST_ID_COLUMN_NUMBER].content.value
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=f"{row_index}", shift=True, ctrl=False, alt=False, meta=False,
+                ),
+                func=lambda e, request_id=request_id: self.on_request_edit_open(request_id=request_id),
+            )
+        # 申請の選択・選択解除
+        for selected_index in range(0, max_row_shortcuts):
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=f"{selected_index}", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=lambda e, selected_index=selected_index: self.on_request_row_select(selected_index=selected_index),
+            )
+
+    @Logging.func_logger
+    def _unregister_key_shortcuts_rows(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 申請の編集
         for row_index in range(0, 10):
             keyboard_shortcut_manager.unregister_key_shortcut(
@@ -564,6 +574,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     def refresh(self):
         RequestRowHelper.refresh_data_rows(self)
         RequestRowHelper.refresh_page_indicator(self)
+        self._unregister_key_shortcuts_rows()
+        self._register_key_shortcuts_rows()
         self.btnActions.disabled = True
         self.btnActions.update()
 
