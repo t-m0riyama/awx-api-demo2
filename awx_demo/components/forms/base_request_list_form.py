@@ -426,68 +426,69 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def unregister_key_shortcuts(self):
-        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # 申請の新規作成
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # 依頼内容に含まれる文字の検索を実行
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Enter", shift=False, ctrl=True, alt=False, meta=False,
-            ),
-        )
-        # 申請一覧の再読み込み
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="R", shift=False, ctrl=True, alt=True, meta=False,
-            ),
-        )
-        # 申請一覧のページ送り / 次のページへ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
-            ),
-        )
-        # 申請一覧のページ送り / 前のページへ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
-            ),
-        )
-        # 申請の状態の変更 => 申請中
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="I", shift=True, ctrl=False, alt=True, meta=False,
-            ),
-        )
-        # 申請の状態の変更 => 承認済み
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="P", shift=True, ctrl=False, alt=True, meta=False,
-            ),
-        )
-        # 申請の状態の変更 => 作業完了
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="E", shift=True, ctrl=False, alt=True, meta=False,
-            ),
-        )
-        # 申請の削除
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="R", shift=True, ctrl=False, alt=True, meta=False,
-            ),
-        )
-        self._unregister_key_shortcuts_rows()
+        if self.page:
+            keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+            # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="F", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # 申請の新規作成
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="N", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # 依頼内容に含まれる文字の検索を実行
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+                ),
+            )
+            # 申請一覧の再読み込み
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="R", shift=False, ctrl=True, alt=True, meta=False,
+                ),
+            )
+            # 申請一覧のページ送り / 次のページへ
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+            )
+            # 申請一覧のページ送り / 前のページへ
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+                ),
+            )
+            # 申請の状態の変更 => 申請中
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="I", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+            )
+            # 申請の状態の変更 => 承認済み
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="P", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+            )
+            # 申請の状態の変更 => 作業完了
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="E", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+            )
+            # 申請の削除
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="R", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+            )
+            self._unregister_key_shortcuts_rows()
 
     @Logging.func_logger
     def _register_key_shortcuts_rows(self):

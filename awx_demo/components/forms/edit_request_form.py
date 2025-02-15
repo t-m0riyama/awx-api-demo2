@@ -383,94 +383,95 @@ class EditRequestForm(BaseWizardCard):
 
     @Logging.func_logger
     def unregister_key_shortcuts(self):
-        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-        # 次のページへ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # 申請の保存
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="S", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # 申請の複製
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="D", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # キャンセル
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # 共通タブに切り替え
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="G", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # 変更対象タブに切り替え
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="O", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
+        if self.page:
+            keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+            # 次のページへ
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="N", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # 申請の保存
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="S", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # 申請の複製
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="D", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # キャンセル
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="X", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # 共通タブに切り替え
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="G", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # 変更対象タブに切り替え
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="O", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
 
-        # 申請の種類に応じて、タブに対応したキーボードショートカットを登録
-        db_session = db.get_db()
-        request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
-        db_session.close()
-        match request_operation:
-            case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
-                # CPUタブに切り替え
-                keyboard_shortcut_manager.unregister_key_shortcut(
-                    key_set=keyboard_shortcut_manager.create_key_set(
-                        key="C", shift=True, ctrl=False, alt=True, meta=False
-                    ),
-                )
-                # メモリタブに切り替え
-                keyboard_shortcut_manager.unregister_key_shortcut(
-                    key_set=keyboard_shortcut_manager.create_key_set(
-                        key="M", shift=True, ctrl=False, alt=True, meta=False
-                    ),
-                )
-            case RequestOperation.VM_START_OR_STOP_FRIENDLY:
-                # 起動/停止タブに切り替え
-                keyboard_shortcut_manager.unregister_key_shortcut(
-                    key_set=keyboard_shortcut_manager.create_key_set(
-                        key="B", shift=True, ctrl=False, alt=True, meta=False
-                    ),
-                )
+            # 申請の種類に応じて、タブに対応したキーボードショートカットを登録
+            db_session = db.get_db()
+            request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
+            db_session.close()
+            match request_operation:
+                case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
+                    # CPUタブに切り替え
+                    keyboard_shortcut_manager.unregister_key_shortcut(
+                        key_set=keyboard_shortcut_manager.create_key_set(
+                            key="C", shift=True, ctrl=False, alt=True, meta=False
+                        ),
+                    )
+                    # メモリタブに切り替え
+                    keyboard_shortcut_manager.unregister_key_shortcut(
+                        key_set=keyboard_shortcut_manager.create_key_set(
+                            key="M", shift=True, ctrl=False, alt=True, meta=False
+                        ),
+                    )
+                case RequestOperation.VM_START_OR_STOP_FRIENDLY:
+                    # 起動/停止タブに切り替え
+                    keyboard_shortcut_manager.unregister_key_shortcut(
+                        key_set=keyboard_shortcut_manager.create_key_set(
+                            key="B", shift=True, ctrl=False, alt=True, meta=False
+                        ),
+                    )
 
-        # 管理情報タブに切り替え
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="A", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # ログへのセッションダンプ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # Semantics Debuggerの有効化/無効化
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # ログへのキーボードショートカット一覧出力
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
+            # 管理情報タブに切り替え
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="A", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # ログへのセッションダンプ
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="V", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # Semantics Debuggerの有効化/無効化
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="Y", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # ログへのキーボードショートカット一覧出力
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="Z", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
 
     @Logging.func_logger
     def on_click_duplicate(self, e):

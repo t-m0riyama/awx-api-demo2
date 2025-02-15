@@ -64,43 +64,44 @@ class BaseWizardCard(ft.Card):
 
     @Logging.func_logger
     def unregister_key_shortcuts(self):
-        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-        # 次へ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # 前へ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="P", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # キャンセル
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # ログへのセッションダンプ
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # Semantics Debuggerの有効化/無効化
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
-        # ログへのキーボードショートカット一覧出力
-        keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=False, alt=True, meta=False
-            ),
-        )
+        if self.page:
+            keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+            # 次へ
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="N", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # 前へ
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="P", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # キャンセル
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="X", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # ログへのセッションダンプ
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="V", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # Semantics Debuggerの有効化/無効化
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="Y", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            # ログへのキーボードショートカット一覧出力
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="Z", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
 
     @Logging.func_logger
     def on_click_cancel(self, e):

@@ -113,13 +113,14 @@ class SetVmMemoryForm(BaseWizardCard):
 
     # @Logging.func_logger
     # def unregister_key_shortcuts(self):
-    #     keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-    #     # autofocus=Trueである、最初のコントロールにフォーカスを移動する
-    #     keyboard_shortcut_manager.unregister_key_shortcut(
-    #         key_set=keyboard_shortcut_manager.create_key_set(
-    #             key="F", shift=True, ctrl=False, alt=True, meta=False
-    #         ),
-    #     )
+    #     if self.page:
+    #         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+    #         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+    #         keyboard_shortcut_manager.unregister_key_shortcut(
+    #             key_set=keyboard_shortcut_manager.create_key_set(
+    #                 key="F", shift=True, ctrl=False, alt=True, meta=False
+    #             ),
+    #         )
 
     @Logging.func_logger
     def generate_confirm_text(self):
