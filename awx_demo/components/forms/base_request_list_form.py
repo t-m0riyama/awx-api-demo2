@@ -706,6 +706,9 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     def on_click_next_page(self, e):
         self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if self.btnNextPage.disabled:
+            self._unlock_form_controls()
+            return
         request_data_count = RequestRowHelper.count_request_all(self)
         self._unlock_form_controls()
         if (self.data_row_offset + 1) < request_data_count:
@@ -716,6 +719,9 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     def on_click_previous_page(self, e):
         self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if self.btnPreviousPage.disabled:
+            self._unlock_form_controls()
+            return
         self._unlock_form_controls()
         if (self.data_row_offset + 1) > self.DATA_ROW_MAX:
             self.data_row_offset -= self.DATA_ROW_MAX
