@@ -9,6 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from awx_demo.awx_api.awx_api_helper import AWXApiHelper
 from awx_demo.components.compounds.form_description import FormDescription
 from awx_demo.components.compounds.form_title import FormTitle
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.wizards.base_wizard_card import BaseWizardCard
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
@@ -62,7 +63,7 @@ class JobProgressForm(BaseWizardCard):
             )
         )
         self.btnExit = ft.FilledButton(
-            '閉じる', tooltip='閉じる (Shift+Alt+X)', on_click=self.on_click_cancel, disabled=True)
+            '閉じる', tooltip='閉じる (Shift+Alt+X)', on_click=self.on_click_exit, disabled=True)
 
         # Content
         header = ft.Container(
@@ -180,6 +181,42 @@ class JobProgressForm(BaseWizardCard):
         elif next_runnable == self.JOB_STATUS_CHECK_RESULT_EXECUTABLE_TIMEOUT:
             self._on_job_status_timeout()
             return
+
+    @Logging.func_logger
+    def on_click_exit(self, e):
+        if self.btnExit.disabled: return
+        self.on_click_cancel(e)
+
+    @Logging.func_logger
+    def register_key_shortcuts(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        super().register_key_shortcuts()
+        # キャンセル（登録解除）
+        keyboard_shortcut_manager.unregister_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="X", shift=True, ctrl=False, alt=True, meta=False
+            ),
+        )
+
+        # 閉じる
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="X", shift=True, ctrl=False, alt=True, meta=False
+            ),
+            func=self.on_click_exit,
+        )
+
+    @Logging.func_logger
+    def unregister_key_shortcuts(self):
+        if self.page:
+            keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+            # 閉じる
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="X", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
+            super().unregister_key_shortcuts()
 
     @Logging.func_logger
     def _job_next_runnable(self):
