@@ -483,6 +483,7 @@ class EditRequestForm(BaseWizardCard):
 
     @Logging.func_logger
     def on_click_next(self, e):
+        if self.btnExecute.disabled: return
         self.session.set('confirm_text', self.generate_confirm_text())
         Logging.info('JOB_OPTIONS: ' + str(self.session.get('job_options')))
         self.step_change_next(e)
