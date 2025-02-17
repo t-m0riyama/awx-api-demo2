@@ -335,7 +335,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             # title=ft.Text("削除の確認"),
             content=formDeleteConfirm,
             actions=[
-                ft.ElevatedButton("はい", tooltip="はい (Control+Shift+Y)", on_click=self.on_click_delete_request_yes),
+                ft.ElevatedButton("はい", tooltip="はい (Shift+Alt+Y)", on_click=self.on_click_delete_request_yes),
                 ft.FilledButton(
                     "キャンセル", tooltip="キャンセル (Esc)", on_click=self.on_click_delete_request_cancel
                 ),
@@ -651,7 +651,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         # 削除確認時に”はい”を選択
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=True, alt=False, meta=False
+                key="Y", shift=True, ctrl=False, alt=True, meta=False
             ),
             func=self.on_click_delete_request_yes,
         )
