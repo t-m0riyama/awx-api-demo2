@@ -235,6 +235,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             icon=ft.Icons.SEARCH,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             on_click=self.on_click_search_request_text,
+            on_focus=self.on_focus_search_request_text,
+            on_blur=self.on_blur_search_request_text,
             autofocus=True,
             tooltip="検索 (Control+Enter)",
         )
@@ -737,6 +739,23 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchRequestText.value)
         self.refresh()
+
+    @Logging.func_logger
+    def on_focus_search_request_text(self, e):
+        self._lock_form_controls()
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.save_key_shortcuts()
+        keyboard_shortcut_manager.clear_key_shortcuts()
+
+    @Logging.func_logger
+    def on_blur_search_request_text(self, e):
+        self._lock_form_controls()
+        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        self._unlock_form_controls()
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        keyboard_shortcut_manager.restore_key_shortcuts()
 
     @Logging.func_logger
     def _lock_form_controls(self):
