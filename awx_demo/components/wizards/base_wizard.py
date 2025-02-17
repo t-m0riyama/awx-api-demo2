@@ -32,8 +32,8 @@ class BaseWizard(metaclass=abc.ABCMeta):
         self.wizard_dialog.open = False
         self.restore_parent_view_title()
         self.page.update()
-        self.parent_refresh_func()
         self._restore_key_shortcuts()
+        self.parent_refresh_func()
 
     @Logging.func_logger
     def on_click_save(self, e):
@@ -42,8 +42,8 @@ class BaseWizard(metaclass=abc.ABCMeta):
         self.wizard_dialog.open = False
         self.restore_parent_view_title()
         self.page.update()
-        self.parent_refresh_func()
         self._restore_key_shortcuts()
+        self.parent_refresh_func()
 
     @Logging.func_logger
     def on_click_duplicate(self, e):
@@ -52,8 +52,8 @@ class BaseWizard(metaclass=abc.ABCMeta):
         self.wizard_dialog.open = False
         self.restore_parent_view_title()
         self.page.update()
-        self.parent_refresh_func()
         self._restore_key_shortcuts()
+        self.parent_refresh_func()
 
     @abc.abstractmethod
     def on_click_next(self, e):

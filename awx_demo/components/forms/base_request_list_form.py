@@ -575,8 +575,6 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     def refresh(self):
         RequestRowHelper.refresh_data_rows(self)
         RequestRowHelper.refresh_page_indicator(self)
-        self._unregister_key_shortcuts_rows()
-        self._register_key_shortcuts_rows()
         self.btnActions.disabled = True
         self.btnActions.update()
 

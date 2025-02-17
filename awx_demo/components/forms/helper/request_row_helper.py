@@ -157,6 +157,8 @@ class RequestRowHelper:
             )
             shortcut_index += 1
         request_list_form.dtRequests.update()
+        request_list_form._unregister_key_shortcuts_rows()
+        request_list_form._register_key_shortcuts_rows()
 
     @staticmethod
     @Logging.func_logger
