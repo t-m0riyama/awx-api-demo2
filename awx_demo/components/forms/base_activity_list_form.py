@@ -376,6 +376,9 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_next_page(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if self.btnNextPage.disabled:
+            self._unlock_form_controls()
+            return
         request_data_count = ActivityRowHelper.count_activity_all(self)
         if (self.data_row_offset + 1) < request_data_count:
             self.data_row_offset += self.DATA_ROW_MAX
@@ -384,6 +387,9 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_previous_page(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if self.btnPreviousPage.disabled:
+            self._unlock_form_controls()
+            return
         if (self.data_row_offset + 1) > self.DATA_ROW_MAX:
             self.data_row_offset -= self.DATA_ROW_MAX
             self.refresh()
