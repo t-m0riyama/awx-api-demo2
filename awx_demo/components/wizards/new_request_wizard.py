@@ -94,4 +94,5 @@ class NewRequestWizard(BaseWizard):
                 self.wizard_dialog.content = self.formStep
                 self.page.title = f"{self.session.get('app_title_base')} - 申請の追加"
                 self.page.open(self.wizard_dialog)
+                self.formStep.register_key_shortcuts()
         self.page.update()
