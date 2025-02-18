@@ -132,3 +132,4 @@ class NavigationRouter:
             self.page.title = page_title_new
             self.page.add(layout)
             self.page.update()
+            self.formRequests.refresh()
