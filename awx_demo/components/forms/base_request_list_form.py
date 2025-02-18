@@ -608,11 +608,9 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_change_request_status(self, e=None, status_text=None):
-        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
-        if self.btnActions.disabled:
-            self._unlock_form_controls()
-            return
+        if self.btnActions.disabled: return
+        self._lock_form_controls()
 
         # キーボードショートカットから呼ばれた場合、
         # status_textにセットされている値を変更したいステータスの代わりに利用する
@@ -627,6 +625,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             request_status = ""
         self._unlock_form_controls()
         RequestRowHelper.update_selected_request_status(self, request_status)
+        self.refresh()
 
     @Logging.func_logger
     def on_change_request_iaas_user(self, e):
