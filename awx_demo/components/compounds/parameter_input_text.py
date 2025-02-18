@@ -4,7 +4,7 @@ import flet as ft
 class ParameterInputText(ft.TextField):
 
     def __init__(self, value=None, label='', hint_text='', helper_text='', is_password=False, text_size=16, text_align=ft.TextAlign.LEFT,
-                 max_length=None, width=0, expand=False, input_filter=None, disabled=False, on_change=None, on_submit=None):
+                 max_length=None, width=0, expand=False, input_filter=None, disabled=False, on_change=None, on_submit=None, on_focus=None, on_blur=None):
         if width:
             super().__init__(
                 value=value,
@@ -22,6 +22,8 @@ class ParameterInputText(ft.TextField):
                 disabled=disabled,
                 on_change=on_change,
                 on_submit=on_submit,
+                on_focus=on_focus,
+                on_blur=on_blur,
                 width=width,
                 expand=expand,
             )
@@ -43,5 +45,7 @@ class ParameterInputText(ft.TextField):
                 disabled=disabled,
                 on_change=on_change,
                 on_submit=on_submit,
+                on_focus=on_focus,
+                on_blur=on_blur,
                 expand=expand,
             )
