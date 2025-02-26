@@ -229,8 +229,6 @@ class SendRequestConfirmForm(BaseWizardCard):
 
         self._unlock_form_controls()
         self.step_change_next(e)
-        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-        keyboard_shortcut_manager.restore_key_shortcuts()
 
     @Logging.func_logger
     def on_change_shutdown_before_change(self, e):

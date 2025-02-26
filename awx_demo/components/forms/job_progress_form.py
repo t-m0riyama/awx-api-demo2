@@ -190,7 +190,6 @@ class JobProgressForm(BaseWizardCard):
     @Logging.func_logger
     def register_key_shortcuts(self):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-        super().register_key_shortcuts()
         # キャンセル（登録解除）
         keyboard_shortcut_manager.unregister_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
@@ -216,7 +215,6 @@ class JobProgressForm(BaseWizardCard):
                     key="X", shift=True, ctrl=False, alt=True, meta=False
                 ),
             )
-            super().unregister_key_shortcuts()
 
     @Logging.func_logger
     def _job_next_runnable(self):
