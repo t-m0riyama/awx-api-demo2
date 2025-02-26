@@ -197,6 +197,13 @@ class JobProgressForm(BaseWizardCard):
             ),
         )
 
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="F", shift=True, ctrl=False, alt=True, meta=False
+            ),
+            func=lambda e: self.btnExit.focus()
+        )
         # 閉じる
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
@@ -209,6 +216,12 @@ class JobProgressForm(BaseWizardCard):
     def unregister_key_shortcuts(self):
         if self.page:
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+            # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="F", shift=True, ctrl=False, alt=True, meta=False
+                ),
+            )
             # 閉じる
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
