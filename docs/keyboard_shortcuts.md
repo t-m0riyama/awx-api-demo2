@@ -27,13 +27,13 @@ AWX API DEMO キーボードショートカット一覧
   - 'Z': 'shift':True,'ctrl':False,'alt':True		キーボードショートカット一覧のログ出力（デバッグ用）
 
 * 新規作成画面
-  - 'F': 'shift':True,'ctrl':False,'alt':True		コントロールフォーカスの初期化
+  - 'F': 'shift':True,'ctrl':False,'alt':True		コントロールフォーカスの初期化（デバッグ用）
   - 'N': 'shift':True,'ctrl':False,'alt':True		次へ、申請する
   - 'P': 'shift':True,'ctrl':False,'alt':True		戻る
   - 'X': 'shift':True,'ctrl':False,'alt':True		キャンセル
 
 * 編集画面
-  - 'F': 'shift':True,'ctrl':False,'alt':True		コントロールフォーカスの初期化
+  - 'F': 'shift':True,'ctrl':False,'alt':True		コントロールフォーカスの初期化（デバッグ用）
   - 'N': 'shift':True,'ctrl':False,'alt':True		実行
   - 'P': 'shift':True,'ctrl':False,'alt':True		戻る
   - 'S': 'shift':True,'ctrl':False,'alt':True		保存
