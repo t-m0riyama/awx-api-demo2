@@ -66,9 +66,13 @@ class MailNotificator:
     def notify(cls, notification_spec: NotificationSpec):
         smtp_host = os.getenv("RMX_MAIL_SMTP_HOST", None)
         if not smtp_host:
-            Logging.error('環境変数 RMX_MAIL_SMTP_HOST が設定されていないため、MAILメッセージ通知が行えませんでした。')
-            Logging.error('環境変数 RMX_MAIL_SMTP_HOST にメールサーバのホスト名またはIPアドレスを設定してください。')
+            Logging.error(f'環境変数 RMX_MAIL_SMTP_HOST が設定されていないため、MAILメッセージ通知が行えませんでした。 {notification_spec.title}')
+            Logging.error(f'環境変数 RMX_MAIL_SMTP_HOST にメールサーバのホスト名またはIPアドレスを設定してください。 {notification_spec.title}')
             return None
+        if notification_spec.mail_to_address is None or notification_spec.mail_to_address.strip() == "":
+            Logging.error(f'通知先のアカウントにメールアドレスが設定されていないため、MAILメッセージ通知が行えませんでした。 {notification_spec.title}')
+            return None
+
         smtp_port = int(os.getenv("RMX_MAIL_SMTP_PORT", cls.RMX_MAIL_SMTP_PORT_DEFAULT))
         smtp_auth_enabled = bool(strtobool(os.getenv("RMX_MAIL_SMTP_AUTH_ENABLED", cls.RMX_MAIL_SMTP_AUTH_ENABLED_DEFAULT)))
         smtp_auth_username = os.getenv("RMX_MAIL_SMTP_AUTH_USERNAME", cls.RMX_MAIL_SMTP_AUTH_USERNAME_DEFAULT)
