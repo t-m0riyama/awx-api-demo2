@@ -25,6 +25,7 @@ awx-api-demo2
  |   `-- utils: Utilitiy modules
  |-- docs: other documents
  |-- main.py: main script
+ |-- script: helerp script
  `-- requirements.txt: dependent modules
 ```
 
