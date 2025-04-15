@@ -4,6 +4,7 @@ from awx_demo.components.app_header import AppHeader
 from awx_demo.components.forms.all_activity_list_form import AllActivityListForm
 from awx_demo.components.forms.all_request_list_form import AllRequestListForm
 from awx_demo.components.forms.completed_request_list_form import CompletedRequestListForm
+from awx_demo.components.forms.dashboard_form import DashboardForm
 from awx_demo.components.forms.deadline_request_list_form import DeadlineRequestListForm
 from awx_demo.components.forms.latest_request_list_form import LatestRequestListForm
 from awx_demo.components.forms.my_activity_list_form import MyActivityListForm
@@ -48,50 +49,20 @@ class NavigationRouter:
 
             if self.session.get('user_role') == UserRole.USER_ROLE:
                 match template_route.route:
+                    case '/dashboard':
+                        self.formRequests = DashboardForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - ダッシュボード"
+                        navigation_selected_index = 0
                     case '/latest_requests':
                         self.formRequests = LatestRequestListForm(
                             self.session, self.page)
                         page_title_new = f"{self.app_title_base} - 最新の申請"
-                        navigation_selected_index = 0
+                        navigation_selected_index = 1
                     case '/deadline_requests':
                         self.formRequests = DeadlineRequestListForm(
                             self.session, self.page)
                         page_title_new = f"{self.app_title_base} - リリース希望日順"
-                        navigation_selected_index = 1
-                    case '/all_requests':
-                        self.formRequests = AllRequestListForm(
-                            self.session, self.page)
-                        page_title_new = f"{self.app_title_base} - すべての申請"
-                        navigation_selected_index = 2
-                    case '/completed_requests':
-                        self.formRequests = CompletedRequestListForm(
-                            self.session, self.page)
-                        page_title_new = f"{self.app_title_base} - 完了済みの申請"
-                        navigation_selected_index = 3
-                    case '/my_activities':
-                        self.formRequests = MyActivityListForm(
-                            self.session, self.page)
-                        page_title_new = f"{self.app_title_base} - 操作履歴"
-                        navigation_selected_index = 0
-                    case _:
-                        Logging.error("error undefined route")
-                        navigation_selected_index = 0
-            else:
-                match template_route.route:
-                    case '/latest_requests':
-                        self.formRequests = LatestRequestListForm(
-                            self.session, self.page)
-                        page_title_new = f"{self.app_title_base} - 最新の申請"
-                        navigation_selected_index = 0
-                    case '/deadline_requests':
-                        self.formRequests = DeadlineRequestListForm(
-                            self.session, self.page)
-                        page_title_new = f"{self.app_title_base} - リリース希望日順"
-                        navigation_selected_index = 1
-                    case '/my_requests':
-                        self.formRequests = MyRequestListForm(
-                            self.session, self.page)
-                        page_title_new = f"{self.app_title_base} - 自身の申請"
                         navigation_selected_index = 2
                     case '/all_requests':
                         self.formRequests = AllRequestListForm(
@@ -103,6 +74,46 @@ class NavigationRouter:
                             self.session, self.page)
                         page_title_new = f"{self.app_title_base} - 完了済みの申請"
                         navigation_selected_index = 4
+                    case '/my_activities':
+                        self.formRequests = MyActivityListForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - 操作履歴"
+                        navigation_selected_index = 0
+                    case _:
+                        Logging.error("error undefined route")
+                        navigation_selected_index = 0
+            else:
+                match template_route.route:
+                    case '/dashboard':
+                        self.formRequests = DashboardForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - ダッシュボード"
+                        navigation_selected_index = 0
+                    case '/latest_requests':
+                        self.formRequests = LatestRequestListForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - 最新の申請"
+                        navigation_selected_index = 1
+                    case '/deadline_requests':
+                        self.formRequests = DeadlineRequestListForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - リリース希望日順"
+                        navigation_selected_index = 2
+                    case '/my_requests':
+                        self.formRequests = MyRequestListForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - 自身の申請"
+                        navigation_selected_index = 3
+                    case '/all_requests':
+                        self.formRequests = AllRequestListForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - すべての申請"
+                        navigation_selected_index = 4
+                    case '/completed_requests':
+                        self.formRequests = CompletedRequestListForm(
+                            self.session, self.page)
+                        page_title_new = f"{self.app_title_base} - 完了済みの申請"
+                        navigation_selected_index = 5
                     case '/all_activities':
                         self.formRequests = AllActivityListForm(
                             self.session, self.page)

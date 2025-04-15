@@ -1,3 +1,4 @@
+import datetime
 import json
 
 import flet as ft
@@ -32,8 +33,10 @@ class RequestRowHelper:
         else:
             row_id_content = ft.Text(str(row_id), color=ft.Colors.PRIMARY)
 
+        deadline_icon = RequestRowHelper._request_deadline_to_icon(request_data.request_deadline)
         return ft.DataRow(
             cells=[
+                ft.DataCell(deadline_icon if deadline_icon else ft.Text('')),
                 ft.DataCell(RequestRowHelper._request_status_to_icon(
                     request_data.request_status)),
                 ft.DataCell(row_id_content, on_tap=request_list_form.on_request_edit_open),
@@ -46,6 +49,72 @@ class RequestRowHelper:
             ],
             on_select_changed=request_list_form.on_request_row_select,
         )
+
+    @staticmethod
+    @Logging.func_logger
+    def generate_request_table(
+            show_checkbox_column=False,
+            heading_row_height=40,
+            data_row_max_height=50,
+            sort_column_index=2,
+            is_sort_ascending=True,
+            on_sort_func=None
+        ):
+        dtRequests = ft.DataTable(
+            columns=[
+                ft.DataColumn(ft.Text("")),
+                ft.DataColumn(ft.Text("")),
+                ft.DataColumn(
+                    ft.Text("依頼ID"), on_sort=on_sort_func
+                ),
+                ft.DataColumn(
+                    ft.Text("リリース希望日"), on_sort=on_sort_func
+                ),
+                ft.DataColumn(
+                    ft.Text("最終更新日"), on_sort=on_sort_func
+                ),
+                ft.DataColumn(
+                    ft.Text("申請者"), on_sort=on_sort_func
+                ),
+                ft.DataColumn(
+                    ft.Text("作業担当者"), on_sort=on_sort_func
+                ),
+                ft.DataColumn(
+                    ft.Text("申請項目"), on_sort=on_sort_func
+                ),
+                ft.DataColumn(
+                    ft.Text("依頼内容"), on_sort=on_sort_func
+                ),
+            ],
+            rows=[],
+            show_checkbox_column=show_checkbox_column,
+            show_bottom_border=True,
+            border=ft.border.all(2, ft.Colors.SURFACE_CONTAINER_HIGHEST),
+            border_radius=10,
+            divider_thickness=1,
+            heading_row_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+            heading_row_height=heading_row_height,
+            data_row_max_height=data_row_max_height,
+            column_spacing=15,
+            sort_column_index=sort_column_index,
+            sort_ascending=is_sort_ascending,
+            # expand=True,
+            checkbox_horizontal_margin=15,
+            # data_row_color={"hovered": "0x30FF0000"},
+        )
+        dtRequests.rows = []
+        return dtRequests
+
+    @staticmethod
+    def _request_deadline_to_icon(request_deadline):
+        now = datetime.datetime.now()
+        now_date = datetime.date(now.year, now.month, now.day)
+        deadline_datetime = datetime.datetime.strptime(f'{request_deadline} 00:00:00', '%Y/%m/%d %H:%M:%S')
+        deadline_date = datetime.date(deadline_datetime.year, deadline_datetime.month, deadline_datetime.day)
+        if now_date >= deadline_date:
+            return ft.Icon(name=ft.Icons.PRIORITY_HIGH_OUTLINED, color=ft.Colors.ERROR, size=18, tooltip='リリース希望日超過')
+        else:
+            return None
 
     @staticmethod
     def _request_status_to_icon(request_status):
@@ -247,6 +316,14 @@ class RequestRowHelper:
 
     @staticmethod
     @Logging.func_logger
+    def count_request(filters):
+        db_session = db.get_db()
+        requests_data = IaasRequestHelper.count_requests(db_session, filters)
+        db_session.close()
+        return requests_data
+
+    @staticmethod
+    @Logging.func_logger
     def sort_column(request_list_form, session, column_label):
         session.set('sort_target_column', column_label)
         # ソート対象が同じ列の場合、昇順と降順を逆転させる
@@ -256,18 +333,18 @@ class RequestRowHelper:
 
         match column_label:
             case '依頼ID':
-                request_list_form.dtRequests.sort_column_index = 1
-            case 'リリース希望日':
                 request_list_form.dtRequests.sort_column_index = 2
-            case '最終更新日':
+            case 'リリース希望日':
                 request_list_form.dtRequests.sort_column_index = 3
-            case '申請者':
+            case '最終更新日':
                 request_list_form.dtRequests.sort_column_index = 4
-            case '作業担当者':
+            case '申請者':
                 request_list_form.dtRequests.sort_column_index = 5
-            case '申請項目':
+            case '作業担当者':
                 request_list_form.dtRequests.sort_column_index = 6
-            case '依頼内容':
+            case '申請項目':
                 request_list_form.dtRequests.sort_column_index = 7
+            case '依頼内容':
+                request_list_form.dtRequests.sort_column_index = 8
         session.set('sort_target_column_old', column_label)
         RequestRowHelper.refresh_data_rows(request_list_form)

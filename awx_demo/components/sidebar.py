@@ -26,6 +26,16 @@ class Sidebar(ft.Container):
             self.main_nav_rail_items = [
                 ft.NavigationRailDestination(
                     icon=ft.Icon(
+                        ft.Icons.ANALYTICS, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.ANALYTICS_OUTLINED, size=self.ICON_SIZE),
+                    label_content=ft.Text(
+                        "ダッシュボード",
+                        tooltip="ダッシュボード (Shift+Alt+B)",
+                    )
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(
                         ft.Icons.FIBER_NEW, size=self.ICON_SIZE),
                     selected_icon=ft.Icon(
                         ft.Icons.FIBER_NEW_OUTLINED, size=self.ICON_SIZE),
@@ -65,6 +75,16 @@ class Sidebar(ft.Container):
             ]
         else:
             self.main_nav_rail_items = [
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(
+                        ft.Icons.ANALYTICS, size=self.ICON_SIZE),
+                    selected_icon=ft.Icon(
+                        ft.Icons.ANALYTICS_OUTLINED, size=self.ICON_SIZE),
+                    label_content=ft.Text(
+                        "ダッシュボード",
+                        tooltip="ダッシュボード (Shift+Alt+B)",
+                    )
+                ),
                 ft.NavigationRailDestination(
                     icon=ft.Icon(
                         ft.Icons.FIBER_NEW, size=self.ICON_SIZE),
@@ -228,62 +248,19 @@ class Sidebar(ft.Container):
                 key_set=keyboard_shortcut_manager.create_key_set(
                     key="L", shift=True, ctrl=False, alt=True, meta=False,
                 ),
-                func=partial(self.on_click_main_navigation_item, item_index=0),
+                func=partial(self.on_click_main_navigation_item, item_index=1),
             )
             # リリース希望日順
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
                     key="D", shift=True, ctrl=False, alt=True, meta=False,
                 ),
-                func=partial(self.on_click_main_navigation_item, item_index=1),
+                func=partial(self.on_click_main_navigation_item, item_index=2),
             )
             # 自身の申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
                     key="M", shift=True, ctrl=False, alt=True, meta=False,
-                ),
-                func=partial(self.on_click_main_navigation_item, item_index=2),
-            )
-            # 完了済みの申請
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="E", shift=True, ctrl=False, alt=True, meta=False,
-                ),
-                func=partial(self.on_click_main_navigation_item, item_index=3),
-            )
-            # 操作履歴
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="H", shift=True, ctrl=False, alt=True, meta=False,
-                ),
-                func=partial(self.on_click_option_navigation_item, item_index=0),
-            )
-        else:
-            # 最新の申請
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="L", shift=True, ctrl=False, alt=True, meta=False,
-                ),
-                func=partial(self.on_click_main_navigation_item, item_index=0),
-            )
-            # リリース希望日順
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="D", shift=True, ctrl=False, alt=True, meta=False,
-                ),
-                func=partial(self.on_click_main_navigation_item, item_index=1),
-            )
-            # 自身の申請
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="M", shift=True, ctrl=False, alt=True, meta=False,
-                ),
-                func=partial(self.on_click_main_navigation_item, item_index=2),
-            )
-            # 全ての申請
-            keyboard_shortcut_manager.register_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="A", shift=True, ctrl=False, alt=True, meta=False,
                 ),
                 func=partial(self.on_click_main_navigation_item, item_index=3),
             )
@@ -301,6 +278,49 @@ class Sidebar(ft.Container):
                 ),
                 func=partial(self.on_click_option_navigation_item, item_index=0),
             )
+        else:
+            # 最新の申請
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="L", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=1),
+            )
+            # リリース希望日順
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="D", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=2),
+            )
+            # 自身の申請
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="M", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=3),
+            )
+            # 全ての申請
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="A", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=4),
+            )
+            # 完了済みの申請
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="E", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=5),
+            )
+            # 操作履歴
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="H", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_option_navigation_item, item_index=0),
+            )
 
     def on_click_main_navigation_item(self, e, item_index=None):
         # キーボードショートカットから呼ばれた場合、
@@ -309,24 +329,28 @@ class Sidebar(ft.Container):
         if self.session.get('user_role') == UserRole.USER_ROLE:
             match selected_index:
                 case 0:
-                    e.page.go('/latest_requests')
+                    e.page.go('/dashboard')
                 case 1:
-                    e.page.go('/deadline_requests')
+                    e.page.go('/latest_requests')
                 case 2:
-                    e.page.go('/all_requests')
+                    e.page.go('/deadline_requests')
                 case 3:
+                    e.page.go('/all_requests')
+                case 4:
                     e.page.go('/completed_requests')
         else:
             match selected_index:
                 case 0:
-                    e.page.go('/latest_requests')
+                    e.page.go('/dashboard')
                 case 1:
-                    e.page.go('/deadline_requests')
+                    e.page.go('/latest_requests')
                 case 2:
-                    e.page.go('/my_requests')
+                    e.page.go('/deadline_requests')
                 case 3:
-                    e.page.go('/all_requests')
+                    e.page.go('/my_requests')
                 case 4:
+                    e.page.go('/all_requests')
+                case 5:
                     e.page.go('/completed_requests')
 
     def on_click_option_navigation_item(self, e, item_index=None):

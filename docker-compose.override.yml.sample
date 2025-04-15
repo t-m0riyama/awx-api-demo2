@@ -107,7 +107,13 @@ services:
       - RMX_LOG_LEVEL_DB=WARNING
 
       # CPUコア/メモリ割り当て変更を行う、AWX/AAPのジョブテンプレート名
-      JOB_TEMPLATE_SET_VM_CPU_MEMORY=vm-config-utils_set_vm_cpu
+      - JOB_TEMPLATE_SET_VM_CPU_MEMORY=vm-config-utils_set_vm_cpu
 
       # サーバの起動/停止を行う、AWX/AAPのジョブテンプレート名
-      JOB_TEMPLATE_VM_START_STOP=vm-config-utils_vm_start_stop
+      - JOB_TEMPLATE_VM_START_STOP=vm-config-utils_vm_start_stop
+
+      # ダッシュボードで、リリース希望日の近い申請を判定する日数（3を指定すると、現在から3日以内に迫った申請をリリース希望日の近い申請と判定）
+      - RMX_DAYS_AFTER_DEADLINE=3
+
+      # ダッシュボードで、作業完了をカウントする申請の対象期間（30を指定すると、直近30日の作業完了の申請件数をカウント）
+      - RMX_DAYS_BEFORE_COMPLETED_TARGET=30
