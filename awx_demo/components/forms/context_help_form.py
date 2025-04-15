@@ -9,7 +9,7 @@ class ContextHelpForm(ft.Card):
 
     # const
     CONTENT_HEIGHT = 500
-    CONTENT_WIDTH = 500
+    CONTENT_WIDTH = 520
     BODY_HEIGHT = 350
 
     def __init__(self, session, page: ft.Page, title: str, content_md: str):
