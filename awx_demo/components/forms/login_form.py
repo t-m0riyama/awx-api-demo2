@@ -152,7 +152,7 @@ class LoginForm(ft.Card):
             self.session.set("awx_password", password)
             self.session.set("awx_url", awx_url)
             self.unregister_key_shortcuts()
-            e.page.go("/latest_requests")
+            e.page.go("/dashboard")
 
     @Logging.func_logger
     def show_login_failed_message(self, reason):
