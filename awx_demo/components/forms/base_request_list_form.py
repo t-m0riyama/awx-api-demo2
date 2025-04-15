@@ -29,7 +29,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     DEFAULT_SORT_ASCENDING = True
     FORM_TITLE = "最新の申請"
     FILTERED_IAAS_USERS_DEFAULT = "root,admin,awxcli"
-    REQUEST_ID_COLUMN_NUMBER = 1
+    REQUEST_ID_COLUMN_NUMBER = 2
 
     def __init__(self, session, page: ft.Page):
         self.session = session
@@ -38,83 +38,16 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self.session.set("sort_target_column", self.DEFAULT_SORT_TARGET_COLUMN)
 
         formTitle = FormTitle(self.FORM_TITLE, None)
-        self.dtRequests = ft.DataTable(
-            columns=[
-                ft.DataColumn(ft.Text("")),
-                ft.DataColumn(
-                    ft.Text("依頼ID"), on_sort=self.on_click_heading_column
-                ),
-                ft.DataColumn(
-                    ft.Text("リリース希望日"), on_sort=self.on_click_heading_column
-                ),
-                ft.DataColumn(
-                    ft.Text("最終更新日"), on_sort=self.on_click_heading_column
-                ),
-                ft.DataColumn(
-                    ft.Text("申請者"), on_sort=self.on_click_heading_column
-                ),
-                ft.DataColumn(
-                    ft.Text("作業担当者"), on_sort=self.on_click_heading_column
-                ),
-                ft.DataColumn(
-                    ft.Text("申請項目"), on_sort=self.on_click_heading_column
-                ),
-                ft.DataColumn(
-                    ft.Text("依頼内容"), on_sort=self.on_click_heading_column
-                ),
-            ],
-            rows=[],
+        self.dtRequests = RequestRowHelper.generate_request_table(
             show_checkbox_column=True,
-            show_bottom_border=True,
-            border=ft.border.all(2, ft.Colors.SURFACE_CONTAINER_HIGHEST),
-            border_radius=10,
-            divider_thickness=1,
-            heading_row_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             heading_row_height=40,
             data_row_max_height=60,
-            column_spacing=15,
             sort_column_index=self.DEFAULT_SORT_COLUMN_INDEX,
-            sort_ascending=self.DEFAULT_SORT_ASCENDING,
-            # expand=True,
-            checkbox_horizontal_margin=15,
-            # data_row_color={"hovered": "0x30FF0000"},
+            is_sort_ascending=self.DEFAULT_SORT_ASCENDING,
+            on_sort_func=self.on_click_heading_column,
         )
+        self.rowRequests = self.generate_data_rows()
 
-        requests_data = RequestRowHelper.query_request_all(self)
-        self.dtRequests.rows = []
-        shortcut_index = 0
-        for request_data in requests_data:
-            request_row_data = RequestRowData(
-                request_status=request_data.request_status,
-                request_deadline=request_data.request_deadline.strftime("%Y/%m/%d"),
-                updated=request_data.updated.strftime("%Y/%m/%d"),
-                request_user=request_data.request_user,
-                iaas_user=request_data.iaas_user,
-                request_operation=request_data.request_operation,
-                request_text=request_data.request_text,
-            )
-            self.dtRequests.rows.append(
-                RequestRowHelper.generate_request_row(
-                    request_list_form=self,
-                    row_id=request_data.request_id,
-                    request_data=request_row_data,
-                    shortcut_index=shortcut_index,
-                )
-            )
-            shortcut_index += 1
-        self.rowRequests = ft.ResponsiveRow(
-            [
-                ft.SelectionArea(
-                    content=ft.Column(
-                        col={"sm": 12},
-                        controls=[self.dtRequests],
-                        scroll=ft.ScrollMode.AUTO,
-                    )
-                )
-            ],
-            expand=1,
-            vertical_alignment=ft.CrossAxisAlignment.START,
-        )
         self.btnAddRequest = ft.FilledButton(
             text="新規作成",
             tooltip="新規作成 (Shift+Alt+N)",
@@ -346,6 +279,43 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         )
         self.register_key_shortcuts()
         super().__init__(self.controls)
+
+    def generate_data_rows(self):
+        requests_data = RequestRowHelper.query_request_all(self)
+        shortcut_index = 0
+        for request_data in requests_data:
+            request_row_data = RequestRowData(
+                request_status=request_data.request_status,
+                request_deadline=request_data.request_deadline.strftime("%Y/%m/%d"),
+                updated=request_data.updated.strftime("%Y/%m/%d"),
+                request_user=request_data.request_user,
+                iaas_user=request_data.iaas_user,
+                request_operation=request_data.request_operation,
+                request_text=request_data.request_text,
+            )
+            self.dtRequests.rows.append(
+                RequestRowHelper.generate_request_row(
+                    request_list_form=self,
+                    row_id=request_data.request_id,
+                    request_data=request_row_data,
+                    shortcut_index=shortcut_index,
+                )
+            )
+            shortcut_index += 1
+        rowRequests = ft.ResponsiveRow(
+            [
+                ft.SelectionArea(
+                    content=ft.Column(
+                        col={"sm": 12},
+                        controls=[self.dtRequests],
+                        scroll=ft.ScrollMode.AUTO,
+                    )
+                )
+            ],
+            expand=1,
+            vertical_alignment=ft.CrossAxisAlignment.START,
+        )
+        return rowRequests
 
     @Logging.func_logger
     def register_key_shortcuts(self):

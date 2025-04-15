@@ -11,7 +11,7 @@ class DeadlineRequestListForm(BaseRequestListForm):
 
     # const
     DEFAULT_SORT_TARGET_COLUMN = 'リリース希望日'
-    DEFAULT_SORT_COLUMN_INDEX = 2
+    DEFAULT_SORT_COLUMN_INDEX = 3
     DEFAULT_SORT_ASCENDING = True
     FORM_TITLE = 'リリース希望日順'
 

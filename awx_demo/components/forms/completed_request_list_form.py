@@ -11,7 +11,7 @@ class CompletedRequestListForm(BaseRequestListForm):
 
     # const
     DEFAULT_SORT_TARGET_COLUMN = '最終更新日'
-    DEFAULT_SORT_COLUMN_INDEX = 3
+    DEFAULT_SORT_COLUMN_INDEX = 4
     DEFAULT_SORT_ASCENDING = False
     FORM_TITLE = '完了済みの申請'
 
