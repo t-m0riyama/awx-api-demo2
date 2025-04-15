@@ -46,7 +46,7 @@ class DashboardForm(ft.Card):
             tabs=[
                 ft.Tab(
                     tab_content=ft.Text('対応中', tooltip='対応中 (Shift+Alt+G)'),
-                    content=ft.SelectionArea(content=self.formInProgress),
+                    content=self.formInProgress,
                     # height=self.tab_body_height,
                 ),
             ],

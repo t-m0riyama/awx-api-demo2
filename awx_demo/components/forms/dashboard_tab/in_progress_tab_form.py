@@ -271,7 +271,7 @@ class InProgressTabForm(ft.Card):
                         ft.Column(
                             col={"sm": 12},
                             controls=[
-                                self.panelListDeadline,
+                                ft.SelectionArea(content=self.panelListDeadline),
                             ]
                         ),
                     ],
