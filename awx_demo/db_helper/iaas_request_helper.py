@@ -284,11 +284,16 @@ class IaasRequestHelper:
 
     @classmethod
     @Logging.func_logger
-    def get_filter_iaas_user(cls, request_user):
-        if request_user:
-            return and_(base.IaasRequest.iaas_user == request_user)
+    def get_filter_iaas_user(cls, iaas_user):
+        if iaas_user:
+            return and_(base.IaasRequest.iaas_user == iaas_user)
         else:
             return None
+
+    @classmethod
+    @Logging.func_logger
+    def get_filter_iaas_user_is_null(cls):
+        return and_(base.IaasRequest.iaas_user == None)
 
     @classmethod
     @Logging.func_logger
@@ -297,6 +302,11 @@ class IaasRequestHelper:
             return and_(base.IaasRequest.request_user == request_user)
         else:
             return None
+
+    @classmethod
+    @Logging.func_logger
+    def get_filter_request_user_is_null(cls):
+        return and_(base.IaasRequest.request_user == None)
 
     @classmethod
     @Logging.func_logger
@@ -314,6 +324,20 @@ class IaasRequestHelper:
             return and_(base.IaasRequest.request_status.in_(request_statuses))
         else:
             return None
+
+    @classmethod
+    @Logging.func_logger
+    def get_filter_request_updated(cls, days_after_updated=0):
+        updated_delta = datetime.timedelta(hours=(24 * days_after_updated))
+        after = datetime.datetime.now() - updated_delta
+        return and_(base.IaasRequest.updated >= after)
+
+    @classmethod
+    @Logging.func_logger
+    def get_filter_request_deadline(cls, days_before_deadeline=0):
+        near_deadline_delta = datetime.timedelta(hours=(24 * days_before_deadeline))
+        before = datetime.datetime.now() + near_deadline_delta
+        return and_(base.IaasRequest.request_deadline <= before)
 
     @classmethod
     @Logging.func_logger
