@@ -337,7 +337,7 @@ class IaasRequestHelper:
     def get_filter_request_deadline(cls, days_before_deadeline=0):
         near_deadline_delta = datetime.timedelta(hours=(24 * days_before_deadeline))
         before = datetime.datetime.now() + near_deadline_delta
-        return and_(base.IaasRequest.request_deadline <= before)
+        return and_(base.IaasRequest.request_deadline < before)
 
     @classmethod
     @Logging.func_logger
