@@ -55,17 +55,17 @@ class InProgressTabForm(ft.Card):
 ダッシュボードは、現在対応中の申請件数とその一覧を示します。
 ***
 
-### :small_blue_diamond: 自身の申請: 自身が担当する申請件数です。
+### :eight_spoked_asterisk: 自身の申請: 自身が担当する申請件数です。
 * 申請中: 状態が「申請中」の申請件数を示します。
 * 承認済み: 状態が「承認済み」の申請件数を示します。
 * 作業完了: 状態が「申請中」の申請件数を示します。直近{self.days_before_completed_target}日間の申請が対象です。
 
-### :small_blue_diamond: 全ての申請: 全体の申請件数です。
+### :eight_spoked_asterisk: 全ての申請: 全体の申請件数です。
 * 未割り当て: 作業担当者を割り当てていない申請件数を示します。
 * リリース希望日: 変作業担当者を割り当てていない申請件数を示します。リリース希望日が{self.days_after_deadline}日以内に迫った申請を対象です。
 * 作業中（失敗）: 作業の実行中に失敗した申請件数を示します。
 
-### :small_blue_diamond: 申請一覧: 申請件数タイルの選択に応じた一覧を示します。
+### :eight_spoked_asterisk: 申請一覧: 申請件数タイルの選択に応じた一覧を示します。表示される申請は最大{self.DATA_ROW_MAX}件です。
         """
 
         formContextHelp = ContextHelpForm(self.session, self.page, title=f"ダッシュボードについて", content_md=content_md)
