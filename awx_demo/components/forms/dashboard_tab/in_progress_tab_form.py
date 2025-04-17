@@ -185,7 +185,7 @@ class InProgressTabForm(ft.Card):
             icon=ft.Icon( ft.Icons.RUNNING_WITH_ERRORS_OUTLINED, size=RequestsIndicator.ICON_SIZE, color=ft.Colors.ERROR),
             indicator_text_font_size=RequestsIndicator.REQUESTS_COUNT_FONT_SIZE_MEDIUM,
             on_click=self.on_click_request_indicator,
-            tooltip=f"実行中に失敗した申請件数",
+            tooltip="実行中に失敗した申請件数",
         )
         panelAll.content = ft.Container(
             content=ft.Row(
@@ -306,6 +306,7 @@ class InProgressTabForm(ft.Card):
         )
         super().__init__(content=self.controls, expand=True)
 
+    @Logging.func_logger
     def count_requests(self):
         requests_count_start = RequestRowHelper.count_request(
             filters=self.get_query_filters_by_status(status=[RequestStatus.START])
@@ -338,6 +339,7 @@ class InProgressTabForm(ft.Card):
             "requests_count_applying_failed": requests_count_applying_failed,
         }
 
+    @Logging.func_logger
     def generate_simple_report(self, e):
         app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
@@ -360,6 +362,7 @@ class InProgressTabForm(ft.Card):
         self.page.open(ft.SnackBar(ft.Text("簡易レポートをクリップボードにコピーしました。")))
         self.page.update()
 
+    @Logging.func_logger
     def generate_data_rows(self):
         requests_data = RequestRowHelper.query_request_all(self)
         shortcut_index = 0
