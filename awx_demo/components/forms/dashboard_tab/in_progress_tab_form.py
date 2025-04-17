@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import flet as ft
@@ -26,6 +27,7 @@ class InProgressTabForm(ft.Card):
     DESCRIPTION_FONT_SIZE = 12
     PANEL_PADDING_SIZE = 5
     DATA_ROW_MAX = 10
+    APP_TITLE_DEFAULT = "AWX API Demo"
     DEFAULT_SORT_TARGET_COLUMN = 'リリース希望日'
     DEFAULT_SORT_COLUMN_INDEX = 3
     DEFAULT_SORT_ASCENDING = True
@@ -88,6 +90,13 @@ class InProgressTabForm(ft.Card):
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             tooltip="再読み込み (Control+Alt+R)",
             on_click=lambda e: self.refresh(),
+            # autofocus=True,
+        )
+        self.btnExportReport = ft.IconButton(
+            icon=ft.Icons.IOS_SHARE_OUTLINED,
+            icon_color=ft.Colors.ON_SURFACE_VARIANT,
+            tooltip="簡易レポート",
+            on_click=self.generate_simple_report,
             # autofocus=True,
         )
 
@@ -242,6 +251,7 @@ class InProgressTabForm(ft.Card):
                                     controls=[
                                         self.btnHelp,
                                         self.btnReload,
+                                        self.btnExportReport,
                                     ],
                                     alignment=ft.MainAxisAlignment.END,
                                     spacing=0,
@@ -327,6 +337,28 @@ class InProgressTabForm(ft.Card):
             "requests_count_deadline": requests_count_deadline,
             "requests_count_applying_failed": requests_count_applying_failed,
         }
+
+    def generate_simple_report(self, e):
+        app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
+        timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        requests_count = self.count_requests()
+        report_string = f"""
+{app_title} 簡易レポート ({timestamp} 作成)
+=============================================
+
+* 自身の申請({self.session.get('awx_loginid')})
+  - 申請中の申請件数: {requests_count['requests_count_start']}
+  - 承認済みの申請件数: {requests_count['requests_count_approved']}
+  - 完了済みの申請件数: {requests_count['requests_count_completed']}
+
+* 全ての申請
+  - 作業担当者が未割り当ての申請件数: {requests_count['requests_count_unassigned']}
+  - リリース希望日が{self.days_after_deadline}日以内に迫った申請件数: {requests_count['requests_count_deadline']}
+  - 実行中に失敗した申請件数: {requests_count['requests_count_applying_failed']}
+"""
+        self.page.set_clipboard(report_string)
+        self.page.open(ft.SnackBar(ft.Text("簡易レポートをクリップボードにコピーしました。")))
+        self.page.update()
 
     def generate_data_rows(self):
         requests_data = RequestRowHelper.query_request_all(self)
