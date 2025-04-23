@@ -33,6 +33,12 @@ class InProgressTabForm(ft.Card):
     DEFAULT_SORT_ASCENDING = True
     DAYS_AFTER_DEADLINE_DEFAULT = 3
     DAYS_BEFORE_COMPLETED_TARGET_DEFAULT = 30
+    INDICATOR_START_TITLE = RequestStatus.START_FRIENDLY
+    INDICATOR_APPROVED_TITLE = RequestStatus.APPROVED_FRIENDLY
+    INDICATOR_COMPLETED_TITLE = RequestStatus.COMPLETED_FRIENDLY
+    INDICATOR_UNASSIGNED_TITLE = "未割り当て"
+    INDICATOR_DEADLINE_TITLE = "リリース希望日"
+    INDICATOR_APPLY_FAILED_TITLE = RequestStatus.APPLYING_FAILED_FRIENDLY
 
     def __init__(
         self,
@@ -89,15 +95,13 @@ class InProgressTabForm(ft.Card):
             icon=ft.Icons.SYNC,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             tooltip="再読み込み (Control+Alt+R)",
-            on_click=lambda e: self.refresh(),
-            # autofocus=True,
+            on_click=self.on_click_refresh,
         )
         self.btnExportReport = ft.IconButton(
             icon=ft.Icons.IOS_SHARE_OUTLINED,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
             tooltip="簡易レポート",
-            on_click=self.generate_simple_report,
-            # autofocus=True,
+            on_click=self.on_click_export_report,
         )
 
         requests_count = self.count_requests()
@@ -112,7 +116,7 @@ class InProgressTabForm(ft.Card):
             expanded=True,
         )
         self.indicatorStart = RequestsIndicator(
-            title=RequestStatus.START_FRIENDLY,
+            title=self.INDICATOR_START_TITLE,
             indicator_text=requests_count['requests_count_start'],
             icon=ft.Icon(ft.Icons.FIBER_NEW, size=RequestsIndicator.ICON_SIZE),
             indicator_text_font_size=RequestsIndicator.REQUESTS_COUNT_FONT_SIZE_MEDIUM,
@@ -121,7 +125,7 @@ class InProgressTabForm(ft.Card):
             border_color=ft.Colors.PRIMARY,
         )
         self.indicatorApproved = RequestsIndicator(
-            title=RequestStatus.APPROVED_FRIENDLY,
+            title=self.INDICATOR_APPROVED_TITLE,
             indicator_text=requests_count['requests_count_approved'],
             icon=ft.Icon(ft.Icons.APPROVAL, size=RequestsIndicator.ICON_SIZE),
             indicator_text_font_size=RequestsIndicator.REQUESTS_COUNT_FONT_SIZE_MEDIUM,
@@ -129,7 +133,7 @@ class InProgressTabForm(ft.Card):
             tooltip="承認済みの申請件数",
         )
         self.indicatorCompleted = RequestsIndicator(
-            title=RequestStatus.COMPLETED_FRIENDLY,
+            title=self.INDICATOR_COMPLETED_TITLE,
             indicator_text=requests_count['requests_count_completed'],
             icon=ft.Icon(ft.Icons.CHECK_CIRCLE, size=RequestsIndicator.ICON_SIZE),
             indicator_text_font_size=RequestsIndicator.REQUESTS_COUNT_FONT_SIZE_MEDIUM,
@@ -163,7 +167,7 @@ class InProgressTabForm(ft.Card):
             expanded=True,
         )
         self.indicatorUnassigned = RequestsIndicator(
-            title="未割り当て",
+            title=self.INDICATOR_UNASSIGNED_TITLE,
             indicator_text=requests_count['requests_count_unassigned'],
             icon=ft.Icon(ft.Icons.ASSIGNMENT_IND_OUTLINED, size=RequestsIndicator.ICON_SIZE, color=ft.Colors.YELLOW_800,),
             indicator_text_font_size=RequestsIndicator.REQUESTS_COUNT_FONT_SIZE_MEDIUM,
@@ -171,7 +175,7 @@ class InProgressTabForm(ft.Card):
             tooltip="作業担当者が未割り当ての申請件数",
         )
         self.indicatorDeadline = RequestsIndicator(
-            title="リリース希望日",
+            title=self.INDICATOR_DEADLINE_TITLE,
             indicator_text=requests_count['requests_count_deadline'],
             icon=ft.Icon(ft.Icons.WARNING_AMBER, size=RequestsIndicator.ICON_SIZE, color=ft.Colors.YELLOW_800),
             indicator_text_font_size=RequestsIndicator.REQUESTS_COUNT_FONT_SIZE_MEDIUM,
@@ -180,7 +184,7 @@ class InProgressTabForm(ft.Card):
             tooltip=f"リリース希望日が{self.days_after_deadline}日以内に迫った申請件数",
         )
         self.indicatorApplyFailed = RequestsIndicator(
-            title=RequestStatus.APPLYING_FAILED_FRIENDLY,
+            title=self.INDICATOR_APPLY_FAILED_TITLE,
             indicator_text=requests_count['requests_count_applying_failed'],
             icon=ft.Icon( ft.Icons.RUNNING_WITH_ERRORS_OUTLINED, size=RequestsIndicator.ICON_SIZE, color=ft.Colors.ERROR),
             indicator_text_font_size=RequestsIndicator.REQUESTS_COUNT_FONT_SIZE_MEDIUM,
@@ -209,8 +213,8 @@ class InProgressTabForm(ft.Card):
             expanded_header_padding=ft.padding.symmetric(vertical=0),
             controls=[],
         )
-        panelRequestList = ft.ExpansionPanel(
-            header=ft.ListTile(title=ft.Text("リリース希望日の近い申請")),
+        self.panelListRequest = ft.ExpansionPanel(
+            header=ft.ListTile(title=ft.Text(f"「申請中」ステータスの申請 (最大{self.DATA_ROW_MAX}件)")),
             expanded=True,
         )
 
@@ -224,7 +228,7 @@ class InProgressTabForm(ft.Card):
         )
         self.rowRequests = self.generate_data_rows()
 
-        panelRequestList.content = ft.Container(
+        self.panelListRequest.content = ft.Container(
             content=ft.Row(
                 controls=[
                     self.dtRequests,
@@ -237,7 +241,7 @@ class InProgressTabForm(ft.Card):
             ),
             padding=ft.padding.all(self.PANEL_PADDING_SIZE),
         )
-        self.panelListDeadline.controls.append(panelRequestList)
+        self.panelListDeadline.controls.append(self.panelListRequest)
 
         # Content
         body = ft.Column(
@@ -309,25 +313,25 @@ class InProgressTabForm(ft.Card):
     @Logging.func_logger
     def count_requests(self):
         requests_count_start = RequestRowHelper.count_request(
-            filters=self.get_query_filters_by_status(status=[RequestStatus.START])
+            filters=self._get_query_filters_by_status(status=[RequestStatus.START])
         )
         requests_count_approved = RequestRowHelper.count_request(
-            filters=self.get_query_filters_by_status(status=[RequestStatus.APPROVED])
+            filters=self._get_query_filters_by_status(status=[RequestStatus.APPROVED])
         )
         requests_count_completed = RequestRowHelper.count_request(
-            filters=self.get_query_filters_by_status(
+            filters=self._get_query_filters_by_status(
                 status=[RequestStatus.COMPLETED],
                 days_before_target=self.days_before_completed_target
             )
         )
         requests_count_unassigned = RequestRowHelper.count_request(
-            filters=self.get_query_filters_unassigned()
+            filters=self._get_query_filters_unassigned()
         )
         requests_count_deadline = RequestRowHelper.count_request(
-            filters=self.get_query_filters_deadline(days_after_deadline=self.days_after_deadline)
+            filters=self._get_query_filters_deadline(days_after_deadline=self.days_after_deadline)
         )
         requests_count_applying_failed = RequestRowHelper.count_request(
-            filters=self.get_query_filters_by_status(status=[RequestStatus.APPLYING_FAILED])
+            filters=self._get_query_filters_by_status(status=[RequestStatus.APPLYING_FAILED])
         )
 
         return {
@@ -338,32 +342,6 @@ class InProgressTabForm(ft.Card):
             "requests_count_deadline": requests_count_deadline,
             "requests_count_applying_failed": requests_count_applying_failed,
         }
-
-    @Logging.func_logger
-    def generate_simple_report(self, e):
-        app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
-        timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-        requests_count = self.count_requests()
-        report_string = f"""
-{app_title} - 簡易レポート ({timestamp} 作成)
-=============================================
-
-* 自身の申請 ({self.session.get('awx_loginid')})
-  - 申請中の申請件数: {requests_count['requests_count_start']: >5}
-  - 承認済みの申請件数: {requests_count['requests_count_approved']: >5}
-  - 完了済みの申請件数: {requests_count['requests_count_completed']: >5}
-
-* 全ての申請
-  - 作業担当者が未割り当ての申請件数: {requests_count['requests_count_unassigned']: >5}
-  - リリース希望日が{self.days_after_deadline}日以内に迫った申請件数: {requests_count['requests_count_deadline']: >5}
-  - 実行中に失敗した申請件数: {requests_count['requests_count_applying_failed']: >5}
-
-* リリース希望日の近い申請
-
-"""
-        self.page.set_clipboard(report_string)
-        self.page.open(ft.SnackBar(ft.Text("簡易レポートをクリップボードにコピーしました。")))
-        self.page.update()
 
     @Logging.func_logger
     def generate_data_rows(self):
@@ -404,23 +382,48 @@ class InProgressTabForm(ft.Card):
         return rowRequests
 
     @Logging.func_logger
-    def on_change_iaas_user(self, e):
-        self.session.set("iaas_user", e.control.value)
-
-    @Logging.func_logger
     def get_query_filters(self):
         filters = []
-        filters.append(IaasRequestHelper.get_filter_request_text(
-            self.session.get('request_text_search_string')))
-        filters.append(IaasRequestHelper.get_filter_request_status(
-            [RequestStatus.APPROVED, RequestStatus.APPLYING, RequestStatus.APPLYING_FAILED, RequestStatus.START]))
+        Logging.error(self.session.get("selected_indicator"))
         if self.session.get('user_role') == UserRole.USER_ROLE:
-            filters.append(IaasRequestHelper.get_filter_request_user(
-                self.session.get('awx_loginid')))
+            match self.session.get("selected_indicator"):
+                case self.INDICATOR_START_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.START]))
+                case self.INDICATOR_APPROVED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.APPROVED]))
+                case self.INDICATOR_COMPLETED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.COMPLETED]))
+                case self.INDICATOR_UNASSIGNED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_iaas_user_is_null())
+                case self.INDICATOR_DEADLINE_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status(
+                        [RequestStatus.APPROVED, RequestStatus.APPLYING, RequestStatus.APPLYING_FAILED, RequestStatus.START]))
+                case self.INDICATOR_APPLY_FAILED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.APPLYING_FAILED]))
+            filters.append(IaasRequestHelper.get_filter_request_user(self.session.get('awx_loginid')))
+        else:
+            match self.session.get("selected_indicator"):
+                case self.INDICATOR_START_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.START]))
+                    filters.append(IaasRequestHelper.get_filter_iaas_user(self.session.get('awx_loginid')))
+                case self.INDICATOR_APPROVED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.APPROVED]))
+                    filters.append(IaasRequestHelper.get_filter_iaas_user(self.session.get('awx_loginid')))
+                case self.INDICATOR_COMPLETED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.COMPLETED]))
+                    filters.append(IaasRequestHelper.get_filter_iaas_user(self.session.get('awx_loginid')))
+                case self.INDICATOR_UNASSIGNED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_iaas_user_is_null())
+                case self.INDICATOR_DEADLINE_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status(
+                        [RequestStatus.APPROVED, RequestStatus.APPLYING, RequestStatus.APPLYING_FAILED, RequestStatus.START]))
+                case self.INDICATOR_APPLY_FAILED_TITLE:
+                    filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.APPLYING_FAILED]))
+
         return filters
 
     @Logging.func_logger
-    def get_query_filters_by_status(self, status=None, days_before_target=0):
+    def _get_query_filters_by_status(self, status=None, days_before_target=0):
         filters = []
         filters.append(IaasRequestHelper.get_filter_request_text(
             self.session.get('request_text_search_string')))
@@ -433,7 +436,7 @@ class InProgressTabForm(ft.Card):
         return filters
 
     @Logging.func_logger
-    def get_query_filters_unassigned(self):
+    def _get_query_filters_unassigned(self):
         filters = []
         filters.append(IaasRequestHelper.get_filter_request_text(
             self.session.get('request_text_search_string')))
@@ -444,7 +447,7 @@ class InProgressTabForm(ft.Card):
         return filters
 
     @Logging.func_logger
-    def get_query_filters_deadline(self, days_after_deadline=0):
+    def _get_query_filters_deadline(self, days_after_deadline=0):
         filters = []
         filters.append(IaasRequestHelper.get_filter_request_text(
             self.session.get('request_text_search_string')))
@@ -466,9 +469,45 @@ class InProgressTabForm(ft.Card):
         self.indicatorDeadline.set_indicator_text(requests_count['requests_count_deadline'])
         self.indicatorApplyFailed.set_indicator_text(requests_count['requests_count_applying_failed'])
         RequestRowHelper.refresh_data_rows(self)
+        self.refresh_panel_lists()
+
+    @Logging.func_logger
+    def refresh_panel_lists(self):
         self.panelListMine.update()
         self.panelListAll.update()
         self.panelListDeadline.update()
+
+    @Logging.func_logger
+    def on_click_export_report(self, e):
+        app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
+        timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        requests_count = self.count_requests()
+        report_string = f"""
+{app_title} - 簡易レポート ({timestamp} 作成)
+=============================================
+
+* 自身の申請 ({self.session.get('awx_loginid')})
+  - 申請中の申請件数: {requests_count['requests_count_start']: >5}
+  - 承認済みの申請件数: {requests_count['requests_count_approved']: >5}
+  - 完了済みの申請件数: {requests_count['requests_count_completed']: >5}
+
+* 全ての申請
+  - 作業担当者が未割り当ての申請件数: {requests_count['requests_count_unassigned']: >5}
+  - リリース希望日が{self.days_after_deadline}日以内に迫った申請件数: {requests_count['requests_count_deadline']: >5}
+  - 実行中に失敗した申請件数: {requests_count['requests_count_applying_failed']: >5}
+
+* リリース希望日の近い申請
+
+"""
+        self.page.set_clipboard(report_string)
+        self.page.open(ft.SnackBar(ft.Text("簡易レポートをクリップボードにコピーしました。")))
+        self.page.update()
+
+    @Logging.func_logger
+    def on_click_refresh(self, e):
+        self.refresh(),
+        self.page.open(ft.SnackBar(ft.Text("最新の情報を再読み込みしました。")))
+        self.page.update()
 
     @Logging.func_logger
     def on_click_heading_column(self, e):
@@ -482,15 +521,41 @@ class InProgressTabForm(ft.Card):
         self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self._unlock_form_controls()
-        self.indicatorStart.set_border()
-        self.indicatorApproved.set_border()
-        self.indicatorCompleted.set_border()
-        self.indicatorUnassigned.set_border()
-        self.indicatorDeadline.set_border()
-        self.indicatorApplyFailed.set_border()
+        self._reset_indicator_borders()
+        # 選択したタイルのボーダー色を変更
         e.control.set_border(color=ft.Colors.PRIMARY)
-        self.panelListMine.update()
-        self.panelListAll.update()
+
+        match e.control:
+            case self.indicatorStart:
+                self.panelListRequest.header=ft.ListTile(title=ft.Text(f"「申請中」ステータスの申請 (最大{self.DATA_ROW_MAX}件)"))
+                self.session.set("selected_indicator", self.INDICATOR_START_TITLE)
+            case self.indicatorApproved:
+                self.panelListRequest.header=ft.ListTile(title=ft.Text(f"「承認済み」ステータスの申請 (最大{self.DATA_ROW_MAX}件)"))
+                self.session.set("selected_indicator", self.INDICATOR_APPROVED_TITLE)
+            case self.indicatorCompleted:
+                self.panelListRequest.header=ft.ListTile(title=ft.Text(f"「作業完了」ステータスの申請 (最大{self.DATA_ROW_MAX}件)"))
+                self.session.set("selected_indicator", self.INDICATOR_COMPLETED_TITLE)
+            case self.indicatorUnassigned:
+                self.panelListRequest.header=ft.ListTile(title=ft.Text(f"作業担当者が未割り当ての申請 (最大{self.DATA_ROW_MAX}件)"))
+                self.session.set("selected_indicator", self.INDICATOR_UNASSIGNED_TITLE)
+            case self.indicatorDeadline:
+                self.panelListRequest.header=ft.ListTile(title=ft.Text(f"リリース希望日の近い申請 (最大{self.DATA_ROW_MAX}件)"))
+                self.session.set("selected_indicator", self.INDICATOR_DEADLINE_TITLE)
+            case self.indicatorApplyFailed:
+                self.panelListRequest.header=ft.ListTile(title=ft.Text(f"作業中に失敗した申請 (最大{self.DATA_ROW_MAX}件)"))
+                self.session.set("selected_indicator", self.INDICATOR_APPLY_FAILED_TITLE)
+
+        self.refresh()
+
+    @Logging.func_logger
+    def _reset_indicator_borders(self):
+        # 全タイルのボーダー色を元に戻す
+        self.indicatorStart.set_border(color=RequestsIndicator.BORDER_COLOR_DEFAULT)
+        self.indicatorApproved.set_border(color=RequestsIndicator.BORDER_COLOR_DEFAULT)
+        self.indicatorCompleted.set_border(color=RequestsIndicator.BORDER_COLOR_DEFAULT)
+        self.indicatorUnassigned.set_border(color=RequestsIndicator.BORDER_COLOR_DEFAULT)
+        self.indicatorDeadline.set_border(color=RequestsIndicator.BORDER_COLOR_DEFAULT)
+        self.indicatorApplyFailed.set_border(color=RequestsIndicator.BORDER_COLOR_DEFAULT)
 
     @Logging.func_logger
     def on_request_row_select(self, e=None, selected_index=None):
