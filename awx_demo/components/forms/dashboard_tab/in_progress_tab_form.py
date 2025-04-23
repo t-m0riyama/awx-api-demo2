@@ -345,18 +345,21 @@ class InProgressTabForm(ft.Card):
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
         requests_count = self.count_requests()
         report_string = f"""
-{app_title} 簡易レポート ({timestamp} 作成)
+{app_title} - 簡易レポート ({timestamp} 作成)
 =============================================
 
-* 自身の申請({self.session.get('awx_loginid')})
-  - 申請中の申請件数: {requests_count['requests_count_start']}
-  - 承認済みの申請件数: {requests_count['requests_count_approved']}
-  - 完了済みの申請件数: {requests_count['requests_count_completed']}
+* 自身の申請 ({self.session.get('awx_loginid')})
+  - 申請中の申請件数: {requests_count['requests_count_start']: >5}
+  - 承認済みの申請件数: {requests_count['requests_count_approved']: >5}
+  - 完了済みの申請件数: {requests_count['requests_count_completed']: >5}
 
 * 全ての申請
-  - 作業担当者が未割り当ての申請件数: {requests_count['requests_count_unassigned']}
-  - リリース希望日が{self.days_after_deadline}日以内に迫った申請件数: {requests_count['requests_count_deadline']}
-  - 実行中に失敗した申請件数: {requests_count['requests_count_applying_failed']}
+  - 作業担当者が未割り当ての申請件数: {requests_count['requests_count_unassigned']: >5}
+  - リリース希望日が{self.days_after_deadline}日以内に迫った申請件数: {requests_count['requests_count_deadline']: >5}
+  - 実行中に失敗した申請件数: {requests_count['requests_count_applying_failed']: >5}
+
+* リリース希望日の近い申請
+
 """
         self.page.set_clipboard(report_string)
         self.page.open(ft.SnackBar(ft.Text("簡易レポートをクリップボードにコピーしました。")))
