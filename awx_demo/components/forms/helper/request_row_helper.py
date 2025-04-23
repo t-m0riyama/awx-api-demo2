@@ -33,7 +33,8 @@ class RequestRowHelper:
         else:
             row_id_content = ft.Text(str(row_id), color=ft.Colors.PRIMARY)
 
-        deadline_icon = RequestRowHelper._request_deadline_to_icon(request_data.request_deadline)
+        deadline_icon = RequestRowHelper._request_deadline_to_icon(
+            request_deadline=request_data.request_deadline, request_status=request_data.request_status)
         return ft.DataRow(
             cells=[
                 ft.DataCell(deadline_icon if deadline_icon else ft.Text('')),
@@ -106,11 +107,15 @@ class RequestRowHelper:
         return dtRequests
 
     @staticmethod
-    def _request_deadline_to_icon(request_deadline):
+    def _request_deadline_to_icon(request_deadline, request_status):
         now = datetime.datetime.now()
         now_date = datetime.date(now.year, now.month, now.day)
         deadline_datetime = datetime.datetime.strptime(f'{request_deadline} 00:00:00', '%Y/%m/%d %H:%M:%S')
         deadline_date = datetime.date(deadline_datetime.year, deadline_datetime.month, deadline_datetime.day)
+
+        # ステータスが作業感ん量であれば、Noneを返す
+        if request_status == RequestStatus.COMPLETED:
+            return None
         if now_date >= deadline_date:
             return ft.Icon(name=ft.Icons.PRIORITY_HIGH_OUTLINED, color=ft.Colors.ERROR, size=18, tooltip='リリース希望日超過')
         else:
