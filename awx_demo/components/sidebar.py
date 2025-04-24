@@ -243,6 +243,13 @@ class Sidebar(ft.Container):
     def register_key_shortcuts(self):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         if self.session.get('user_role') == UserRole.USER_ROLE:
+            # ダッシュボード
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="B", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=0),
+            )
             # 最新の申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
@@ -279,6 +286,13 @@ class Sidebar(ft.Container):
                 func=partial(self.on_click_option_navigation_item, item_index=0),
             )
         else:
+            # ダッシュボード
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key="B", shift=True, ctrl=False, alt=True, meta=False,
+                ),
+                func=partial(self.on_click_main_navigation_item, item_index=0),
+            )
             # 最新の申請
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
