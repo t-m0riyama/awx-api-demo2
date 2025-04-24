@@ -176,7 +176,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         self.btnReloadRequestList = ft.IconButton(
             icon=ft.Icons.SYNC,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
-            on_click=lambda e: self.refresh(),
+            on_click=self.on_click_refresh,
             autofocus=True,
             tooltip="申請一覧の再読み込み (Control+Alt+R)",
         )
@@ -603,6 +603,12 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         if SessionHelper.logout_if_session_expired(self.page, self.session): return
         self._unlock_form_controls()
         RequestRowHelper.update_selected_request_iaas_user(self, e.control.text)
+
+    @Logging.func_logger
+    def on_click_refresh(self, e):
+        self.refresh(),
+        self.page.open(ft.SnackBar(ft.Text("最新の情報を再読み込みしました。")))
+        self.page.update()
 
     @Logging.func_logger
     def on_click_heading_column(self, e):

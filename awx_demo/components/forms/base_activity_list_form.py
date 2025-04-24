@@ -177,7 +177,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         self.btnReloadRequestList = ft.IconButton(
             icon=ft.Icons.SYNC,
             icon_color=ft.Colors.ON_SURFACE_VARIANT,
-            on_click=lambda e: self.refresh(),
+            on_click=self.on_click_refresh,
             autofocus=True,
             tooltip="操作履歴一覧の再読み込み (Control+Alt+R)",
         )
@@ -367,6 +367,12 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         self.session.set("filter_activity_type", e.control.value)
         ActivityRowHelper.query_activity_all(self)
         self.refresh()
+
+    @Logging.func_logger
+    def on_click_refresh(self, e):
+        self.refresh(),
+        self.page.open(ft.SnackBar(ft.Text("最新の情報を再読み込みしました。")))
+        self.page.update()
 
     @Logging.func_logger
     def on_click_heading_column(self, e):
