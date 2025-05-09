@@ -207,6 +207,7 @@ class InProgressTabForm(ft.Card):
         )
         self.panelListAll.controls.append(panelAll)
 
+        self.session.set("selected_indicator", self.INDICATOR_START_TITLE)
         self.panelListDeadline = ft.ExpansionPanelList(
             expand_icon_color=ft.Colors.SECONDARY,
             divider_color=ft.Colors.SECONDARY,
@@ -382,6 +383,24 @@ class InProgressTabForm(ft.Card):
         return rowRequests
 
     @Logging.func_logger
+    def generate_data_rows_as_markdown(self):
+        requests_data = RequestRowHelper.query_request_all(self)
+        markdown_text =  '''
+| ステータス | 依頼ID | リリース希望日 | 最終更新日 | 申請者 | 作業担当者 | 申請項目 | 依頼内容 |
+|:---------|:-------|:------------|:----------|:------|:---------|:--------|:-------|
+'''
+        for request_data in requests_data:
+            markdown_text += (f"| {RequestStatus.to_friendly(request_data.request_status)} "
+                              f"| {request_data.request_id} "
+                              f"| {request_data.request_deadline} "
+                              f"| {request_data.updated} "
+                              f"| {request_data.request_user} "
+                              f"| {request_data.iaas_user} "
+                              f"| {request_data.request_operation} "
+                              f"| {request_data.request_text} |\n")
+        return markdown_text
+
+    @Logging.func_logger
     def get_query_filters(self):
         filters = []
         if self.session.get('user_role') == UserRole.USER_ROLE:
@@ -502,6 +521,7 @@ class InProgressTabForm(ft.Card):
 
 * リリース希望日の近い申請
 
+{self.generate_data_rows_as_markdown()}
 """
         self.page.set_clipboard(report_string)
         self.page.open(ft.SnackBar(ft.Text("簡易レポートをクリップボードにコピーしました。")))
