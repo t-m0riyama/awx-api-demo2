@@ -24,6 +24,9 @@ class RequestRowData:
 
 class RequestRowHelper:
 
+    # const
+    REQUEST_ID_COLUMN_NUMBER = 2
+
     @staticmethod
     @Logging.func_logger
     def generate_request_row(request_list_form, row_id, request_data: RequestRowData, shortcut_index: int):
@@ -141,7 +144,7 @@ class RequestRowHelper:
         db_session = db.get_db()
         for row in request_list_form.dtRequests.rows:
             if row.selected:
-                request_id = row.cells[1].content.value
+                request_id = row.cells[RequestRowHelper.REQUEST_ID_COLUMN_NUMBER].content.value
                 IaasRequestHelper.delete_request(
                     db_session=db_session,
                     session=request_list_form.session,
@@ -174,7 +177,7 @@ class RequestRowHelper:
         db_session = db.get_db()
         for row in request_list_form.dtRequests.rows:
             if row.selected:
-                request_id = row.cells[1].content.value
+                request_id = row.cells[RequestRowHelper.REQUEST_ID_COLUMN_NUMBER].content.value
                 IaasRequestHelper.update_request_status(
                     db_session=db_session,
                     session=request_list_form.session,
@@ -192,7 +195,7 @@ class RequestRowHelper:
         db_session = db.get_db()
         for row in request_list_form.dtRequests.rows:
             if row.selected:
-                request_id = row.cells[1].content.value
+                request_id = row.cells[RequestRowHelper.REQUEST_ID_COLUMN_NUMBER].content.value
                 IaasRequestHelper.update_request_iaas_user(
                     db_session=db_session,
                     session=request_list_form.session,
