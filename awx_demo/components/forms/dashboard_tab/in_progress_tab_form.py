@@ -384,7 +384,6 @@ class InProgressTabForm(ft.Card):
     @Logging.func_logger
     def get_query_filters(self):
         filters = []
-        Logging.error(self.session.get("selected_indicator"))
         if self.session.get('user_role') == UserRole.USER_ROLE:
             match self.session.get("selected_indicator"):
                 case self.INDICATOR_START_TITLE:
@@ -393,6 +392,7 @@ class InProgressTabForm(ft.Card):
                     filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.APPROVED]))
                 case self.INDICATOR_COMPLETED_TITLE:
                     filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.COMPLETED]))
+                    filters.append(IaasRequestHelper.get_filter_request_updated(self.days_before_completed_target))
                 case self.INDICATOR_UNASSIGNED_TITLE:
                     filters.append(IaasRequestHelper.get_filter_iaas_user_is_null())
                 case self.INDICATOR_DEADLINE_TITLE:
@@ -412,6 +412,7 @@ class InProgressTabForm(ft.Card):
                 case self.INDICATOR_COMPLETED_TITLE:
                     filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.COMPLETED]))
                     filters.append(IaasRequestHelper.get_filter_iaas_user(self.session.get('awx_loginid')))
+                    filters.append(IaasRequestHelper.get_filter_request_updated(self.days_before_completed_target))
                 case self.INDICATOR_UNASSIGNED_TITLE:
                     filters.append(IaasRequestHelper.get_filter_iaas_user_is_null())
                 case self.INDICATOR_DEADLINE_TITLE:
@@ -429,6 +430,9 @@ class InProgressTabForm(ft.Card):
             self.session.get('request_text_search_string')))
         if self.session.get('user_role') == UserRole.USER_ROLE:
             filters.append(IaasRequestHelper.get_filter_request_user(
+                self.session.get('awx_loginid')))
+        else:
+            filters.append(IaasRequestHelper.get_filter_iaas_user(
                 self.session.get('awx_loginid')))
         if days_before_target > 0:
             filters.append(IaasRequestHelper.get_filter_request_updated(days_before_target))
