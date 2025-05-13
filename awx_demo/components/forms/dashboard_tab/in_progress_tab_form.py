@@ -404,7 +404,7 @@ class InProgressTabForm(ft.Card):
                 f"| {request_data.request_deadline.strftime('%Y/%m/%d')} "
                 f"| {request_data.updated.strftime('%Y/%m/%d')} "
                 f"| {request_data.request_user} "
-                f"| {request_data.iaas_user} "
+                f"| {request_data.iaas_user if request_data.iaas_user is not None else '-'} "
                 f"| {request_data.request_operation} "
                 f"| {request_data.request_text} |\n"
             )
