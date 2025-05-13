@@ -66,12 +66,12 @@ class InProgressTabForm(ft.Card):
 * 承認済み: 状態が「承認済み」の申請件数を示します。
 * 作業完了: 状態が「申請中」の申請件数を示します。直近{self.days_before_completed_target}日間の申請が対象です。
 
-### :eight_spoked_asterisk: 全ての申請: 全体の申請件数です。
+### :eight_spoked_asterisk: 全ての申請: 全体の申請件数です。※作業担当者/管理者のみ参照可能
 * 未割り当て: 作業担当者を割り当てていない申請件数を示します。
 * リリース希望日: 変作業担当者を割り当てていない申請件数を示します。リリース希望日が{self.days_after_deadline}日以内に迫った申請を対象です。
 * 作業中（失敗）: 作業の実行中に失敗した申請件数を示します。
 
-### :eight_spoked_asterisk: 申請一覧: 申請件数タイルの選択に応じた一覧を示します。表示される申請は最大{self.DATA_ROW_MAX}件です。
+### :eight_spoked_asterisk: 申請一覧: 申請件数タイルの選択に応じた一覧を示します。
         """
 
         formContextHelp = ContextHelpForm(self.session, self.page, title=f"ダッシュボードについて", content_md=content_md)
@@ -244,6 +244,40 @@ class InProgressTabForm(ft.Card):
         )
         self.panelListDeadline.controls.append(self.panelListRequest)
 
+        if self.session.get('user_role') == UserRole.USER_ROLE:
+            buttons = [
+                self.btnHelp,
+                self.btnReload,
+            ]
+            tiles = [
+                ft.Column(
+                    col={"sm": 6},
+                    controls=[
+                        self.panelListMine,
+                    ],
+                ),
+            ]
+        else:
+            buttons = [
+                self.btnHelp,
+                self.btnReload,
+                self.btnExportReport,
+            ]
+            tiles = [
+                ft.Column(
+                    col={"sm": 6},
+                    controls=[
+                        self.panelListMine,
+                    ],
+                ),
+                ft.Column(
+                    col={"sm": 6},
+                    controls=[
+                        self.panelListAll,
+                    ],
+                ),
+            ]
+
         # Content
         body = ft.Column(
             [
@@ -253,11 +287,7 @@ class InProgressTabForm(ft.Card):
                             col={"sm": 12},
                             controls=[
                                 ft.Row(
-                                    controls=[
-                                        self.btnHelp,
-                                        self.btnReload,
-                                        self.btnExportReport,
-                                    ],
+                                    controls=buttons,
                                     alignment=ft.MainAxisAlignment.END,
                                     spacing=0,
                                 )
@@ -266,20 +296,7 @@ class InProgressTabForm(ft.Card):
                     ],
                 ),
                 ft.ResponsiveRow(
-                    [
-                        ft.Column(
-                            col={"sm": 6},
-                            controls=[
-                                self.panelListMine,
-                            ],
-                        ),
-                        ft.Column(
-                            col={"sm": 6},
-                            controls=[
-                                self.panelListAll,
-                            ],
-                        ),
-                    ],
+                    tiles,
                 ),
                 ft.ResponsiveRow(
                     [
