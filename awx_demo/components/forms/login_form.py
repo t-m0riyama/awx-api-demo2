@@ -24,6 +24,7 @@ class LoginForm(ft.Card):
     AWX_URL_DEFAULT = "https://awx.example.com"
     ADMIN_TEAM_DEFAULT = "requestmanager-admins"
     OPERATOR_TEAM_DEFAULT = "requestmanager-operators"
+    SYSTEM_ID_PREFIX_TEAM_NAME_DEFAULT = "requestmanager-sid-"
     USER_TEAM_DEFAULT = "requestmanager-users"
     APP_TITLE_DEFAULT = "AWX API Demo"
 
@@ -33,34 +34,22 @@ class LoginForm(ft.Card):
         self.default_awx_url = default_awx_url
 
         # controls
-        default_awx_url = re.sub('/$', '', os.getenv("RMX_AWX_URL", self.AWX_URL_DEFAULT))
+        default_awx_url = re.sub("/$", "", os.getenv("RMX_AWX_URL", self.AWX_URL_DEFAULT))
         app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
         self.tfLoginid = ParameterInputText(
             label="Login ID",
-            value=(
-                self.session.get("awx_loginid")
-                if self.session.contains_key("awx_loginid")
-                else ""
-            ),
+            value=(self.session.get("awx_loginid") if self.session.contains_key("awx_loginid") else ""),
             on_submit=self.on_click_login,
         )
         self.tfPassword = ParameterInputText(
             label="Password",
-            value=(
-                self.session.get("awx_password")
-                if self.session.contains_key("awx_password")
-                else ""
-            ),
+            value=(self.session.get("awx_password") if self.session.contains_key("awx_password") else ""),
             is_password=True,
             on_submit=self.on_click_login,
         )
         self.tfAWXUrl = ParameterInputText(
             label="AWX URL",
-            value=(
-                self.session.get("awx_url")
-                if self.session.contains_key("awx_url")
-                else default_awx_url
-            ),
+            value=(self.session.get("awx_url") if self.session.contains_key("awx_url") else default_awx_url),
             on_submit=self.on_click_login,
         )
         self.txtLoginMessage = ft.Text(
@@ -110,15 +99,17 @@ class LoginForm(ft.Card):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=True, alt=False, meta=False
-            ),
-            func=lambda e: self.tfLoginid.focus()
+            key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=True, alt=False, meta=False),
+            func=lambda e: self.tfLoginid.focus(),
         )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=True, alt=False, meta=False,
+                key="Z",
+                shift=True,
+                ctrl=True,
+                alt=False,
+                meta=False,
             ),
             func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )
@@ -129,15 +120,11 @@ class LoginForm(ft.Card):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # autofocus=Trueである、最初のコントロールにフォーカスを移動する
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="F", shift=True, ctrl=True, alt=False, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=True, alt=False, meta=False),
             )
             # ログへのキーボードショートカット一覧出力
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Z", shift=True, ctrl=True, alt=False, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=True, alt=False, meta=False),
             )
 
     @Logging.func_logger
@@ -156,7 +143,7 @@ class LoginForm(ft.Card):
 
     @Logging.func_logger
     def show_login_failed_message(self, reason):
-        message = ''
+        message = ""
         match reason:
             case AWXApiHelper.API_FAILED_STATUS:
                 message = "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。"
@@ -176,7 +163,9 @@ class LoginForm(ft.Card):
 
     @Logging.func_logger
     def show_lack_authority_message(self):
-        self.txtLoginMessage.value = "ログイン失敗: 指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。"
+        self.txtLoginMessage.value = (
+            "ログイン失敗: 指定したユーザには、ログインする権限がありません。ログインIDとパスワードを確認して下さい。"
+        )
         self.txtLoginMessage.visible = True
         self.txtLoginMessage.update()
 
@@ -184,14 +173,16 @@ class LoginForm(ft.Card):
     def login_auth(self, awx_url, loginid, password):
         login_result, reason = AWXApiHelper.login(awx_url, loginid, password)
         if not login_result:
-            summary = ''
+            summary = ""
             match reason:
                 case AWXApiHelper.API_FAILED_STATUS:
                     summary = "ログインに失敗しました。認証に失敗しました。ログインIDとパスワードを確認して下さい。"
                 case AWXApiHelper.API_FAILED_TO_CONNECT:
                     summary = "ログインに失敗しました。AWXサーバーに接続できません。AWX URLを確認して下さい。"
                 case _:
-                    summary = "ログインに失敗しました。AWXサーバーに接続できません。管理者に連絡し、ログを確認してください。"
+                    summary = (
+                        "ログインに失敗しました。AWXサーバーに接続できません。管理者に連絡し、ログを確認してください。"
+                    )
 
             activity_spec = ActivityHelper.ActivitySpec(
                 user=loginid,
@@ -233,9 +224,7 @@ class LoginForm(ft.Card):
                 request_id="",
                 activity_type=EventType.LOGIN,
                 status=EventStatus.SUCCEED,
-                summary="ログインに成功しました。{}ロールが付与されました。".format(
-                    self.session.get("user_role")
-                ),
+                summary="ログインに成功しました。{}ロールが付与されました。".format(self.session.get("user_role")),
                 detail="",
             )
             EventManager.emit_event(
@@ -246,9 +235,16 @@ class LoginForm(ft.Card):
 
     @Logging.func_logger
     def check_role(self, teams):
+        # システム識別子を示す、AWX/AAPのチーム名
+        system_ids = []
+
+        # ロールのチェック結果
         is_admin = False
         is_operator = False
         is_user = False
+
+        # システム識別子を示す、AWX/AAPのチーム名プリフィックスを決定する
+        system_id_prefix = os.getenv("RMX_SYSTEM_ID_PREFIX_TEAM_NAME", self.SYSTEM_ID_PREFIX_TEAM_NAME_DEFAULT)
 
         # AWX/AAPのチーム名を環境変数で指定している場合、変更する
         admin_team_name = os.getenv("RMX_ADMIN_TEAM_NAME", self.ADMIN_TEAM_DEFAULT)
@@ -256,12 +252,19 @@ class LoginForm(ft.Card):
         user_team_name = os.getenv("RMX_USER_TEAM_NAME", self.USER_TEAM_DEFAULT)
 
         for team in teams:
+            # システム識別子を示す、AWX/AAPのチーム名プリフィックスに合致した場合、システム識別子として追加する
+            if team.startswith(system_id_prefix):
+                system_ids.append(team.replace(system_id_prefix, ""))
+
             if team == admin_team_name:
                 is_admin = True
             elif team == operator_team_name:
                 is_operator = True
             elif team == user_team_name:
                 is_user = True
+
+        # システム識別子をセッションに保存
+        self.session.set("system_ids", system_ids)
 
         # より高い権限を持つロールに合致した場合、優先的に返す
         if is_admin:

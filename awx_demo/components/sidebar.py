@@ -160,16 +160,16 @@ class Sidebar(ft.Container):
                         tooltip="操作履歴 (Shift+Alt+H)",
                     )
                 ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(
-                        ft.Icons.SETTINGS_OUTLINED, size=self.ICON_SIZE),
-                    selected_icon=ft.Icon(
-                        ft.Icons.SETTINGS, size=self.ICON_SIZE),
-                    label_content=ft.Text(
-                        "設定",
-                        tooltip="設定 (Shift+Alt+C)",
-                    )
-                ),
+                # ft.NavigationRailDestination(
+                #     icon=ft.Icon(
+                #         ft.Icons.SETTINGS_OUTLINED, size=self.ICON_SIZE),
+                #     selected_icon=ft.Icon(
+                #         ft.Icons.SETTINGS, size=self.ICON_SIZE),
+                #     label_content=ft.Text(
+                #         "設定",
+                #         tooltip="設定 (Shift+Alt+C)",
+                #     )
+                # ),
             ]
         self.main_nav_rail = ft.NavigationRail(
             height=self.MAIN_RAIL_HEIGHT,

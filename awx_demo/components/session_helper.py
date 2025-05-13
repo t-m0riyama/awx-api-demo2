@@ -18,6 +18,7 @@ class SessionHelper:
         cls.clean_wizard_steps(session)
         cls._remove_session_key(session, "awx_loginid")
         cls._remove_session_key(session, "awx_password")
+        cls._remove_session_key(session, "system_ids")
         cls._remove_session_key(session, "user_role")
         cls._remove_session_key(session, "request_text_search_string")
         cls._remove_session_key(session, "keyboard_press_locked")
@@ -37,7 +38,7 @@ class SessionHelper:
             session_value = session.get(session_key_name)
             for filter in SessionHelper.SESSION_DUMP_FILTER:
                 if filter.lower() in session_key_name.lower():
-                    session_value = '*********'
+                    session_value = "*********"
                     break
             Logging.info(f"SESSION_DUMP / {session_key_name}: {session_value}")
 
@@ -97,9 +98,7 @@ class SessionHelper:
             modal=True,
             # title=ft.Text("セッションのタイムアウト"),
             content=formSessionTimeoutConfirm,
-            actions=[
-                ft.FilledButton("OK", on_click=_logout)
-            ],
+            actions=[ft.FilledButton("OK", on_click=_logout)],
             actions_alignment=ft.MainAxisAlignment.END,
         )
 
