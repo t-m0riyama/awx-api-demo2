@@ -385,19 +385,29 @@ class InProgressTabForm(ft.Card):
     @Logging.func_logger
     def generate_data_rows_as_markdown(self):
         requests_data = RequestRowHelper.query_request_all(self)
+        if len(requests_data) == 0:
+            return 'なし'
         markdown_text =  '''
-| ステータス | 依頼ID | リリース希望日 | 最終更新日 | 申請者 | 作業担当者 | 申請項目 | 依頼内容 |
-|:---------|:-------|:------------|:----------|:------|:---------|:--------|:-------|
+| 期限超過 | ステータス | 依頼ID | リリース希望日 | 最終更新日 | 申請者 | 作業担当者 | 申請項目 | 依頼内容 |
+|:--------|:---------|:-------|:------------|:----------|:------|:---------|:--------|:-------|
 '''
         for request_data in requests_data:
-            markdown_text += (f"| {RequestStatus.to_friendly(request_data.request_status)} "
-                              f"| {request_data.request_id} "
-                              f"| {request_data.request_deadline} "
-                              f"| {request_data.updated} "
-                              f"| {request_data.request_user} "
-                              f"| {request_data.iaas_user} "
-                              f"| {request_data.request_operation} "
-                              f"| {request_data.request_text} |\n")
+            deadline_mark = RequestRowHelper.request_deadline_to_string(
+                request_deadline=request_data.request_deadline.strftime("%Y/%m/%d"),
+                request_status=request_data.request_status,
+                alternative_string='!'
+            )
+            markdown_text += (
+                f"| {deadline_mark} "
+                f"| {RequestStatus.to_friendly(request_data.request_status)} "
+                f"| {request_data.request_id} "
+                f"| {request_data.request_deadline.strftime('%Y/%m/%d')} "
+                f"| {request_data.updated.strftime('%Y/%m/%d')} "
+                f"| {request_data.request_user} "
+                f"| {request_data.iaas_user} "
+                f"| {request_data.request_operation} "
+                f"| {request_data.request_text} |\n"
+            )
         return markdown_text
 
     @Logging.func_logger
@@ -505,10 +515,31 @@ class InProgressTabForm(ft.Card):
         app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
         timestamp = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
         requests_count = self.count_requests()
+
+        # 選択しているタイルのセッション変数を退避
+        selected_indicator_old = self.session.get('selected_indicator')
+
+        self.session.set('selected_indicator', self.INDICATOR_START_TITLE)
+        start_request_list = self.generate_data_rows_as_markdown()
+        self.session.set('selected_indicator', self.INDICATOR_APPROVED_TITLE)
+        approved_request_list = self.generate_data_rows_as_markdown()
+        self.session.set('selected_indicator', self.INDICATOR_COMPLETED_TITLE)
+        completed_request_list = self.generate_data_rows_as_markdown()
+        self.session.set('selected_indicator', self.INDICATOR_UNASSIGNED_TITLE)
+        unassigned_request_list = self.generate_data_rows_as_markdown()
+        self.session.set('selected_indicator', self.INDICATOR_DEADLINE_TITLE)
+        deadline_request_list = self.generate_data_rows_as_markdown()
+        self.session.set('selected_indicator', self.INDICATOR_APPLY_FAILED_TITLE)
+        apply_failed_request_list = self.generate_data_rows_as_markdown()
+
+        # 選択しているタイルのセッション変数を元に戻す
+        self.session.set('selected_indicator', selected_indicator_old)
+
         report_string = f"""
 {app_title} - 簡易レポート ({timestamp} 作成)
 =============================================
 
+## 申請件数
 * 自身の申請 ({self.session.get('awx_loginid')})
   - 申請中の申請件数: {requests_count['requests_count_start']: >5}
   - 承認済みの申請件数: {requests_count['requests_count_approved']: >5}
@@ -519,9 +550,32 @@ class InProgressTabForm(ft.Card):
   - リリース希望日が{self.days_after_deadline}日以内に迫った申請件数: {requests_count['requests_count_deadline']: >5}
   - 実行中に失敗した申請件数: {requests_count['requests_count_applying_failed']: >5}
 
-* リリース希望日の近い申請
+## 申請一覧
+### 自身の申請
+* 「申請中」ステータスの申請 (最大{self.DATA_ROW_MAX}件)
 
-{self.generate_data_rows_as_markdown()}
+{start_request_list}
+
+* 「承認済み」ステータスの申請 (最大{self.DATA_ROW_MAX}件)
+
+{approved_request_list}
+
+* 「作業完了」ステータスの申請 (最大{self.DATA_ROW_MAX}件)
+
+{completed_request_list}
+
+### 全ての申請
+* 作業担当者が未割り当ての申請 (最大{self.DATA_ROW_MAX}件)
+
+{unassigned_request_list}
+
+* リリース希望日の近い申請 (最大{self.DATA_ROW_MAX}件)
+
+{deadline_request_list}
+
+* 作業中に失敗した申請 (最大{self.DATA_ROW_MAX}件)
+
+{apply_failed_request_list}
 """
         self.page.set_clipboard(report_string)
         self.page.open(ft.SnackBar(ft.Text("簡易レポートをクリップボードにコピーしました。")))

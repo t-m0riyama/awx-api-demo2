@@ -116,13 +116,28 @@ class RequestRowHelper:
         deadline_datetime = datetime.datetime.strptime(f'{request_deadline} 00:00:00', '%Y/%m/%d %H:%M:%S')
         deadline_date = datetime.date(deadline_datetime.year, deadline_datetime.month, deadline_datetime.day)
 
-        # ステータスが作業感ん量であれば、Noneを返す
+        # ステータスが作業完了であれば、Noneを返す
         if request_status == RequestStatus.COMPLETED:
             return None
         if now_date >= deadline_date:
             return ft.Icon(name=ft.Icons.PRIORITY_HIGH_OUTLINED, color=ft.Colors.ERROR, size=18, tooltip='リリース希望日超過')
         else:
             return None
+
+    @staticmethod
+    def request_deadline_to_string(request_deadline, request_status, alternative_string):
+        now = datetime.datetime.now()
+        now_date = datetime.date(now.year, now.month, now.day)
+        deadline_datetime = datetime.datetime.strptime(f'{request_deadline} 00:00:00', '%Y/%m/%d %H:%M:%S')
+        deadline_date = datetime.date(deadline_datetime.year, deadline_datetime.month, deadline_datetime.day)
+
+        # ステータスが作業完了であれば、Noneを返す
+        if request_status == RequestStatus.COMPLETED:
+            return ' '
+        if now_date >= deadline_date:
+            return alternative_string
+        else:
+            return ' '
 
     @staticmethod
     def _request_status_to_icon(request_status):
