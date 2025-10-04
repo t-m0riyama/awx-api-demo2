@@ -254,7 +254,9 @@ class LoginForm(ft.Card):
         for team in teams:
             # システム識別子を示す、AWX/AAPのチーム名プリフィックスに合致した場合、システム識別子として追加する
             if team.startswith(system_id_prefix):
-                system_ids.append(team.replace(system_id_prefix, ""))
+                system_id = team.replace(system_id_prefix, "").strip()
+                if system_id != "":
+                    system_ids.append(system_id)
 
             if team == admin_team_name:
                 is_admin = True
