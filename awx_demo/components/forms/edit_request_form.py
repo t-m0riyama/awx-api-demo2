@@ -2,11 +2,18 @@ import flet as ft
 
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.forms.edit_tab.manage_info_tab_form import ManageInfoTabForm
-from awx_demo.components.forms.edit_tab.request_common_info_tab_form import RequestCommonInfoTabForm
-from awx_demo.components.forms.edit_tab.select_target_tab_form import SelectTargetTabForm
+from awx_demo.components.forms.edit_tab.request_common_info_tab_form import (
+    RequestCommonInfoTabForm,
+)
+from awx_demo.components.forms.edit_tab.select_target_vcenter_tab_form import (
+    SelectTargetVCenterTabForm,
+)
+from awx_demo.components.forms.edit_tab.select_target_vms_tab_form import SelectTargetVmsTabForm
 from awx_demo.components.forms.edit_tab.set_vm_cpu_tab_form import SetVmCpuTabForm
 from awx_demo.components.forms.edit_tab.set_vm_memory_tab_form import SetVmMemoryTabForm
-from awx_demo.components.forms.edit_tab.set_vm_start_stop_tab_form import SetVmStartStopTabForm
+from awx_demo.components.forms.edit_tab.set_vm_start_stop_tab_form import (
+    SetVmStartStopTabForm,
+)
 from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
@@ -26,7 +33,19 @@ class EditRequestForm(BaseWizardCard):
     CONTENT_WIDTH = 800
     BODY_HEIGHT = 380
 
-    def __init__(self, session, page: ft.Page, request_id=None, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, click_execute_func=None, click_duplicate_func=None, click_save_func=None, click_cancel_func=None):
+    def __init__(
+        self,
+        session,
+        page: ft.Page,
+        request_id=None,
+        height=CONTENT_HEIGHT,
+        width=CONTENT_WIDTH,
+        body_height=BODY_HEIGHT,
+        click_execute_func=None,
+        click_duplicate_func=None,
+        click_save_func=None,
+        click_cancel_func=None,
+    ):
         self.session = session
         self.page = page
         self.request_id = request_id
@@ -43,16 +62,15 @@ class EditRequestForm(BaseWizardCard):
         self.tab_body_height = self.body_height - 80
 
         db_session = db.get_db()
-        SessionHelper.load_request_to_session_from_db(
-            self.session, db_session, self.request_id)
+        SessionHelper.load_request_to_session_from_db(self.session, db_session, self.request_id)
         request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
         db_session.close()
 
         # controls
-        if self.session.get('user_role') == UserRole.USER_ROLE:
-            formTitle = FormTitle('申請の詳細', '')
+        if self.session.get("user_role") == UserRole.USER_ROLE:
+            formTitle = FormTitle("申請の詳細", "")
         else:
-            formTitle = FormTitle('申請の編集', '')
+            formTitle = FormTitle("申請の編集", "")
 
         # overlayを利用する可能性があるコントロールは、あらかじめインスタンスを作成する
         match request_operation:
@@ -64,11 +82,20 @@ class EditRequestForm(BaseWizardCard):
                     self.tab_content_width,
                     self.tab_body_height,
                 )
-                self.formSelectTarget = SelectTargetTabForm(
+                self.formSelectTargetVms = SelectTargetVmsTabForm(
                     self.session,
                     self.tab_content_height,
                     self.tab_content_width,
                     self.tab_body_height,
+                )
+                self.formSelectTargetVCenter = SelectTargetVCenterTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                    on_change_vcenter_or_system_ids=self.formSelectTargetVms.refresh_vms_available,
+                    lock_form_controls=self._lock_form_controls,
+                    unlock_form_controls=self._unlock_form_controls,
                 )
                 self.formSetVmCpu = SetVmCpuTabForm(
                     self.session,
@@ -93,23 +120,27 @@ class EditRequestForm(BaseWizardCard):
                     animation_duration=300,
                     tabs=[
                         ft.Tab(
-                            tab_content=ft.Text('共通', tooltip='共通 (Shift+Alt+G)'),
+                            tab_content=ft.Text("共通", tooltip="共通 (Shift+Alt+G)"),
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+O)'),
-                            content=ft.SelectionArea(content=self.formSelectTarget),
+                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+O)"),
+                            content=ft.SelectionArea(content=self.formSelectTargetVCenter),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('CPU', tooltip='CPU (Shift+Alt+C)'),
+                            tab_content=ft.Text("変更対象の仮想マシン", tooltip="変更対象の仮想マシン (Shift+Alt+O)"),
+                            content=ft.SelectionArea(content=self.formSelectTargetVms),
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text("CPU", tooltip="CPU (Shift+Alt+C)"),
                             content=ft.SelectionArea(content=self.formSetVmCpu),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('メモリ', tooltip='メモリ (Shift+Alt+M)'),
+                            tab_content=ft.Text("メモリ", tooltip="メモリ (Shift+Alt+M)"),
                             content=ft.SelectionArea(content=self.formSetVmMemory),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Shift+Alt+A)'),
+                            tab_content=ft.Text("管理情報", tooltip="管理情報 (Shift+Alt+A)"),
                             content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
@@ -124,11 +155,20 @@ class EditRequestForm(BaseWizardCard):
                     self.tab_content_width,
                     self.tab_body_height,
                 )
-                self.formSelectTarget = SelectTargetTabForm(
+                self.formSelectTargetVms = SelectTargetVmsTabForm(
                     self.session,
                     self.tab_content_height,
                     self.tab_content_width,
                     self.tab_body_height,
+                )
+                self.formSelectTargetVCenter = SelectTargetVCenterTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                    on_change_vcenter_or_system_ids=self.formSelectTargetVms.refresh_vms_available,
+                    lock_form_controls=self._lock_form_controls,
+                    unlock_form_controls=self._unlock_form_controls,
                 )
                 self.formStartStop = SetVmStartStopTabForm(
                     self.session,
@@ -147,36 +187,53 @@ class EditRequestForm(BaseWizardCard):
                     animation_duration=300,
                     tabs=[
                         ft.Tab(
-                            tab_content=ft.Text('共通', tooltip='共通 (Shift+Alt+G)'),
+                            tab_content=ft.Text("共通", tooltip="共通 (Shift+Alt+G)"),
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('変更対象', tooltip='変更対象 (Shift+Alt+O)'),
-                            content=ft.SelectionArea(content=self.formSelectTarget),
+                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+O)"),
+                            content=ft.SelectionArea(content=self.formSelectTargetVCenter),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('起動/停止', tooltip='起動/停止 (Shift+Alt+B)'),
+                            tab_content=ft.Text("変更対象の仮想マシン", tooltip="変更対象の仮想マシン (Shift+Alt+O)"),
+                            content=ft.SelectionArea(content=self.formSelectTargetVms),
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text("起動/停止", tooltip="起動/停止 (Shift+Alt+B)"),
                             content=ft.SelectionArea(content=self.formStartStop),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text('管理情報', tooltip='管理情報 (Shift+Alt+A)'),
+                            tab_content=ft.Text("管理情報", tooltip="管理情報 (Shift+Alt+A)"),
                             content=ft.SelectionArea(content=self.formManageInfo),
                         ),
                     ],
                     scrollable=True,
                     expand=1,
                 )
-        change_disabled = True if self.session.get('user_role') == UserRole.USER_ROLE else False
-        is_execute_disabled = self.session.get('request_status') not in [
-            RequestStatus.APPROVED, RequestStatus.COMPLETED]
+        change_disabled = True if self.session.get("user_role") == UserRole.USER_ROLE else False
+        is_execute_disabled = self.session.get("request_status") not in [
+            RequestStatus.APPROVED,
+            RequestStatus.COMPLETED,
+        ]
         self.btnExecute = ft.ElevatedButton(
-            '実行', tooltip='実行 (Shift+Alt+N)', on_click=self.on_click_next, disabled=(is_execute_disabled or change_disabled))
+            "実行",
+            tooltip="実行 (Shift+Alt+N)",
+            on_click=self.on_click_next,
+            disabled=(is_execute_disabled or change_disabled),
+        )
         self.btnSave = ft.ElevatedButton(
-            '保存', tooltip='保存 (Shift+Alt+S)', on_click=self.on_click_save, disabled=change_disabled)
+            "保存",
+            tooltip="保存 (Shift+Alt+S)",
+            on_click=self.on_click_save,
+            disabled=change_disabled,
+        )
         self.btnDuplicate = ft.ElevatedButton(
-            '複製', tooltip='複製 (Shift+Alt+D)', on_click=self.on_click_duplicate, disabled=change_disabled)
-        self.btnCancel = ft.FilledButton(
-            '閉じる', tooltip='閉じる (Shift+Alt+X)', on_click=self.on_click_cancel)
+            "複製",
+            tooltip="複製 (Shift+Alt+D)",
+            on_click=self.on_click_duplicate,
+            disabled=change_disabled,
+        )
+        self.btnCancel = ft.FilledButton("閉じる", tooltip="閉じる (Shift+Alt+X)", on_click=self.on_click_cancel)
 
         # Content
         header = ft.Container(
@@ -219,45 +276,58 @@ class EditRequestForm(BaseWizardCard):
         db_session = db.get_db()
         request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
         db_session.close()
-        confirm_text = '== 基本情報 ====================='
+        confirm_text = "== 基本情報 ====================="
         match request_operation:
             case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
-                confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
-                confirm_text += '\n依頼内容: ' + (self.session.get('request_text') if self.session.contains_key(
-                    'request_text') and self.session.get('request_text') != '' else '(未指定)')
-                confirm_text += '\n依頼区分: ' + self.session.get('request_category')
-                confirm_text += '\n申請項目: ' + self.session.get('request_operation')
-                request_deadline = self.session.get('request_deadline').strftime(
-                    '%Y/%m/%d') if self.session.contains_key('request_deadline') else '(未指定)'
-                confirm_text += '\nリリース希望日: ' + request_deadline
-                confirm_text += '\n\n== 詳細情報 ====================='
-                confirm_text += '\nクラスタ: ' + \
-                    self.session.get('job_options')['vsphere_cluster']
-                confirm_text += '\n仮想マシン: ' + \
-                    self.session.get('job_options')['target_vms']
-                if str(self.session.get('job_options')['change_vm_cpu_enabled']) == 'True':
-                    confirm_text += '\nCPUコア数: ' + \
-                        str(self.session.get('job_options')['vcpus'])
-                if str(self.session.get('job_options')['change_vm_memory_enabled']) == 'True':
-                    confirm_text += '\nメモリ容量(GB): ' + str(self.session.get('job_options')['memory_gb'])
+                confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
+                confirm_text += "\n依頼内容: " + (
+                    self.session.get("request_text")
+                    if self.session.contains_key("request_text") and self.session.get("request_text") != ""
+                    else "(未指定)"
+                )
+                confirm_text += "\n依頼区分: " + self.session.get("request_category")
+                confirm_text += "\n申請項目: " + self.session.get("request_operation")
+                request_deadline = (
+                    self.session.get("request_deadline").strftime("%Y/%m/%d")
+                    if self.session.contains_key("request_deadline")
+                    else "(未指定)"
+                )
+                confirm_text += "\nリリース希望日: " + request_deadline
+                confirm_text += "\n\n== 詳細情報 ====================="
+                confirm_text += "\nvCenter: " + self.session.get("job_options")["vsphere_vcenter"]
+                confirm_text += "\n仮想マシン: " + self.session.get("job_options")["target_vms"]
+                if str(self.session.get("job_options")["change_vm_cpu_enabled"]) == "True":
+                    confirm_text += "\nCPUコア数: " + str(self.session.get("job_options")["vcpus"])
+                if str(self.session.get("job_options")["change_vm_memory_enabled"]) == "True":
+                    confirm_text += "\nメモリ容量(GB): " + str(self.session.get("job_options")["memory_gb"])
             case RequestOperation.VM_START_OR_STOP_FRIENDLY:
-                confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
-                confirm_text += '\n依頼内容: ' + (self.session.get('request_text') if self.session.contains_key(
-                    'request_text') and self.session.get('request_text') != '' else '(未指定)')
-                confirm_text += '\n依頼区分: ' + self.session.get('request_category')
-                confirm_text += '\n申請項目: ' + self.session.get('request_operation')
-                request_deadline = self.session.get('request_deadline').strftime(
-                    '%Y/%m/%d') if self.session.contains_key('request_deadline') else '(未指定)'
-                confirm_text += '\nリリース希望日: ' + request_deadline
-                confirm_text += '\n\n== 詳細情報 ====================='
-                confirm_text += '\nクラスタ: ' + \
-                    self.session.get('job_options')['vsphere_cluster']
-                confirm_text += '\n仮想マシン: ' + \
-                    self.session.get('job_options')['target_vms']
-                if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
-                    confirm_text += '\n起動/停止: ' + VmStartStop.to_friendly(self.session.get('job_options')['vm_start_stop'])
-                    confirm_text += '\nシャットダウン時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
-                    confirm_text += '\n起動時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
+                confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
+                confirm_text += "\n依頼内容: " + (
+                    self.session.get("request_text")
+                    if self.session.contains_key("request_text") and self.session.get("request_text") != ""
+                    else "(未指定)"
+                )
+                confirm_text += "\n依頼区分: " + self.session.get("request_category")
+                confirm_text += "\n申請項目: " + self.session.get("request_operation")
+                request_deadline = (
+                    self.session.get("request_deadline").strftime("%Y/%m/%d")
+                    if self.session.contains_key("request_deadline")
+                    else "(未指定)"
+                )
+                confirm_text += "\nリリース希望日: " + request_deadline
+                confirm_text += "\n\n== 詳細情報 ====================="
+                confirm_text += "\nvCenter: " + self.session.get("job_options")["vsphere_vcenter"]
+                confirm_text += "\n仮想マシン: " + self.session.get("job_options")["target_vms"]
+                if str(self.session.get("job_options")["vm_start_stop_enabled"]) == "True":
+                    confirm_text += "\n起動/停止: " + VmStartStop.to_friendly(
+                        self.session.get("job_options")["vm_start_stop"]
+                    )
+                    confirm_text += "\nシャットダウン時の最大待ち合わせ時間(秒): " + str(
+                        self.session.get("job_options")["shutdown_timeout_sec"]
+                    )
+                    confirm_text += "\n起動時の最大待ち合わせ時間(秒): " + str(
+                        self.session.get("job_options")["tools_wait_timeout_sec"]
+                    )
         return confirm_text
 
     @Logging.func_logger
@@ -270,44 +340,32 @@ class EditRequestForm(BaseWizardCard):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="N", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_next,
         )
         # 申請の保存
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="S", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="S", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_save,
         )
         # 申請の複製
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="D", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="D", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_duplicate,
         )
         # キャンセル
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="X", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_cancel,
         )
         # 共通タブに切り替え
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="G", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="G", shift=True, ctrl=False, alt=True, meta=False),
             func=lambda e: self._keyboard_switch_tab(0),
         )
         # 変更対象タブに切り替え
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="O", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="O", shift=True, ctrl=False, alt=True, meta=False),
             func=lambda e: self._keyboard_switch_tab(1),
         )
 
@@ -356,23 +414,17 @@ class EditRequestForm(BaseWizardCard):
 
         # ログへのセッションダンプ
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="V", shift=True, ctrl=False, alt=True, meta=False),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
         # Semantics Debuggerの有効化/無効化
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="Y", shift=True, ctrl=False, alt=True, meta=False),
             func=self.toggle_show_semantics_debugger,
         )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=False, alt=True, meta=False),
             func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )
 
@@ -387,39 +439,27 @@ class EditRequestForm(BaseWizardCard):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # 次のページへ
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="N", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="N", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 申請の保存
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="S", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="S", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 申請の複製
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="D", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="D", shift=True, ctrl=False, alt=True, meta=False),
             )
             # キャンセル
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="X", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="X", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 共通タブに切り替え
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="G", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="G", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 変更対象タブに切り替え
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="O", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="O", shift=True, ctrl=False, alt=True, meta=False),
             )
 
             # 申請の種類に応じて、タブに対応したキーボードショートカットを登録
@@ -450,27 +490,19 @@ class EditRequestForm(BaseWizardCard):
 
             # 管理情報タブに切り替え
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="A", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="A", shift=True, ctrl=False, alt=True, meta=False),
             )
             # ログへのセッションダンプ
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="V", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="V", shift=True, ctrl=False, alt=True, meta=False),
             )
             # Semantics Debuggerの有効化/無効化
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Y", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="Y", shift=True, ctrl=False, alt=True, meta=False),
             )
             # ログへのキーボードショートカット一覧出力
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Z", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=False, alt=True, meta=False),
             )
 
     @Logging.func_logger
@@ -483,7 +515,8 @@ class EditRequestForm(BaseWizardCard):
 
     @Logging.func_logger
     def on_click_next(self, e):
-        if self.btnExecute.disabled: return
-        self.session.set('confirm_text', self.generate_confirm_text())
-        Logging.info('JOB_OPTIONS: ' + str(self.session.get('job_options')))
+        if self.btnExecute.disabled:
+            return
+        self.session.set("confirm_text", self.generate_confirm_text())
+        Logging.info("JOB_OPTIONS: " + str(self.session.get("job_options")))
         self.step_change_next(e)

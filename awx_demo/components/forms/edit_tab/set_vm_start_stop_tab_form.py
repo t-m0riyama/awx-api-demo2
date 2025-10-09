@@ -14,11 +14,17 @@ class SetVmStartStopTabForm(ft.Card):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
-    VM_START_DESCRIPTION = '仮想マシンを起動する'
-    VM_STOP_DESCRIPTION = '仮想マシンを停止する'
-    VM_POWEROFF_DESCRIPTION = '仮想マシンを電源OFFにする'
+    VM_START_DESCRIPTION = "仮想マシンを起動する"
+    VM_STOP_DESCRIPTION = "仮想マシンを停止する"
+    VM_POWEROFF_DESCRIPTION = "仮想マシンを電源OFFにする"
 
-    def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT):
+    def __init__(
+        self,
+        session,
+        height=CONTENT_HEIGHT,
+        width=CONTENT_WIDTH,
+        body_height=BODY_HEIGHT,
+    ):
         self.session = session
         self.content_height = height
         self.content_width = width
@@ -26,44 +32,52 @@ class SetVmStartStopTabForm(ft.Card):
 
         # controls
         self.checkChangeStartStopEnabled = ft.Checkbox(
-            label='起動/停止の状態を変更する',
-            value=self.session.get('job_options')['vm_start_stop_enabled'] if 'vm_start_stop_enabled' in self.session.get('job_options') else True,
+            label="起動/停止の状態を変更する",
+            value=(self.session.get("job_options")["vm_start_stop_enabled"] if "vm_start_stop_enabled" in self.session.get("job_options") else True),
             on_change=self.on_change_vm_start_stop_enabled,
             disabled=True,
         )
 
         self.dropVmStartStop = ft.Dropdown(
-            label='起動または停止',
-            value=VmStartStop.to_friendly(self.session.get('job_options')['vm_start_stop']) if 'vm_start_stop' in self.session.get('job_options') else VmStartStop.STARTUP_FRIENDLY,
+            label="起動または停止",
+            value=(
+                VmStartStop.to_friendly(self.session.get("job_options")["vm_start_stop"])
+                if "vm_start_stop" in self.session.get("job_options")
+                else VmStartStop.STARTUP_FRIENDLY
+            ),
             options=[
                 ft.dropdown.Option(VmStartStop.STARTUP_FRIENDLY),
                 ft.dropdown.Option(VmStartStop.SHUTDOWN_FRIENDLY),
                 ft.dropdown.Option(VmStartStop.POWEROFF_FRIENDLY),
             ],
             on_change=self.on_change_vm_start_stop,
-            disabled=(not bool(strtobool(self.session.get('job_options')['vm_start_stop_enabled']))) if 'vm_start_stop_enabled' in self.session.get('job_options') else False,
+            disabled=(
+                (not bool(strtobool(self.session.get("job_options")["vm_start_stop_enabled"])))
+                if "vm_start_stop_enabled" in self.session.get("job_options")
+                else False
+            ),
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
-            value=self.session.get('job_options')['shutdown_timeout_sec'] if 'shutdown_timeout_sec' in self.session.get('job_options') else 600,
-            label='シャットダウン時の最大待ち合わせ時間(秒)',
+            value=(self.session.get("job_options")["shutdown_timeout_sec"] if "shutdown_timeout_sec" in self.session.get("job_options") else 600),
+            label="シャットダウン時の最大待ち合わせ時間(秒)",
             text_align=ft.TextAlign.RIGHT,
             expand=True,
-            hint_text='シャットダウンに時間を要するサーバは、この値をより大きく設定して下さい。',
+            hint_text="シャットダウンに時間を要するサーバは、この値をより大きく設定して下さい。",
             input_filter=ft.InputFilter(allow=True, regex_string=r"^\d{1,4}$", replacement_string=""),
             on_change=self.on_change_shutdown_timeout_sec,
         )
         self.tfToolsWaitTimeoutSec = ParameterInputText(
-            value=self.session.get('job_options')['tools_wait_timeout_sec'] if 'tools_wait_timeout_sec' in self.session.get('job_options') else 600,
-            label='起動時の最大待ち合わせ時間(秒)',
+            value=(self.session.get("job_options")["tools_wait_timeout_sec"] if "tools_wait_timeout_sec" in self.session.get("job_options") else 600),
+            label="起動時の最大待ち合わせ時間(秒)",
             text_align=ft.TextAlign.RIGHT,
             expand=True,
-            hint_text='起動に時間を要するサーバは、この値をより大きく設定して下さい。',
+            hint_text="起動に時間を要するサーバは、この値をより大きく設定して下さい。",
             input_filter=ft.InputFilter(allow=True, regex_string=r"^\d{1,4}$", replacement_string=""),
             on_change=self.on_change_tools_wait_timeout_sec,
         )
 
         # 申請者ロールの場合は、変更できないようにする
-        change_disabled = True if self.session.get('user_role') == UserRole.USER_ROLE else False
+        change_disabled = True if self.session.get("user_role") == UserRole.USER_ROLE else False
 
         # Content
         body = ft.Column(
@@ -71,10 +85,12 @@ class SetVmStartStopTabForm(ft.Card):
                 # formDescription,
                 self.checkChangeStartStopEnabled,
                 self.dropVmStartStop,
-                ft.Row([
-                    self.tfShutdownTimeoutSec,
-                    self.tfToolsWaitTimeoutSec,
-                ]),
+                ft.Row(
+                    [
+                        self.tfShutdownTimeoutSec,
+                        self.tfToolsWaitTimeoutSec,
+                    ]
+                ),
             ],
             height=self.body_height,
             disabled=change_disabled,
@@ -94,29 +110,27 @@ class SetVmStartStopTabForm(ft.Card):
 
     @Logging.func_logger
     def generate_confirm_text(self):
-        confirm_text = '== 基本情報 ====================='
-        confirm_text += '\n依頼者(アカウント): ' + self.session.get('awx_loginid')
-        confirm_text += '\n依頼内容: ' + (self.session.get('request_text') if self.session.contains_key(
-            'request_text') and self.session.get('request_text') != '' else '(未指定)')
-        confirm_text += '\n依頼区分: ' + self.session.get('request_category')
-        confirm_text += '\n申請項目: ' + self.session.get('request_operation')
-        request_deadline = self.session.get('request_deadline').strftime(
-            '%Y/%m/%d') if self.session.contains_key('request_deadline') else '(未指定)'
-        confirm_text += '\nリリース希望日: ' + request_deadline
-        confirm_text += '\n\n== 詳細情報 ====================='
-        confirm_text += '\nクラスタ: ' + \
-            self.session.get('job_options')['vsphere_cluster']
-        confirm_text += '\n仮想マシン: ' + \
-            self.session.get('job_options')['target_vms']
-        if str(self.session.get('job_options')['vm_start_stop_enabled']) == 'True':
-            confirm_text += '\n起動/停止: ' + VmStartStop.to_friendly(self.session.get('job_options')['vm_start_stop'])
-            confirm_text += '\nシャットダウン時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['shutdown_timeout_sec'])
-            confirm_text += '\n起動時の最大待ち合わせ時間(秒): ' + str(self.session.get('job_options')['tools_wait_timeout_sec'])
+        confirm_text = "== 基本情報 ====================="
+        confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
+        confirm_text += "\n依頼内容: " + (
+            self.session.get("request_text") if self.session.contains_key("request_text") and self.session.get("request_text") != "" else "(未指定)"
+        )
+        confirm_text += "\n依頼区分: " + self.session.get("request_category")
+        confirm_text += "\n申請項目: " + self.session.get("request_operation")
+        request_deadline = self.session.get("request_deadline").strftime("%Y/%m/%d") if self.session.contains_key("request_deadline") else "(未指定)"
+        confirm_text += "\nリリース希望日: " + request_deadline
+        confirm_text += "\n\n== 詳細情報 ====================="
+        confirm_text += "\nvCenter: " + self.session.get("job_options")["vsphere_vcenter"]
+        confirm_text += "\n仮想マシン: " + self.session.get("job_options")["target_vms"]
+        if str(self.session.get("job_options")["vm_start_stop_enabled"]) == "True":
+            confirm_text += "\n起動/停止: " + VmStartStop.to_friendly(self.session.get("job_options")["vm_start_stop"])
+            confirm_text += "\nシャットダウン時の最大待ち合わせ時間(秒): " + str(self.session.get("job_options")["shutdown_timeout_sec"])
+            confirm_text += "\n起動時の最大待ち合わせ時間(秒): " + str(self.session.get("job_options")["tools_wait_timeout_sec"])
         return confirm_text
 
     @Logging.func_logger
     def on_change_vm_start_stop_enabled(self, e):
-        self.session.get('job_options')['vm_start_stop_enabled'] = str(e.control.value)
+        self.session.get("job_options")["vm_start_stop_enabled"] = str(e.control.value)
         self.dropVmStartStop.disabled = False if e.control.value else True
         self.tfShutdownTimeoutSec.disabled = False if e.control.value else True
         self.tfToolsWaitTimeoutSec.disabled = False if e.control.value else True
@@ -126,12 +140,12 @@ class SetVmStartStopTabForm(ft.Card):
 
     @Logging.func_logger
     def on_change_vm_start_stop(self, e):
-        self.session.get('job_options')['vm_start_stop'] = VmStartStop.to_formal(self.dropVmStartStop.value)
+        self.session.get("job_options")["vm_start_stop"] = VmStartStop.to_formal(self.dropVmStartStop.value)
 
     @Logging.func_logger
     def on_change_shutdown_timeout_sec(self, e):
-        self.session.get('job_options')['shutdown_timeout_sec'] = int(self.tfShutdownTimeoutSec.value)
+        self.session.get("job_options")["shutdown_timeout_sec"] = int(self.tfShutdownTimeoutSec.value)
 
     @Logging.func_logger
     def on_change_tools_wait_timeout_sec(self, e):
-        self.session.get('job_options')['tools_wait_timeout_sec'] = int(self.tfToolsWaitTimeoutSec.value)
+        self.session.get("job_options")["tools_wait_timeout_sec"] = int(self.tfToolsWaitTimeoutSec.value)
