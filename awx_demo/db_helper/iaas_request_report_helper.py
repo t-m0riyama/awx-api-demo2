@@ -42,6 +42,8 @@ class IaasRequestReportHelper:
     ]
     JOB_OPTIONS_KEYS = [
         "vsphere_cluster",
+        "vsphere_vcenter",
+        "system_ids",
         "target_vms",
         "vcpus",
         "memory_gb",
@@ -56,6 +58,8 @@ class IaasRequestReportHelper:
     ]
     JOB_OPTIONS_FRIENDLY_KEYS = [
         "クラスタ名",
+        "vCenter",
+        "システム識別子",
         "仮想マシン名",
         "CPUコア数",
         "メモリ容量（GB)",
@@ -74,16 +78,20 @@ class IaasRequestReportHelper:
     def diff_request_change(cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old):
         diff_request = {}
         if request.request_text != request_text_old:
-            diff_request['request_text'] = '{} -> {}'.format(request_text_old, request.request_text)
+            diff_request["request_text"] = "{} -> {}".format(request_text_old, request.request_text)
         if request.request_deadline != request_deadline_old:
-            diff_request['request_deadline'] = '{} -> {}'.format(request_deadline_old.strftime('%Y/%m/%d'), request.request_deadline.strftime('%Y/%m/%d'))
+            diff_request["request_deadline"] = "{} -> {}".format(
+                request_deadline_old.strftime("%Y/%m/%d"), request.request_deadline.strftime("%Y/%m/%d")
+            )
         if request.request_status != request_status_old:
-            diff_request['request_status'] = '{} -> {}'.format(RequestStatus.to_friendly(request_status_old), RequestStatus.to_friendly(request.request_status))
+            diff_request["request_status"] = "{} -> {}".format(
+                RequestStatus.to_friendly(request_status_old), RequestStatus.to_friendly(request.request_status)
+            )
         if request.iaas_user != iaas_user_old:
-            diff_request['iaas_user'] = '{} -> {}'.format(iaas_user_old, request.iaas_user)
+            diff_request["iaas_user"] = "{} -> {}".format(iaas_user_old, request.iaas_user)
         job_options_dict = cls.diff_job_options(request.job_options, job_options_old)
         if job_options_dict != {}:
-            diff_request['job_options'] = job_options_dict
+            diff_request["job_options"] = job_options_dict
 
         return diff_request
 
@@ -95,7 +103,7 @@ class IaasRequestReportHelper:
         job_options_old_dict = json.loads(job_options_old)
         for key in job_options_dict.keys():
             if job_options_dict[key] != job_options_old_dict[key]:
-                diff_job_options[key] = '{} -> {}'.format(job_options_old_dict[key], job_options_dict[key])
+                diff_job_options[key] = "{} -> {}".format(job_options_old_dict[key], job_options_dict[key])
         return diff_job_options
 
     @classmethod
@@ -134,27 +142,26 @@ class IaasRequestReportHelper:
     @Logging.func_logger
     def except_request_status_and_iaas_user(cls, diff_request):
         diff_request_except = diff_request.copy()
-        diff_request_except.pop('request_status', None)
-        diff_request_except.pop('iaas_user', None)
+        diff_request_except.pop("request_status", None)
+        diff_request_except.pop("iaas_user", None)
         return diff_request_except
 
     @classmethod
     @Logging.func_logger
     def generate_common_fields(cls, request_id, event_type_friendly, is_succeeded, request_text=None, request_deadline=None, additional_info=None):
-        ok_ng = 'OK' if is_succeeded else 'NG'
+        ok_ng = "OK" if is_succeeded else "NG"
         status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
         title = "[申請通知 / {}({}) / {}]".format(event_type_friendly, request_id, ok_ng)
-        summary = '{}に{}しました。'.format(
-                event_type_friendly, EventStatus.to_friendly(status))
+        summary = "{}に{}しました。".format(event_type_friendly, EventStatus.to_friendly(status))
         if request_text:
-            title += ' {}'.format(request_text)
+            title += " {}".format(request_text)
         if request_deadline:
             if isinstance(request_deadline, datetime.datetime):
-                title += ' (リリース希望日: {})'.format(request_deadline.strftime('%Y/%m/%d'))
+                title += " (リリース希望日: {})".format(request_deadline.strftime("%Y/%m/%d"))
             else:
-                title += ' (リリース希望日: {})'.format(request_deadline)
+                title += " (リリース希望日: {})".format(request_deadline)
         if additional_info:
-            summary += '{}'.format(additional_info)
+            summary += "{}".format(additional_info)
         return title, status, summary
 
     @classmethod
@@ -164,11 +171,13 @@ class IaasRequestReportHelper:
         for i, request_key in enumerate(cls.REQUEST_KEYS):
             if request.get(request_key):
                 if isinstance(request[request_key], datetime.datetime):
-                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value).strftime('%Y/%m/%d')
+                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value).strftime("%Y/%m/%d")
                 else:
                     request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value)
         if request_friendly.get("ジョブ設定"):
-            request_friendly["ジョブ設定"] = cls.to_friendly_job_options(job_options_str=json.dumps(request_friendly["ジョブ設定"]), convert_to_yaml=False)
+            request_friendly["ジョブ設定"] = cls.to_friendly_job_options(
+                job_options_str=json.dumps(request_friendly["ジョブ設定"]), convert_to_yaml=False
+            )
         yaml_string = yaml.safe_dump(data=request_friendly, allow_unicode=True, sort_keys=False)
         return yaml_string
 
@@ -178,7 +187,7 @@ class IaasRequestReportHelper:
         job_options_dict = json.loads(job_options_str)
         for i, job_options_key in enumerate(cls.JOB_OPTIONS_KEYS):
             if job_options_dict.get(job_options_key):
-                job_options_dict[f'+--{cls.JOB_OPTIONS_FRIENDLY_KEYS[i]}'] = job_options_dict.pop(job_options_key, default_value)
+                job_options_dict[f"+--{cls.JOB_OPTIONS_FRIENDLY_KEYS[i]}"] = job_options_dict.pop(job_options_key, default_value)
 
         if convert_to_yaml:
             # YAML文字列として返却

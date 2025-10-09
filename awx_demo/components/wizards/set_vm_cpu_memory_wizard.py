@@ -1,7 +1,9 @@
 import flet as ft
 
 from awx_demo.components.forms.job_progress_form import JobProgressForm
-from awx_demo.components.forms.select_target_form import SelectTargetForm
+
+from awx_demo.components.forms.select_target_vcenter_form import SelectTargetVcenterForm
+from awx_demo.components.forms.select_target_vms_form import SelectTargetVmsForm
 from awx_demo.components.forms.send_request_confirm_form import SendRequestConfirmForm
 from awx_demo.components.forms.set_vm_cpu_form import SetVmCpuForm
 from awx_demo.components.forms.set_vm_memory_form import SetVmMemoryForm
@@ -19,7 +21,12 @@ class SetVmCpuMemoryWizard(BaseWizard):
     CONFIRM_FORM_TITLE = "CPU/メモリ割り当て変更"
 
     def __init__(
-        self, session, page: ft.Page, wizard_dialog: ft.AlertDialog, parent_wizard, parent_refresh_func
+        self,
+        session,
+        page: ft.Page,
+        wizard_dialog: ft.AlertDialog,
+        parent_wizard,
+        parent_refresh_func,
     ):
         self.session = session
         self.page = page
@@ -31,7 +38,8 @@ class SetVmCpuMemoryWizard(BaseWizard):
 
     @Logging.func_logger
     def on_click_next(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
 
         # 遷移前のフォームのショートカットキーを登録解除
@@ -40,8 +48,8 @@ class SetVmCpuMemoryWizard(BaseWizard):
 
         match self.session.get("new_request_wizard_step"):
             case "create_request":
-                self.session.set("new_request_wizard_step", "select_target")
-                self.formStep = SelectTargetForm(
+                self.session.set("new_request_wizard_step", "select_target_vcenter")
+                self.formStep = SelectTargetVcenterForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -52,9 +60,24 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = self.formStep
-                self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
+                self.page.title = f"{self.session.get('app_title_base')} - 変更対象のvCenter選択"
                 self.page.open(self.wizard_dialog)
-            case "select_target":
+            case "select_target_vcenter":
+                self.session.set("new_request_wizard_step", "select_target_vms")
+                self.formStep = SelectTargetVmsForm(
+                    session=self.session,
+                    page=self.page,
+                    height=self.CONTENT_HEIGHT,
+                    width=self.CONTENT_WIDTH,
+                    body_height=self.BODY_HEIGHT,
+                    step_change_next=self.on_click_next,
+                    step_change_previous=self.on_click_previous,
+                    step_change_cancel=self.on_click_cancel,
+                )
+                self.wizard_dialog.content = self.formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 変更対象の仮想マシン選択"
+                self.page.open(self.wizard_dialog)
+            case "select_target_vms":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
                 self.formStep = SetVmCpuForm(
                     session=self.session,
@@ -127,7 +150,8 @@ class SetVmCpuMemoryWizard(BaseWizard):
 
     @Logging.func_logger
     def on_click_previous(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
 
         # 遷移前のフォームのショートカットキーを登録解除
@@ -135,11 +159,11 @@ class SetVmCpuMemoryWizard(BaseWizard):
             self.formStep.unregister_key_shortcuts()
 
         match self.session.get("new_request_wizard_step"):
-            case "select_target":
+            case "select_target_vcenter":
                 self.parent_wizard.on_click_previous(e)
-            case "set_vm_cpu":
-                self.session.set("new_request_wizard_step", "select_target")
-                self.formStep = SelectTargetForm(
+            case "select_target_vms":
+                self.session.set("new_request_wizard_step", "select_target_vcenter")
+                self.formStep = SelectTargetVcenterForm(
                     session=self.session,
                     page=self.page,
                     height=self.CONTENT_HEIGHT,
@@ -150,7 +174,22 @@ class SetVmCpuMemoryWizard(BaseWizard):
                     step_change_cancel=self.on_click_cancel,
                 )
                 self.wizard_dialog.content = self.formStep
-                self.page.title = f"{self.session.get('app_title_base')} - 変更対象の選択"
+                self.page.title = f"{self.session.get('app_title_base')} - 変更対象のvCenter選択"
+                self.page.open(self.wizard_dialog)
+            case "set_vm_cpu":
+                self.session.set("new_request_wizard_step", "select_target_vms")
+                self.formStep = SelectTargetVmsForm(
+                    session=self.session,
+                    page=self.page,
+                    height=self.CONTENT_HEIGHT,
+                    width=self.CONTENT_WIDTH,
+                    body_height=self.BODY_HEIGHT,
+                    step_change_next=self.on_click_next,
+                    step_change_previous=self.on_click_previous,
+                    step_change_cancel=self.on_click_cancel,
+                )
+                self.wizard_dialog.content = self.formStep
+                self.page.title = f"{self.session.get('app_title_base')} - 変更対象の仮想マシン選択"
                 self.page.open(self.wizard_dialog)
             case "set_vm_memory":
                 self.session.set("new_request_wizard_step", "set_vm_cpu")
