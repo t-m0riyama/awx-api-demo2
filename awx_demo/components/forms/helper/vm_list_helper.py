@@ -99,7 +99,7 @@ class VmListHelper:
                                 content=ft.Container(
                                     content=ft.Text(
                                         vm.name,
-                                        tooltip=f"仮想マシン名: {vm.name}, ホスト名: {vm.hostname},\nvCenter: {vm.vcenter}, システム識別子: {vm.vm_folder}, \n電源状態: {vm.power_state}, CPUコア数: {vm.num_cpu}, メモリ容量(GB): {int(vm.memory_size_mb / 1024)}, IPアドレス: {vm.ip_address}",
+                                        tooltip=f"仮想マシン名: {vm.name}, ホスト名: {vm.hostname},\nvCenter: {vm.vcenter}, システム識別子: {vm.vm_folder}",
                                     ),
                                 ),
                             ),
