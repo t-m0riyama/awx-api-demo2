@@ -5,9 +5,6 @@ from awx_demo.utils.logging import Logging
 
 class VmListHelper:
 
-    # const
-    DATA_ROW_MAX = 10
-
     @staticmethod
     @Logging.func_logger
     def generate_vm_list_labels(vm_list_form):
