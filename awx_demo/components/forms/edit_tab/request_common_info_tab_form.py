@@ -91,6 +91,7 @@ class RequestCommonInfoTabForm(ft.Card):
                 ft.dropdown.Option(RequestCategory.PRIVILEGED_ID_CREATE_FRIENDLY, disabled=True),
             ],
             disabled=True,
+            expand=True,
         )
         self.dropOperation = ft.Dropdown(
             label="申請項目(＊)",
@@ -104,6 +105,7 @@ class RequestCommonInfoTabForm(ft.Card):
                 ft.dropdown.Option(RequestOperation.VM_START_OR_STOP_FRIENDLY),
             ],
             disabled=True,
+            expand=True,
         )
         self.textRequestDeadline = ft.Text(
             value=(

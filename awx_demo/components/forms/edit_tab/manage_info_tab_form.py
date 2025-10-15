@@ -29,7 +29,9 @@ class ManageInfoTabForm(ft.Card):
         self.body_height = body_height
 
         # controls
-        filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip("'").split(",")
+        filtered_users = (
+            os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip("'").split(",")
+        )
         filtered_users = list(map(lambda s: s.strip(), filtered_users))
         iaas_users = AWXApiHelper.get_users(
             self.session.get("awx_url"),
@@ -51,12 +53,17 @@ class ManageInfoTabForm(ft.Card):
             on_change=self.on_change_iaas_user,
             disabled=iaas_user_change_disabled,
             autofocus=True,
+            expand=True,
         )
 
         status_change_disabled = False if self.session.get("user_role") == UserRole.ADMIN_ROLE else True
         self.dropRequestStatus = ft.Dropdown(
             label="申請の状態",
-            value=(RequestStatus.to_friendly(self.session.get("request_status")) if self.session.contains_key("request_status") else ""),
+            value=(
+                RequestStatus.to_friendly(self.session.get("request_status"))
+                if self.session.contains_key("request_status")
+                else ""
+            ),
             options=[
                 ft.dropdown.Option(RequestStatus.START_FRIENDLY),
                 ft.dropdown.Option(RequestStatus.APPROVED_FRIENDLY),
@@ -67,12 +74,19 @@ class ManageInfoTabForm(ft.Card):
             on_change=self.on_change_request_status,
             disabled=status_change_disabled,
             autofocus=True,
+            expand=True,
         )
         self.textJobId = ft.Text(
-            value=("最新のジョブID: " + str(self.session.get("job_id")) if self.session.contains_key("job_id") else "ジョブID: (未実行)"),
+            value=(
+                "最新のジョブID: " + str(self.session.get("job_id"))
+                if self.session.contains_key("job_id")
+                else "ジョブID: (未実行)"
+            ),
         )
         self.btnAWXJobLink = ft.TextButton(
-            text="ジョブ出力の参照: " + self.session.get("awx_url") + "/#/jobs/playbook/{}/output".format(self.session.get("job_id")),
+            text="ジョブ出力の参照: "
+            + self.session.get("awx_url")
+            + "/#/jobs/playbook/{}/output".format(self.session.get("job_id")),
             url=self.session.get("awx_url") + "/#/jobs/playbook/{}/output".format(self.session.get("job_id")),
             visible=True if self.session.contains_key("job_id") else False,
         )

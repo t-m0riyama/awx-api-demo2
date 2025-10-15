@@ -48,6 +48,7 @@ class SetVmCpuTabForm(ft.Card):
                 if "change_vm_cpu_enabled" in self.session.get("job_options")
                 else False
             ),
+            expand=True,
         )
 
         # 申請者ロールの場合は、変更できないようにする

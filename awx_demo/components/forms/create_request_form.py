@@ -88,6 +88,7 @@ class CreateRequestForm(BaseWizardCard):
                 ft.dropdown.Option(RequestCategory.BACKUP_STOP_OR_RESUME_FRIENDLY, disabled=True),
                 ft.dropdown.Option(RequestCategory.PRIVILEGED_ID_CREATE_FRIENDLY, disabled=True),
             ],
+            expand=True,
         )
         self.dropOperation = ft.Dropdown(
             label="申請項目(＊)",
@@ -101,6 +102,7 @@ class CreateRequestForm(BaseWizardCard):
                 ft.dropdown.Option(RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY),
                 ft.dropdown.Option(RequestOperation.VM_START_OR_STOP_FRIENDLY),
             ],
+            expand=True,
         )
         self.lblRequestDeadline = ft.Text(
             value=(

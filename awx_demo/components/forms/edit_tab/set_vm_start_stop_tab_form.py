@@ -60,6 +60,7 @@ class SetVmStartStopTabForm(ft.Card):
                 if "vm_start_stop_enabled" in self.session.get("job_options")
                 else False
             ),
+            expand=True,
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
             value=(

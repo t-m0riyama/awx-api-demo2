@@ -48,7 +48,11 @@ class SetVmStartStopForm(BaseWizardCard):
         )
         self.checkChangeStartStopEnabled = ft.Checkbox(
             label="起動/停止の状態を変更する",
-            value=(self.session.get("job_options")["vm_start_stop_enabled"] if "vm_start_stop_enabled" in self.session.get("job_options") else True),
+            value=(
+                self.session.get("job_options")["vm_start_stop_enabled"]
+                if "vm_start_stop_enabled" in self.session.get("job_options")
+                else True
+            ),
             on_change=self.on_change_vm_start_stop_enabled,
             disabled=True,
         )
@@ -71,9 +75,14 @@ class SetVmStartStopForm(BaseWizardCard):
                 if "vm_start_stop_enabled" in self.session.get("job_options")
                 else False
             ),
+            expand=True,
         )
         self.tfShutdownTimeoutSec = ParameterInputText(
-            value=(self.session.get("job_options")["shutdown_timeout_sec"] if "shutdown_timeout_sec" in self.session.get("job_options") else 600),
+            value=(
+                self.session.get("job_options")["shutdown_timeout_sec"]
+                if "shutdown_timeout_sec" in self.session.get("job_options")
+                else 600
+            ),
             label="シャットダウン時の最大待ち合わせ時間(秒)",
             text_align=ft.TextAlign.RIGHT,
             expand=True,
@@ -81,7 +90,11 @@ class SetVmStartStopForm(BaseWizardCard):
             input_filter=ft.InputFilter(allow=True, regex_string=r"^\d{1,4}$", replacement_string=""),
         )
         self.tfToolsWaitTimeoutSec = ParameterInputText(
-            value=(self.session.get("job_options")["tools_wait_timeout_sec"] if "tools_wait_timeout_sec" in self.session.get("job_options") else 600),
+            value=(
+                self.session.get("job_options")["tools_wait_timeout_sec"]
+                if "tools_wait_timeout_sec" in self.session.get("job_options")
+                else 600
+            ),
             label="起動時の最大待ち合わせ時間(秒)",
             text_align=ft.TextAlign.RIGHT,
             expand=True,
@@ -182,19 +195,29 @@ class SetVmStartStopForm(BaseWizardCard):
         confirm_text = "== 基本情報 ====================="
         confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
         confirm_text += "\n依頼内容: " + (
-            self.session.get("request_text") if self.session.contains_key("request_text") and self.session.get("request_text") != "" else "(未指定)"
+            self.session.get("request_text")
+            if self.session.contains_key("request_text") and self.session.get("request_text") != ""
+            else "(未指定)"
         )
         confirm_text += "\n依頼区分: " + self.session.get("request_category")
         confirm_text += "\n申請項目: " + self.session.get("request_operation")
-        request_deadline = self.session.get("request_deadline").strftime("%Y/%m/%d") if self.session.contains_key("request_deadline") else "(未指定)"
+        request_deadline = (
+            self.session.get("request_deadline").strftime("%Y/%m/%d")
+            if self.session.contains_key("request_deadline")
+            else "(未指定)"
+        )
         confirm_text += "\nリリース希望日: " + request_deadline
         confirm_text += "\n\n== 詳細情報 ====================="
         confirm_text += "\vCenter: " + self.session.get("job_options")["vsphere_vcenter"]
         confirm_text += "\n仮想マシン: " + self.session.get("job_options")["target_vms"]
         if str(self.session.get("job_options")["vm_start_stop_enabled"]) == "True":
             confirm_text += "\n起動/停止: " + VmStartStop.to_friendly(self.session.get("job_options")["vm_start_stop"])
-            confirm_text += "\nシャットダウン時の最大待ち合わせ時間(秒): " + str(self.session.get("job_options")["shutdown_timeout_sec"])
-            confirm_text += "\n起動時の最大待ち合わせ時間(秒): " + str(self.session.get("job_options")["tools_wait_timeout_sec"])
+            confirm_text += "\nシャットダウン時の最大待ち合わせ時間(秒): " + str(
+                self.session.get("job_options")["shutdown_timeout_sec"]
+            )
+            confirm_text += "\n起動時の最大待ち合わせ時間(秒): " + str(
+                self.session.get("job_options")["tools_wait_timeout_sec"]
+            )
         return confirm_text
 
     @Logging.func_logger

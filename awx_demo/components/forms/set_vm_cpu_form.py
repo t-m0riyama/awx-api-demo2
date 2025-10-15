@@ -84,6 +84,7 @@ class SetVmCpuForm(BaseWizardCard):
                 if "change_vm_cpu_enabled" in self.session.get("job_options")
                 else False
             ),
+            expand=True,
         )
         self.btnNext = ft.FilledButton("次へ", tooltip="次へ (Shift+Alt+N)", on_click=self.on_click_next)
         self.btnPrev = ft.ElevatedButton("戻る", tooltip="戻る (Shift+Alt+P)", on_click=self.on_click_previous)
