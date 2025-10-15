@@ -325,7 +325,7 @@ class SelectTargetVmsTabForm(ft.Card):
         vm_name = e.control.content.value
         vm = next((vm for vm in self.vms_available if vm.name == vm_name), None)
         # 仮想マシンの詳細情報を取得
-        if hasattr(vm, "disk_devices"):
+        if not hasattr(vm, "disk_devices"):
             vm_detail = VlbSimpleClient.get_vm(
                 api_client=self.api_client, vcenter=vm.vcenter, vm_instance_uuid=vm.instance_uuid
             )
