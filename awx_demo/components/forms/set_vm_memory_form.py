@@ -40,12 +40,16 @@ class SetVmMemoryForm(BaseWizardCard):
 
         # controls
         formTitle = FormTitle("メモリの割り当て変更", "変更内容")
-        formDescription = FormDescription("仮想マシンに割り当てるメモリ容量を変更します。＊は入力/選択が必須の項目です。")
+        formDescription = FormDescription(
+            "仮想マシンに割り当てるメモリ容量を変更します。＊は入力/選択が必須の項目です。"
+        )
 
         self.checkChangeVmMemoryEnabled = ft.Checkbox(
             label="メモリ容量を変更する",
             value=(
-                self.session.get("job_options")["change_vm_memory_enabled"] if "change_vm_memory_enabled" in self.session.get("job_options") else True
+                self.session.get("job_options")["change_vm_memory_enabled"]
+                if "change_vm_memory_enabled" in self.session.get("job_options")
+                else True
             ),
             autofocus=True,
             on_change=self.on_change_vm_memory_enabled,
@@ -60,7 +64,7 @@ class SetVmMemoryForm(BaseWizardCard):
 
         # 設定変更前のメモリ容量が選択可能なメモリ容量に含まれていない場合は、選択可能なメモリ容量に追加
         if self.session.contains_key("memory_gb_default"):
-            if not str(self.session.get("memory_gb_default")) in vm_memory_sizes_array:
+            if str(self.session.get("memory_gb_default")) not in vm_memory_sizes_array:
                 vm_memory_options.append(ft.dropdown.Option(str(self.session.get("memory_gb_default"))))
 
         # メモリ容量のデフォルト値を決定
@@ -157,11 +161,17 @@ class SetVmMemoryForm(BaseWizardCard):
         confirm_text = "== 基本情報 ====================="
         confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
         confirm_text += "\n依頼内容: " + (
-            self.session.get("request_text") if self.session.contains_key("request_text") and self.session.get("request_text") != "" else "(未指定)"
+            self.session.get("request_text")
+            if self.session.contains_key("request_text") and self.session.get("request_text") != ""
+            else "(未指定)"
         )
         confirm_text += "\n依頼区分: " + self.session.get("request_category")
         confirm_text += "\n申請項目: " + self.session.get("request_operation")
-        request_deadline = self.session.get("request_deadline").strftime("%Y/%m/%d") if self.session.contains_key("request_deadline") else "(未指定)"
+        request_deadline = (
+            self.session.get("request_deadline").strftime("%Y/%m/%d")
+            if self.session.contains_key("request_deadline")
+            else "(未指定)"
+        )
         confirm_text += "\nリリース希望日: " + request_deadline
         confirm_text += "\n\n== 詳細情報 ====================="
         confirm_text += "\nvCenter: " + self.session.get("job_options")["vsphere_vcenter"]

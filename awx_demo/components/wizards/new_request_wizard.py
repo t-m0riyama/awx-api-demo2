@@ -50,7 +50,8 @@ class NewRequestWizard(BaseWizard):
 
     @Logging.func_logger
     def on_click_next(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
         Logging.warning("REQUEST_OPERATION: " + self.session.get("request_operation"))
 
@@ -87,7 +88,8 @@ class NewRequestWizard(BaseWizard):
 
     @Logging.func_logger
     def on_click_previous(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         match self.session.get("new_request_wizard_step"):
             case _:
                 self.session.set("new_request_wizard_step", "create_request")

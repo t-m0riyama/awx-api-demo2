@@ -37,12 +37,8 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             columns=[
                 ft.DataColumn(ft.Text("")),
                 ft.DataColumn(ft.Text("時刻"), on_sort=self.on_click_heading_column),
-                ft.DataColumn(
-                    ft.Text("ユーザ名"), on_sort=self.on_click_heading_column
-                ),
-                ft.DataColumn(
-                    ft.Text("操作種別"), on_sort=self.on_click_heading_column
-                ),
+                ft.DataColumn(ft.Text("ユーザ名"), on_sort=self.on_click_heading_column),
+                ft.DataColumn(ft.Text("操作種別"), on_sort=self.on_click_heading_column),
                 ft.DataColumn(ft.Text("依頼ID"), on_sort=self.on_click_heading_column),
                 ft.DataColumn(ft.Text("概要"), on_sort=self.on_click_heading_column),
             ],
@@ -97,7 +93,9 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
         iaas_user_options = []
         if self.session.get("user_role") != UserRole.USER_ROLE:
-            filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip('\'').split(",")
+            filtered_users = (
+                os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip("'").split(",")
+            )
             filtered_users = list(map(lambda s: s.strip(), filtered_users))
             iaas_users = AWXApiHelper.get_users(
                 self.session.get("awx_url"),
@@ -114,15 +112,11 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             iaas_user_options.append(ft.dropdown.Option(iaas_user["username"]))
 
         # 申請者ロールの場合は、変更できないようにする
-        user_change_disabled = (
-            True if self.session.get("user_role") == UserRole.USER_ROLE else False
-        )
+        user_change_disabled = True if self.session.get("user_role") == UserRole.USER_ROLE else False
         self.dropUser = ft.Dropdown(
             label="ユーザ",
             value=(
-                self.session.get("activity_user")
-                if self.session.contains_key("activity_user")
-                else "すべてのユーザ"
+                self.session.get("activity_user") if self.session.contains_key("activity_user") else "すべてのユーザ"
             ),
             options=iaas_user_options,
             hint_text="操作を実行したアカウント",
@@ -135,11 +129,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         )
         self.dropActivityType = ft.Dropdown(
             label="操作種別",
-            value=(
-                self.session.get("activity_type")
-                if self.session.contains_key("activity_type")
-                else "すべての操作"
-            ),
+            value=(self.session.get("activity_type") if self.session.contains_key("activity_type") else "すべての操作"),
             options=[
                 ft.dropdown.Option("すべての操作"),
                 ft.dropdown.Option(EventType.LOGIN_FRIENDLY),
@@ -181,12 +171,8 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             autofocus=True,
             tooltip="操作履歴一覧の再読み込み (Control+Alt+R)",
         )
-        range_min, range_max, request_data_count = ActivityRowHelper.get_page_range(
-            self
-        )
-        self.textRequestsRange = ft.Text(
-            "{}-{} / {}".format(range_min, range_max, request_data_count)
-        )
+        range_min, range_max, request_data_count = ActivityRowHelper.get_page_range(self)
+        self.textRequestsRange = ft.Text("{}-{} / {}".format(range_min, range_max, request_data_count))
         self.btnPreviousPage = ft.IconButton(
             tooltip="前へ (Shift+Alt+←)",
             icon=ft.Icons.ARROW_LEFT,
@@ -270,10 +256,8 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=False, alt=True, meta=False
-            ),
-            func=lambda e: self.dropUser.focus()
+            key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+            func=lambda e: self.dropUser.focus(),
         )
         # 概要に含まれる文字の検索を実行
         keyboard_shortcut_manager.register_key_shortcut(
@@ -285,7 +269,11 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
         # 操作履歴一覧の再読み込み
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="R", shift=False, ctrl=True, alt=True, meta=False,
+                key="R",
+                shift=False,
+                ctrl=True,
+                alt=True,
+                meta=False,
             ),
             func=lambda e: self.refresh(),
         )
@@ -310,9 +298,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # autofocus=Trueである、最初のコントロールにフォーカスを移動する
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="F", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 概要に含まれる文字の検索を実行
             keyboard_shortcut_manager.unregister_key_shortcut(
@@ -322,9 +308,7 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
             )
             # 操作履歴一覧の再読み込み
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="R", shift=False, ctrl=True, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="R", shift=False, ctrl=True, alt=True, meta=False),
             )
             # 操作履歴一覧のページ送り / 次のページへ
             keyboard_shortcut_manager.unregister_key_shortcut(
@@ -349,21 +333,24 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_request_edit_open(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self.session.set("request_id", e.control.content.value)
         # TODO: アクティビティの詳細をダイアログで表示する場合は別途実装する
         # self.open_edit_request_dialog()
 
     @Logging.func_logger
     def on_change_filter_activity_user(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self.session.set("filter_activity_user", e.control.value)
         ActivityRowHelper.query_activity_all(self)
         self.refresh()
 
     @Logging.func_logger
     def on_change_filter_activity_type(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self.session.set("filter_activity_type", e.control.value)
         ActivityRowHelper.query_activity_all(self)
         self.refresh()
@@ -376,12 +363,14 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_heading_column(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         ActivityRowHelper.sort_column(self, self.session, e.control.label.value)
 
     @Logging.func_logger
     def on_click_next_page(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         if self.btnNextPage.disabled:
             self._unlock_form_controls()
             return
@@ -392,7 +381,8 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_previous_page(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         if self.btnPreviousPage.disabled:
             self._unlock_form_controls()
             return
@@ -402,7 +392,8 @@ class BaseActivityListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_search_summary(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchSummary.value)
         self.refresh()

@@ -59,7 +59,8 @@ class EditRequestWizard(BaseWizard):
 
     @Logging.func_logger
     def on_click_next(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         match self.session.get("edit_request_wizard_step"):
             case "edit_request":
                 self.session.set("edit_request_wizard_step", "job_execute_confirm")
@@ -98,7 +99,8 @@ class EditRequestWizard(BaseWizard):
 
     @Logging.func_logger
     def on_click_previous(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         match self.session.get("edit_request_wizard_step"):
             case "job_execute_confirm":
                 self.session.set("edit_request_wizard_step", "edit_request")

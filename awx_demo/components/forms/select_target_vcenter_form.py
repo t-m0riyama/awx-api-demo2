@@ -1,5 +1,3 @@
-import os
-
 import flet as ft
 
 from awx_demo.components.compounds.form_description import FormDescription
@@ -256,7 +254,7 @@ class SelectTargetVcenterForm(BaseWizardCard):
     def on_change_system_ids(self, e):
         # システム識別子の追加/削除
         if e.control.value:
-            if not e.control.label in self.system_ids_array:
+            if e.control.label not in self.system_ids_array:
                 self.system_ids_array.append(e.control.label)
         else:
             if e.control.label in self.system_ids_array:

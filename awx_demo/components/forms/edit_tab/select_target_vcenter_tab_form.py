@@ -64,7 +64,7 @@ class SelectTargetVCenterTabForm(ft.Card):
 
         # vCenterの指定
         self.dropVcenter = ft.Dropdown(
-            label=f"vCenter名(*)",
+            label="vCenter名(*)",
             value=default_vcenter,
             options=vcenter_options,
             hint_text="仮想マシンの稼働するvCenter名を指定します。",
@@ -174,7 +174,7 @@ class SelectTargetVCenterTabForm(ft.Card):
     def on_change_system_ids(self, e):
         # システム識別子の追加/削除
         if e.control.value:
-            if not e.control.label in self.system_ids_array:
+            if e.control.label not in self.system_ids_array:
                 self.system_ids_array.append(e.control.label)
         else:
             if e.control.label in self.system_ids_array:

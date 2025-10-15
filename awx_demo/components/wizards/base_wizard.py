@@ -26,7 +26,8 @@ class BaseWizard(metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_cancel(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         if self.session.contains_key("job_options"):
             self.session.remove("job_options")
         self.wizard_dialog.open = False
@@ -37,7 +38,8 @@ class BaseWizard(metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_save(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         self._update_request()
         self.wizard_dialog.open = False
         self.restore_parent_view_title()
@@ -47,7 +49,8 @@ class BaseWizard(metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_click_duplicate(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
+            return
         self._duplicate_request()
         self.wizard_dialog.open = False
         self.restore_parent_view_title()
@@ -89,7 +92,11 @@ class BaseWizard(metaclass=abc.ABCMeta):
     def _update_request(self):
         if self.session.get("iaas_user") is None:
             self.session.set("iaas_user", self.session.get("awx_loginid"))
-        request_id = self.session.get("request_id") if "request_id" in self.session.get_keys() else self.session.get("document_id")
+        request_id = (
+            self.session.get("request_id")
+            if "request_id" in self.session.get_keys()
+            else self.session.get("document_id")
+        )
         db_session = db.get_db()
         IaasRequestHelper.update_request(
             db_session=db_session,

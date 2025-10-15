@@ -26,55 +26,64 @@ class RequestCommonInfoTabForm(ft.Card):
         self.body_height = body_height
 
         # initialize Job options
-        if not self.session.contains_key('job_options'):
-            self.session.set('job_options', {})
+        if not self.session.contains_key("job_options"):
+            self.session.set("job_options", {})
 
         # overlay settings
         start_date_days = int(os.getenv("RMX_DEADLINE_START_DATE_DAYS", self.START_DATE_DAYS_DEFAULT))
         end_date_days = int(os.getenv("RMX_DEADLINE_END_DATE_DAYS", self.END_DATE_DAYS_DEFAULT))
         start_date = datetime.datetime.now() + datetime.timedelta(days=start_date_days)
         end_date = datetime.datetime.now() + datetime.timedelta(days=end_date_days)
-        current_date = self.session.get('request_deadline') if self.session.contains_key('request_deadline') else start_date
+        current_date = (
+            self.session.get("request_deadline") if self.session.contains_key("request_deadline") else start_date
+        )
         self.dpRequestDeadline = ft.DatePicker(
             on_change=self.on_change_request_deadline,
             # on_dismiss=date_picker_dismissed,
-            first_date=datetime.datetime(
-                start_date.year, start_date.month, start_date.day),
-            last_date=datetime.datetime(
-                end_date.year, end_date.month, end_date.day),
+            first_date=datetime.datetime(start_date.year, start_date.month, start_date.day),
+            last_date=datetime.datetime(end_date.year, end_date.month, end_date.day),
             current_date=current_date,
         )
         self.page.overlay.append(self.dpRequestDeadline)
 
         # controls
         self.textRequestId = ft.Text(
-            value=('申請ID: ' + self.session.get('request_id')),
+            value=("申請ID: " + self.session.get("request_id")),
             theme_style=ft.TextThemeStyle.BODY_LARGE,
             color=ft.Colors.PRIMARY,
         )
         self.textRequestDate = ft.Text(
-            value=('申請日: ' + self.session.get('request_date').strftime('%Y/%m/%d %H:%M')
-                   ) if self.session.contains_key('request_date') else '申請日:(未指定)',
+            value=(
+                ("申請日: " + self.session.get("request_date").strftime("%Y/%m/%d %H:%M"))
+                if self.session.contains_key("request_date")
+                else "申請日:(未指定)"
+            ),
             theme_style=ft.TextThemeStyle.BODY_LARGE,
             color=ft.Colors.PRIMARY,
         )
         self.textUpdated = ft.Text(
-            value=('最終更新日: ' + self.session.get('updated').strftime('%Y/%m/%d %H:%M')
-                   ) if self.session.contains_key('updated') else '最終更新日:(未指定)',
+            value=(
+                ("最終更新日: " + self.session.get("updated").strftime("%Y/%m/%d %H:%M"))
+                if self.session.contains_key("updated")
+                else "最終更新日:(未指定)"
+            ),
             theme_style=ft.TextThemeStyle.BODY_LARGE,
             color=ft.Colors.PRIMARY,
         )
         self.tfRequestText = ParameterInputText(
-            value=self.session.get('request_text') if self.session.contains_key(
-                'request_text') else '',
-            label='依頼内容',
+            value=self.session.get("request_text") if self.session.contains_key("request_text") else "",
+            label="依頼内容",
             max_length=80,
-            hint_text='ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバCPU増設',
-            on_change=self.on_change_request_text)
+            hint_text="ご依頼内容を簡潔に記載してください。 例)ABCシステムのWEBサーバCPU増設",
+            on_change=self.on_change_request_text,
+        )
         self.dropCategory = ft.Dropdown(
-            label='依頼区分(＊)',
-            value=self.session.get('request_category') if self.session.contains_key(
-                'request_category') else RequestCategory.VM_SETTING_CHANGE_FRIENDLY,
+            label="依頼区分(＊)",
+            value=(
+                self.session.get("request_category")
+                if self.session.contains_key("request_category")
+                else RequestCategory.VM_SETTING_CHANGE_FRIENDLY
+            ),
             options=[
                 ft.dropdown.Option(RequestCategory.VM_CREATE_FRIENDLY, disabled=True),
                 ft.dropdown.Option(RequestCategory.VM_SETTING_CHANGE_FRIENDLY),
@@ -84,9 +93,12 @@ class RequestCommonInfoTabForm(ft.Card):
             disabled=True,
         )
         self.dropOperation = ft.Dropdown(
-            label='申請項目(＊)',
-            value=self.session.get('request_operation') if self.session.contains_key(
-                'request_operation') else RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY,
+            label="申請項目(＊)",
+            value=(
+                self.session.get("request_operation")
+                if self.session.contains_key("request_operation")
+                else RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY
+            ),
             options=[
                 ft.dropdown.Option(RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY),
                 ft.dropdown.Option(RequestOperation.VM_START_OR_STOP_FRIENDLY),
@@ -94,22 +106,22 @@ class RequestCommonInfoTabForm(ft.Card):
             disabled=True,
         )
         self.textRequestDeadline = ft.Text(
-            value=('リリース希望日(＊): ' + self.session.get('request_deadline').strftime('%Y/%m/%d')
-                   ) if self.session.contains_key('request_deadline') else 'リリース希望日(＊):(未指定)',
+            value=(
+                ("リリース希望日(＊): " + self.session.get("request_deadline").strftime("%Y/%m/%d"))
+                if self.session.contains_key("request_deadline")
+                else "リリース希望日(＊):(未指定)"
+            ),
             theme_style=ft.TextThemeStyle.BODY_LARGE,
             color=ft.Colors.PRIMARY,
         )
         self.btnRequestDeadline = ft.FilledTonalButton(
-            '希望日の指定',
+            "希望日の指定",
             icon=ft.Icons.CALENDAR_MONTH,
-            on_click=lambda _: self.page.open(
-                self.dpRequestDeadline
-            ),
+            on_click=lambda _: self.page.open(self.dpRequestDeadline),
         )
 
         # 申請者ロールの場合は、変更できないようにする
-        change_disabled = True if self.session.get(
-            'user_role') == UserRole.USER_ROLE else False
+        change_disabled = True if self.session.get("user_role") == UserRole.USER_ROLE else False
 
         # Content
         body = ft.Column(
@@ -152,11 +164,10 @@ class RequestCommonInfoTabForm(ft.Card):
 
     @Logging.func_logger
     def on_change_request_text(self, e):
-        self.session.set('request_text', e.control.value)
+        self.session.set("request_text", e.control.value)
 
     @Logging.func_logger
     def on_change_request_deadline(self, e):
-        self.session.set('request_deadline', self.dpRequestDeadline.value)
-        self.textRequestDeadline.value = 'リリース希望日: ' + \
-            self.session.get('request_deadline').strftime('%Y/%m/%d')
+        self.session.set("request_deadline", self.dpRequestDeadline.value)
+        self.textRequestDeadline.value = "リリース希望日: " + self.session.get("request_deadline").strftime("%Y/%m/%d")
         self.textRequestDeadline.update()

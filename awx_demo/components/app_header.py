@@ -17,7 +17,7 @@ class AppHeader(ft.Row):
         self.session = session
         self.page = page
         self.app_title = app_title
-        content_md = f"""
+        content_md = """
 定型的な設定変更・作業を依頼するために申請を行い、作業担当者は申請内容に基づいて実行することができます。
 ***
 
@@ -31,7 +31,12 @@ class AppHeader(ft.Row):
 * 申請一覧から、実行を行いたい申請の「依頼ID」をクリックし、申請の内容を実行できます。
         """
 
-        formContextHelp = ContextHelpForm(self.session, self.page, title=f"{self.page.session.get('app_title_base')} へようこそ", content_md=content_md)
+        formContextHelp = ContextHelpForm(
+            self.session,
+            self.page,
+            title=f"{self.page.session.get('app_title_base')} へようこそ",
+            content_md=content_md,
+        )
         self.dlgContextForm = ft.AlertDialog(
             modal=True,
             content=formContextHelp,
@@ -53,16 +58,9 @@ class AppHeader(ft.Row):
         )
         role_friendly = UserRole.to_friendly(self.session.get("user_role"))
         self.appbar_items = [
-            ft.PopupMenuItem(
-                text=(self.session.get("awx_loginid") + " [" + role_friendly + "]")
-            ),
+            ft.PopupMenuItem(text=(self.session.get("awx_loginid") + " [" + role_friendly + "]")),
             ft.PopupMenuItem(),
-            ft.PopupMenuItem(
-                content=ft.Text(
-                    "ログアウト (Shift+Alt+Q)"
-                ),
-                on_click=self.logout_clicked
-            ),
+            ft.PopupMenuItem(content=ft.Text("ログアウト (Shift+Alt+Q)"), on_click=self.logout_clicked),
             # ft.PopupMenuItem(text='設定'),
         ]
         # appbarフィールドの設定
@@ -104,35 +102,55 @@ class AppHeader(ft.Row):
         # ダークモード/ライトモードのテーマ切り替え
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="T", shift=True, ctrl=False, alt=True, meta=False,
+                key="T",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=self.toggle_thema_mode,
         )
         # ログアウト
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Q", shift=True, ctrl=False, alt=True, meta=False,
+                key="Q",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=self.logout_clicked,
         )
         # ログへのセッションダンプ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=False, alt=True, meta=False,
+                key="V",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
         # Semantics Debuggerの有効化/無効化
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=False, alt=True, meta=False,
+                key="Y",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=self.toggle_show_semantics_debugger,
         )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=False, alt=True, meta=False,
+                key="Z",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )

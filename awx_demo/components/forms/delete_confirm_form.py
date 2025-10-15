@@ -17,9 +17,10 @@ class DeleteConfirmForm(ft.Card):
         self.page = page
 
         # controls
-        formTitle = FormTitle('削除の確認', None)
+        formTitle = FormTitle("削除の確認", None)
         formDescription = FormDescription(
-            '選択した申請の削除を行います。削除処理を続ける場合は「はい」、中止する場合は「キャンセル」を選択して下さい。')
+            "選択した申請の削除を行います。削除処理を続ける場合は「はい」、中止する場合は「キャンセル」を選択して下さい。"
+        )
 
         header = ft.Container(
             formTitle,

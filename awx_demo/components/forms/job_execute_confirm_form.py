@@ -22,10 +22,21 @@ class JobExecuteConfirmForm(BaseWizardCard):
     CONTENT_HEIGHT = 600
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 300
-    DEFAULT_FORM_TITLE = '確認'
+    DEFAULT_FORM_TITLE = "確認"
     DOCUMENT_ID_LENGTH = 7
 
-    def __init__(self, session, page: ft.Page, title=DEFAULT_FORM_TITLE, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_next=None, step_change_previous=None, step_change_cancel=None):
+    def __init__(
+        self,
+        session,
+        page: ft.Page,
+        title=DEFAULT_FORM_TITLE,
+        height=CONTENT_HEIGHT,
+        width=CONTENT_WIDTH,
+        body_height=BODY_HEIGHT,
+        step_change_next=None,
+        step_change_previous=None,
+        step_change_cancel=None,
+    ):
         self.session = session
         self.page = page
         self.title = title
@@ -37,31 +48,38 @@ class JobExecuteConfirmForm(BaseWizardCard):
         self.step_change_cancel = step_change_cancel
 
         # controls
-        formTitle = FormTitle(self.title, '変更内容の確認')
-        formDescription = FormDescription('以下の内容で、変更を適用します。')
+        formTitle = FormTitle(self.title, "変更内容の確認")
+        formDescription = FormDescription("以下の内容で、変更を適用します。")
         self.tfConfirmText = ft.TextField(
-            value=self.session.get('confirm_text'),
+            value=self.session.get("confirm_text"),
             color=ft.Colors.PRIMARY,
             multiline=True,
             max_lines=4,
             read_only=True,
         )
         self.checkShutdownBeforeChange = ft.Checkbox(
-            label='設定変更前に、仮想マシンを停止する',
-            value=bool(strtobool(str(self.session.get('job_options')['shutdown_before_change']))) if 'shutdown_before_change' in self.session.get('job_options') else True,
+            label="設定変更前に、仮想マシンを停止する",
+            value=(
+                bool(strtobool(str(self.session.get("job_options")["shutdown_before_change"])))
+                if "shutdown_before_change" in self.session.get("job_options")
+                else True
+            ),
             on_change=self.on_change_shutdown_before_change,
         )
         self.checkStartupAfterChange = ft.Checkbox(
-            label='設定変更後に、仮想マシンを起動する',
-            value=bool(strtobool(str(self.session.get('job_options')['startup_after_change']))) if 'startup_after_change' in self.session.get('job_options') else True,
+            label="設定変更後に、仮想マシンを起動する",
+            value=(
+                bool(strtobool(str(self.session.get("job_options")["startup_after_change"])))
+                if "startup_after_change" in self.session.get("job_options")
+                else True
+            ),
             on_change=self.on_change_startup_after_change,
         )
-        self.btnNext = ft.ElevatedButton(
-            '実行', tooltip='実行 (Shift+Alt+N)', on_click=self.on_click_next)
-        self.btnPrev = ft.ElevatedButton(
-            '戻る', tooltip='戻る (Shift+Alt+P)', on_click=self.on_click_previous)
+        self.btnNext = ft.ElevatedButton("実行", tooltip="実行 (Shift+Alt+N)", on_click=self.on_click_next)
+        self.btnPrev = ft.ElevatedButton("戻る", tooltip="戻る (Shift+Alt+P)", on_click=self.on_click_previous)
         self.btnCancel = ft.FilledButton(
-            'キャンセル', tooltip='キャンセル (Shift+Alt+X)', on_click=self.on_click_cancel)
+            "キャンセル", tooltip="キャンセル (Shift+Alt+X)", on_click=self.on_click_cancel
+        )
 
         # Content
         header = ft.Container(
@@ -84,7 +102,11 @@ class JobExecuteConfirmForm(BaseWizardCard):
             ],
             height=self.body_height,
         )
-        body = body_start_stop if self.session.get('request_operation') == RequestOperation.VM_START_OR_STOP_FRIENDLY else body_general
+        body = (
+            body_start_stop
+            if self.session.get("request_operation") == RequestOperation.VM_START_OR_STOP_FRIENDLY
+            else body_general
+        )
         footer = ft.Row(
             [
                 self.btnCancel,
@@ -113,17 +135,17 @@ class JobExecuteConfirmForm(BaseWizardCard):
     @Logging.func_logger
     def _add_request(self, job_options, request_status):
         document_id = DocIdUtils.generate_id(self.DOCUMENT_ID_LENGTH)
-        self.session.set('document_id', document_id)
+        self.session.set("document_id", document_id)
         db_session = db.get_db()
         IaasRequestHelper.add_request(
             db_session=db_session,
             session=self.session,
-            request_id=self.session.get('document_id'),
-            request_deadline=self.session.get('request_deadline'),
-            request_user=self.session.get('awx_loginid'),
-            request_category=self.session.get('request_category'),
-            request_operation=self.session.get('request_operation'),
-            request_text=self.session.get('request_text'),
+            request_id=self.session.get("document_id"),
+            request_deadline=self.session.get("request_deadline"),
+            request_user=self.session.get("awx_loginid"),
+            request_category=self.session.get("request_category"),
+            request_operation=self.session.get("request_operation"),
+            request_text=self.session.get("request_text"),
             job_options=json.dumps(job_options),
             request_status=request_status,
         )
@@ -134,10 +156,8 @@ class JobExecuteConfirmForm(BaseWizardCard):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=False, alt=True, meta=False
-            ),
-            func=lambda e: self.tfConfirmText.focus()
+            key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+            func=lambda e: self.tfConfirmText.focus(),
         )
         super().register_key_shortcuts()
 
@@ -147,9 +167,7 @@ class JobExecuteConfirmForm(BaseWizardCard):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # autofocus=Trueである、最初のコントロールにフォーカスを移動する
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="F", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
             )
             super().unregister_key_shortcuts()
 
@@ -165,18 +183,24 @@ class JobExecuteConfirmForm(BaseWizardCard):
     def on_click_next(self, e):
         self._lock_form_controls()
 
-        if not self.session.get('request_operation') == RequestOperation.VM_START_OR_STOP_FRIENDLY:
-            self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
-            self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
-        job_options = JobOptionsHelper.generate_job_options(self.session, RequestOperation.to_formal(self.session.get('request_operation')))
+        if not self.session.get("request_operation") == RequestOperation.VM_START_OR_STOP_FRIENDLY:
+            self.session.get("job_options")["shutdown_before_change"] = str(self.checkShutdownBeforeChange.value)
+            self.session.get("job_options")["startup_after_change"] = str(self.checkStartupAfterChange.value)
+        job_options = JobOptionsHelper.generate_job_options(
+            session=self.session,
+            request_operation=RequestOperation.to_formal(self.session.get("request_operation")),
+            for_execute_job=True,
+        )
 
         db_session = db.get_db()
-        request = IaasRequestHelper.get_request(db_session, self.session.get('document_id'))
-        job_template_name = JobOptionsHelper.get_job_template_name(RequestOperation.to_formal(self.session.get('request_operation')))
+        request = IaasRequestHelper.get_request(db_session, self.session.get("document_id"))
+        job_template_name = JobOptionsHelper.get_job_template_name(
+            RequestOperation.to_formal(self.session.get("request_operation"))
+        )
         job_id = AWXApiHelper.start_job(
-            uri_base=self.session.get('awx_url'),
-            loginid=self.session.get('awx_loginid'),
-            password=self.session.get('awx_password'),
+            uri_base=self.session.get("awx_url"),
+            loginid=self.session.get("awx_loginid"),
+            password=self.session.get("awx_password"),
             job_template_name=job_template_name,
             request=request,
             job_options=job_options,
@@ -186,13 +210,12 @@ class JobExecuteConfirmForm(BaseWizardCard):
         IaasRequestHelper.update_request_iaas_user(
             db_session=db_session,
             session=self.session,
-            request_id=self.session.get('document_id'),
-            iaas_user=self.session.get('awx_loginid'),
+            request_id=self.session.get("document_id"),
+            iaas_user=self.session.get("awx_loginid"),
         )
         if job_id > 0:
-            self.session.set('job_id', job_id)
-            IaasRequestHelper.update_job_id(
-                db_session, self.session.get('document_id'), job_id)
+            self.session.set("job_id", job_id)
+            IaasRequestHelper.update_job_id(db_session, self.session.get("document_id"), job_id)
         db_session.close()
 
         self._unlock_form_controls()
@@ -200,8 +223,8 @@ class JobExecuteConfirmForm(BaseWizardCard):
 
     @Logging.func_logger
     def on_change_shutdown_before_change(self, e):
-        self.session.get('job_options')['shutdown_before_change'] = str(self.checkShutdownBeforeChange.value)
+        self.session.get("job_options")["shutdown_before_change"] = str(self.checkShutdownBeforeChange.value)
 
     @Logging.func_logger
     def on_change_startup_after_change(self, e):
-        self.session.get('job_options')['startup_after_change'] = str(self.checkStartupAfterChange.value)
+        self.session.get("job_options")["startup_after_change"] = str(self.checkStartupAfterChange.value)

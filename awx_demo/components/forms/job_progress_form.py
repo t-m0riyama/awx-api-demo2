@@ -23,14 +23,23 @@ class JobProgressForm(BaseWizardCard):
     CONTENT_HEIGHT = 500
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
-    JOB_STATUS_CHECK_ID_PREFIX = 'job_status_check'
+    JOB_STATUS_CHECK_ID_PREFIX = "job_status_check"
     JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT = 3600
     JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT = 5
     JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE = 0
     JOB_STATUS_CHECK_RESULT_NEXT_NOT_RUNNABLE = 1
     JOB_STATUS_CHECK_RESULT_EXECUTABLE_TIMEOUT = 2
 
-    def __init__(self, session, page: ft.Page, request_id, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT, step_change_exit=None):
+    def __init__(
+        self,
+        session,
+        page: ft.Page,
+        request_id,
+        height=CONTENT_HEIGHT,
+        width=CONTENT_WIDTH,
+        body_height=BODY_HEIGHT,
+        step_change_exit=None,
+    ):
         self.session = session
         self.page = page
         self.request_id = request_id
@@ -38,32 +47,34 @@ class JobProgressForm(BaseWizardCard):
         self.content_width = width
         self.body_height = body_height
         self.step_change_cancel = step_change_exit
-        self.scheduler_job_id = ''
+        self.scheduler_job_id = ""
 
         # controls
-        formTitle = FormTitle('処理の進捗', 'ジョブの進捗状況')
-        formDescription = FormDescription('ジョブの進捗状況を表示します。')
+        formTitle = FormTitle("処理の進捗", "ジョブの進捗状況")
+        formDescription = FormDescription("ジョブの進捗状況を表示します。")
         self.pbJob = ft.ProgressBar(value=0, width=self.CONTENT_WIDTH)
         self.lvProgressLog = ft.ListView(
             # expand=1,
             spacing=10,
             padding=10,
             divider_thickness=1,
-            auto_scroll=True)
+            auto_scroll=True,
+        )
         self.lvProgressLog.controls.append(
             ft.Row(
                 [
                     ft.Icon(ft.Icons.INFO_OUTLINED, color=ft.Colors.BLUE_500),
                     ft.Text(
-                        value=f'{JobProgressForm._get_timestamp()} 処理を開始しました。',
+                        value=f"{JobProgressForm._get_timestamp()} 処理を開始しました。",
                         theme_style=ft.TextThemeStyle.BODY_LARGE,
-                        color=ft.Colors.SECONDARY
+                        color=ft.Colors.SECONDARY,
                     ),
                 ]
             )
         )
         self.btnExit = ft.FilledButton(
-            '閉じる', tooltip='閉じる (Shift+Alt+X)', on_click=self.on_click_exit, disabled=True)
+            "閉じる", tooltip="閉じる (Shift+Alt+X)", on_click=self.on_click_exit, disabled=True
+        )
 
         # Content
         header = ft.Container(
@@ -86,19 +97,28 @@ class JobProgressForm(BaseWizardCard):
         )
 
         self.scheduler_job_id = f'{self.JOB_STATUS_CHECK_ID_PREFIX}_{self.session.get("job_id")}'
-        self.check_timeout = int(os.getenv('RMX_JOB_STATUS_CHECK_TIMEOUT_SECS', self.JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT))
-        self.check_interval = int(os.getenv('RMX_JOB_STATUS_CHECK_INTERVAL_SECS', self.JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT))
+        self.check_timeout = int(
+            os.getenv("RMX_JOB_STATUS_CHECK_TIMEOUT_SECS", self.JOB_STATUS_CHECK_TIMEOUT_SECS_DEFAULT)
+        )
+        self.check_interval = int(
+            os.getenv("RMX_JOB_STATUS_CHECK_INTERVAL_SECS", self.JOB_STATUS_CHECK_INTERVAL_SECS_DEFAULT)
+        )
 
         # ジョブがタイムアウトし、終了する時間を求める
         dt_now = datetime.now()
         dt_delta = timedelta(seconds=self.check_timeout)
         self.job_end_date = dt_now + dt_delta
-        job_end_date_str = self.job_end_date.strftime('%Y-%m-%d %H:%M:%S')
-        Logging.info(f'JOB_TIMEOUT_DATE({self.scheduler_job_id}): {job_end_date_str}')
+        job_end_date_str = self.job_end_date.strftime("%Y-%m-%d %H:%M:%S")
+        Logging.info(f"JOB_TIMEOUT_DATE({self.scheduler_job_id}): {job_end_date_str}")
 
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_job(
-            self.refresh_progress, 'interval', seconds=self.check_interval, end_date=job_end_date_str, id=self.scheduler_job_id)
+            self.refresh_progress,
+            "interval",
+            seconds=self.check_interval,
+            end_date=job_end_date_str,
+            id=self.scheduler_job_id,
+        )
         try:
             self.scheduler.start()
         except (KeyboardInterrupt, SystemExit):
@@ -124,12 +144,12 @@ class JobProgressForm(BaseWizardCard):
 
     @Logging.func_logger
     def refresh_progress(self):
-        if self.session.get('job_id') is None:
+        if self.session.get("job_id") is None:
             self._on_job_request_failed()
             IaasRequestHelper.update_request_status(
                 db_session=db.get_db(),
                 session=self.session,
-                request_id=self.session.get('document_id'),
+                request_id=self.session.get("document_id"),
                 request_status=RequestStatus.APPLYING_FAILED,
             )
             return
@@ -137,11 +157,11 @@ class JobProgressForm(BaseWizardCard):
         db_session = db.get_db()
         request = IaasRequestHelper.get_request(db_session, self.request_id)
         job_status = AWXApiHelper.get_job_status(
-            uri_base=self.session.get('awx_url'),
-            loginid=self.session.get('awx_loginid'),
-            password=self.session.get('awx_password'),
+            uri_base=self.session.get("awx_url"),
+            loginid=self.session.get("awx_loginid"),
+            password=self.session.get("awx_password"),
             request=request,
-            job_id=self.session.get('job_id'),
+            job_id=self.session.get("job_id"),
             session=self.session,
         )
         db_session.close()
@@ -151,7 +171,7 @@ class JobProgressForm(BaseWizardCard):
             IaasRequestHelper.update_request_status(
                 db_session=db.get_db(),
                 session=self.session,
-                request_id=self.session.get('document_id'),
+                request_id=self.session.get("document_id"),
                 request_status=RequestStatus.COMPLETED,
             )
             self.pbJob.update()
@@ -165,7 +185,7 @@ class JobProgressForm(BaseWizardCard):
             IaasRequestHelper.update_request_status(
                 db_session=db.get_db(),
                 session=self.session,
-                request_id=self.session.get('document_id'),
+                request_id=self.session.get("document_id"),
                 request_status=RequestStatus.APPLYING_FAILED,
             )
             self.pbJob.update()
@@ -184,7 +204,8 @@ class JobProgressForm(BaseWizardCard):
 
     @Logging.func_logger
     def on_click_exit(self, e):
-        if self.btnExit.disabled: return
+        if self.btnExit.disabled:
+            return
         self.on_click_cancel(e)
 
     @Logging.func_logger
@@ -192,23 +213,17 @@ class JobProgressForm(BaseWizardCard):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # キャンセル（登録解除）
         keyboard_shortcut_manager.unregister_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="X", shift=True, ctrl=False, alt=True, meta=False),
         )
 
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=False, alt=True, meta=False
-            ),
-            func=lambda e: self.btnExit.focus()
+            key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+            func=lambda e: self.btnExit.focus(),
         )
         # 閉じる
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="X", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_exit,
         )
 
@@ -218,15 +233,11 @@ class JobProgressForm(BaseWizardCard):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # autofocus=Trueである、最初のコントロールにフォーカスを移動する
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="F", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 閉じる
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="X", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="X", shift=True, ctrl=False, alt=True, meta=False),
             )
 
     @Logging.func_logger
@@ -241,10 +252,14 @@ class JobProgressForm(BaseWizardCard):
         diff_date = (dt_end_time - dt_next_check).seconds - float(self.check_interval)
 
         if diff_date > 0:
-            Logging.info(f"JOB_NEXT_RUN / TIMEOUT / DIFF: {dt_next_check.strftime('%Y-%m-%d %H:%M:%S')} / {dt_end_time.strftime('%Y-%m-%d %H:%M:%S')} / {diff_date}")
+            Logging.info(
+                f"JOB_NEXT_RUN / TIMEOUT / DIFF: {dt_next_check.strftime('%Y-%m-%d %H:%M:%S')} / {dt_end_time.strftime('%Y-%m-%d %H:%M:%S')} / {diff_date}"
+            )
             return self.JOB_STATUS_CHECK_RESULT_NEXT_RUNNABLE
         else:
-            Logging.warning(f"JOB_NEXT_RUN / TIMEOUT / DIFF: {dt_next_check.strftime('%Y-%m-%d %H:%M:%S')} / {dt_end_time.strftime('%Y-%m-%d %H:%M:%S')} / {diff_date}")
+            Logging.warning(
+                f"JOB_NEXT_RUN / TIMEOUT / DIFF: {dt_next_check.strftime('%Y-%m-%d %H:%M:%S')} / {dt_end_time.strftime('%Y-%m-%d %H:%M:%S')} / {diff_date}"
+            )
             return self.JOB_STATUS_CHECK_RESULT_EXECUTABLE_TIMEOUT
 
     @Logging.func_logger
@@ -256,35 +271,32 @@ class JobProgressForm(BaseWizardCard):
             self.lvProgressLog.controls.append(
                 ft.Row(
                     [
-                        ft.Icon(ft.Icons.THUMB_UP_OUTLINED,
-                                color=ft.Colors.BLUE_500),
+                        ft.Icon(ft.Icons.THUMB_UP_OUTLINED, color=ft.Colors.BLUE_500),
                         ft.Text(
-                            value=f'{JobProgressForm._get_timestamp()} 処理は正常終了しました。',
+                            value=f"{JobProgressForm._get_timestamp()} 処理は正常終了しました。",
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.Colors.SECONDARY
+                            color=ft.Colors.SECONDARY,
                         ),
                     ]
                 )
             )
             self.lvProgressLog.controls.append(
                 ft.TextButton(
-                    'ジョブ出力の参照: ' +
-                    self.session.get(
-                        'awx_url') + '/#/jobs/playbook/{}/output'.format(self.session.get('job_id')),
-                    url=self.session.get(
-                        'awx_url') + '/#/jobs/playbook/{}/output'.format(self.session.get('job_id')),
+                    "ジョブ出力の参照: "
+                    + self.session.get("awx_url")
+                    + "/#/jobs/playbook/{}/output".format(self.session.get("job_id")),
+                    url=self.session.get("awx_url") + "/#/jobs/playbook/{}/output".format(self.session.get("job_id")),
                 ),
             )
         else:
             self.lvProgressLog.controls.append(
                 ft.Row(
                     [
-                        ft.Icon(ft.Icons.ERROR_OUTLINED,
-                                color=ft.Colors.ERROR),
+                        ft.Icon(ft.Icons.ERROR_OUTLINED, color=ft.Colors.ERROR),
                         ft.Text(
-                            value=f'{JobProgressForm._get_timestamp()} 処理は異常終了しました。実行可能な時間を超過した可能性があります。',
+                            value=f"{JobProgressForm._get_timestamp()} 処理は異常終了しました。実行可能な時間を超過した可能性があります。",
                             theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.Colors.SECONDARY
+                            color=ft.Colors.SECONDARY,
                         ),
                     ]
                 )
@@ -299,12 +311,11 @@ class JobProgressForm(BaseWizardCard):
         self.lvProgressLog.controls.append(
             ft.Row(
                 [
-                    ft.Icon(ft.Icons.ERROR_OUTLINED,
-                            color=ft.Colors.ERROR),
+                    ft.Icon(ft.Icons.ERROR_OUTLINED, color=ft.Colors.ERROR),
                     ft.Text(
-                        value=f'{JobProgressForm._get_timestamp()} ジョブの実行可能時間を超過しました。',
+                        value=f"{JobProgressForm._get_timestamp()} ジョブの実行可能時間を超過しました。",
                         theme_style=ft.TextThemeStyle.BODY_LARGE,
-                        color=ft.Colors.SECONDARY
+                        color=ft.Colors.SECONDARY,
                     ),
                 ]
             )
@@ -317,27 +328,25 @@ class JobProgressForm(BaseWizardCard):
     def _on_job_status_request_failed(self):
         self._stop_job_and_scheduler()
         self.lvProgressLog.controls.append(
-                ft.Row(
-                    [
-                        ft.Icon(ft.Icons.ERROR_OUTLINED,
-                                color=ft.Colors.ERROR),
-                        ft.Text(
-                            value=f'{JobProgressForm._get_timestamp()} 処理に失敗しました。',
-                            theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.Colors.SECONDARY
-                        ),
-                    ]
-                )
+            ft.Row(
+                [
+                    ft.Icon(ft.Icons.ERROR_OUTLINED, color=ft.Colors.ERROR),
+                    ft.Text(
+                        value=f"{JobProgressForm._get_timestamp()} 処理に失敗しました。",
+                        theme_style=ft.TextThemeStyle.BODY_LARGE,
+                        color=ft.Colors.SECONDARY,
+                    ),
+                ]
             )
+        )
         self.lvProgressLog.controls.append(
-                ft.TextButton(
-                    'ジョブ出力の参照: ' +
-                    self.session.get(
-                        'awx_url') + '/#/jobs/playbook/{}/output'.format(self.session.get('job_id')),
-                    url=self.session.get(
-                        'awx_url') + '/#/jobs/playbook/{}/output'.format(self.session.get('job_id')),
-                ),
-            )
+            ft.TextButton(
+                "ジョブ出力の参照: "
+                + self.session.get("awx_url")
+                + "/#/jobs/playbook/{}/output".format(self.session.get("job_id")),
+                url=self.session.get("awx_url") + "/#/jobs/playbook/{}/output".format(self.session.get("job_id")),
+            ),
+        )
         self.btnExit.disabled = False
         self.lvProgressLog.update()
         self.btnExit.update()
@@ -345,18 +354,17 @@ class JobProgressForm(BaseWizardCard):
     @Logging.func_logger
     def _on_job_request_failed(self):
         self.lvProgressLog.controls.append(
-                ft.Row(
-                    [
-                        ft.Icon(ft.Icons.ERROR_OUTLINED,
-                                color=ft.Colors.ERROR),
-                        ft.Text(
-                            value=f'{JobProgressForm._get_timestamp()} ジョブの実行要求に失敗しました。',
-                            theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.Colors.SECONDARY
-                        ),
-                    ]
-                )
+            ft.Row(
+                [
+                    ft.Icon(ft.Icons.ERROR_OUTLINED, color=ft.Colors.ERROR),
+                    ft.Text(
+                        value=f"{JobProgressForm._get_timestamp()} ジョブの実行要求に失敗しました。",
+                        theme_style=ft.TextThemeStyle.BODY_LARGE,
+                        color=ft.Colors.SECONDARY,
+                    ),
+                ]
             )
+        )
 
         self._stop_job_and_scheduler()
         self.btnExit.disabled = False
@@ -366,18 +374,17 @@ class JobProgressForm(BaseWizardCard):
     @Logging.func_logger
     def _on_job_execution_failed(self):
         self.lvProgressLog.controls.append(
-                ft.Row(
-                    [
-                        ft.Icon(ft.Icons.ERROR_OUTLINED,
-                                color=ft.Colors.ERROR),
-                        ft.Text(
-                            value=f'{JobProgressForm._get_timestamp()} ジョブの実行中にエラーが発生しました。',
-                            theme_style=ft.TextThemeStyle.BODY_LARGE,
-                            color=ft.Colors.SECONDARY
-                        ),
-                    ]
-                )
+            ft.Row(
+                [
+                    ft.Icon(ft.Icons.ERROR_OUTLINED, color=ft.Colors.ERROR),
+                    ft.Text(
+                        value=f"{JobProgressForm._get_timestamp()} ジョブの実行中にエラーが発生しました。",
+                        theme_style=ft.TextThemeStyle.BODY_LARGE,
+                        color=ft.Colors.SECONDARY,
+                    ),
+                ]
             )
+        )
 
         self._stop_job_and_scheduler()
         self.btnExit.disabled = False
@@ -393,7 +400,9 @@ class JobProgressForm(BaseWizardCard):
         except JobLookupError:
             job_succeeded = False
             self.scheduler.pause()
-            Logging.warning(f'JOB_AND_SCHEDULER_STOP: ビルトインスケジューラのジョブID({self.scheduler_job_id}) が見つかりません。実行可能な時間を超過した可能性があります。')
+            Logging.warning(
+                f"JOB_AND_SCHEDULER_STOP: ビルトインスケジューラのジョブID({self.scheduler_job_id}) が見つかりません。実行可能な時間を超過した可能性があります。"
+            )
         except (KeyboardInterrupt, SystemExit):
             pass
         return job_succeeded
@@ -402,5 +411,5 @@ class JobProgressForm(BaseWizardCard):
     @Logging.func_logger
     def _get_timestamp():
         dt_now = datetime.now()
-        timestamp = dt_now.strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = dt_now.strftime("%Y-%m-%d %H:%M:%S")
         return timestamp

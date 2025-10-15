@@ -77,7 +77,7 @@ class InProgressTabForm(ft.Card):
         """
 
         formContextHelp = ContextHelpForm(
-            self.session, self.page, title=f"ダッシュボードについて", content_md=content_md
+            self.session, self.page, title="ダッシュボードについて", content_md=content_md
         )
         self.dlgContextForm = ft.AlertDialog(
             modal=True,

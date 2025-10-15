@@ -58,7 +58,9 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             on_click=self.on_click_add_request,
         )
 
-        filtered_users = os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip('\'').split(",")
+        filtered_users = (
+            os.getenv("RMX_FILTERED_IAAS_USERS", self.FILTERED_IAAS_USERS_DEFAULT).strip('"').strip("'").split(",")
+        )
         filtered_users = list(map(lambda s: s.strip(), filtered_users))
         iaas_users = AWXApiHelper.get_users(
             self.session.get("awx_url"),
@@ -181,9 +183,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             tooltip="申請一覧の再読み込み (Control+Alt+R)",
         )
         range_min, range_max, request_data_count = RequestRowHelper.get_page_range(self)
-        self.textRequestsRange = ft.Text(
-            "{}-{} / {}".format(range_min, range_max, request_data_count)
-        )
+        self.textRequestsRange = ft.Text("{}-{} / {}".format(range_min, range_max, request_data_count))
         self.btnPreviousPage = ft.IconButton(
             tooltip="前へ (Shift+Alt+←)",
             icon=ft.Icons.ARROW_LEFT,
@@ -271,9 +271,7 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             content=formDeleteConfirm,
             actions=[
                 ft.ElevatedButton("はい", tooltip="はい (Shift+Alt+Enter)", on_click=self.on_click_delete_request_yes),
-                ft.FilledButton(
-                    "キャンセル", tooltip="キャンセル (Esc)", on_click=self.on_click_delete_request_cancel
-                ),
+                ft.FilledButton("キャンセル", tooltip="キャンセル (Esc)", on_click=self.on_click_delete_request_cancel),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
@@ -322,43 +320,55 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
             func=lambda e: self.tfSearchRequestText.focus(),
         )
         # 申請の新規作成
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="N", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_add_request,
         )
         # 依頼内容に含まれる文字の検索を実行
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+                key="Enter",
+                shift=False,
+                ctrl=True,
+                alt=False,
+                meta=False,
             ),
             func=self.on_click_search_request_text,
         )
         # 申請一覧の再読み込み
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="R", shift=False, ctrl=True, alt=True, meta=False,
+                key="R",
+                shift=False,
+                ctrl=True,
+                alt=True,
+                meta=False,
             ),
             func=lambda e: self.refresh(),
         )
         # 申請一覧のページ送り / 次のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Right", shift=True, ctrl=False, alt=True, meta=False,
+                key="Arrow Right",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=self.on_click_next_page,
         )
         # 申請一覧のページ送り / 前のページへ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Arrow Left", shift=True, ctrl=False, alt=True, meta=False,
+                key="Arrow Left",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=self.on_click_previous_page,
         )
@@ -366,7 +376,11 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         status_text = RequestStatus.START_FRIENDLY + " (Shift+I)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="I", shift=True, ctrl=False, alt=False, meta=False,
+                key="I",
+                shift=True,
+                ctrl=False,
+                alt=False,
+                meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
@@ -374,7 +388,11 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         status_text = RequestStatus.APPROVED_FRIENDLY + " (Shift+P)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="P", shift=True, ctrl=False, alt=False, meta=False,
+                key="P",
+                shift=True,
+                ctrl=False,
+                alt=False,
+                meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
@@ -382,14 +400,22 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         status_text = RequestStatus.COMPLETED_FRIENDLY + " (Shift+E)"
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="E", shift=True, ctrl=False, alt=False, meta=False,
+                key="E",
+                shift=True,
+                ctrl=False,
+                alt=False,
+                meta=False,
             ),
             func=lambda e, status_text=status_text: self.on_change_request_status(status_text=status_text),
         )
         # 申請の削除
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="R", shift=True, ctrl=False, alt=True, meta=False,
+                key="R",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=self.on_selected_delete,
         )
@@ -402,62 +428,90 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # autofocus=Trueである、最初のコントロールにフォーカスを移動する
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="F", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 申請の新規作成
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="N", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="N", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 依頼内容に含まれる文字の検索を実行
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Enter", shift=False, ctrl=True, alt=False, meta=False,
+                    key="Enter",
+                    shift=False,
+                    ctrl=True,
+                    alt=False,
+                    meta=False,
                 ),
             )
             # 申請一覧の再読み込み
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="R", shift=False, ctrl=True, alt=True, meta=False,
+                    key="R",
+                    shift=False,
+                    ctrl=True,
+                    alt=True,
+                    meta=False,
                 ),
             )
             # 申請一覧のページ送り / 次のページへ
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Arrow Right", shift=True, ctrl=True, alt=False, meta=False,
+                    key="Arrow Right",
+                    shift=True,
+                    ctrl=True,
+                    alt=False,
+                    meta=False,
                 ),
             )
             # 申請一覧のページ送り / 前のページへ
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Arrow Left", shift=True, ctrl=True, alt=False, meta=False,
+                    key="Arrow Left",
+                    shift=True,
+                    ctrl=True,
+                    alt=False,
+                    meta=False,
                 ),
             )
             # 申請の状態の変更 => 申請中
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="I", shift=True, ctrl=False, alt=True, meta=False,
+                    key="I",
+                    shift=True,
+                    ctrl=False,
+                    alt=True,
+                    meta=False,
                 ),
             )
             # 申請の状態の変更 => 承認済み
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="P", shift=True, ctrl=False, alt=True, meta=False,
+                    key="P",
+                    shift=True,
+                    ctrl=False,
+                    alt=True,
+                    meta=False,
                 ),
             )
             # 申請の状態の変更 => 作業完了
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="E", shift=True, ctrl=False, alt=True, meta=False,
+                    key="E",
+                    shift=True,
+                    ctrl=False,
+                    alt=True,
+                    meta=False,
                 ),
             )
             # 申請の削除
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key="R", shift=True, ctrl=False, alt=True, meta=False,
+                    key="R",
+                    shift=True,
+                    ctrl=False,
+                    alt=True,
+                    meta=False,
                 ),
             )
             self._unregister_key_shortcuts_rows()
@@ -471,7 +525,11 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             request_id = self.dtRequests.rows[row_index].cells[self.REQUEST_ID_COLUMN_NUMBER].content.value
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key=f"{row_index}", shift=True, ctrl=False, alt=False, meta=False,
+                    key=f"{row_index}",
+                    shift=True,
+                    ctrl=False,
+                    alt=False,
+                    meta=False,
                 ),
                 func=lambda e, request_id=request_id: self.on_request_edit_open(request_id=request_id),
             )
@@ -479,7 +537,11 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         for selected_index in range(0, max_row_shortcuts):
             keyboard_shortcut_manager.register_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key=f"{selected_index}", shift=True, ctrl=False, alt=True, meta=False,
+                    key=f"{selected_index}",
+                    shift=True,
+                    ctrl=False,
+                    alt=True,
+                    meta=False,
                 ),
                 func=lambda e, selected_index=selected_index: self.on_request_row_select(selected_index=selected_index),
             )
@@ -491,14 +553,22 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
         for row_index in range(0, 10):
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key=str(row_index), shift=True, ctrl=False, alt=False, meta=False,
+                    key=str(row_index),
+                    shift=True,
+                    ctrl=False,
+                    alt=False,
+                    meta=False,
                 ),
             )
         # 申請の選択・選択解除
         for row_index in range(0, 10):
             keyboard_shortcut_manager.unregister_key_shortcut(
                 key_set=keyboard_shortcut_manager.create_key_set(
-                    key=str(row_index), shift=True, ctrl=False, alt=True, meta=False,
+                    key=str(row_index),
+                    shift=True,
+                    ctrl=False,
+                    alt=True,
+                    meta=False,
                 ),
             )
 
@@ -567,19 +637,22 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_request_edit_open(self, e=None, request_id=None):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
 
         # キーボードショートカットから呼ばれた場合、
         # request_idにセットされている値を申請IDの代わりに利用する
         request_id = request_id if request_id is not None else e.control.content.value
         self.session.set("request_id", request_id)
-        self._unlock_form_controls()
         self.open_edit_request_dialog()
+        self._unlock_form_controls()
 
     @Logging.func_logger
     def on_change_request_status(self, e=None, status_text=None):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
-        if self.btnActions.disabled: return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
+        if self.btnActions.disabled:
+            return
         self._lock_form_controls()
 
         # キーボードショートカットから呼ばれた場合、
@@ -600,7 +673,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_change_request_iaas_user(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self._unlock_form_controls()
         RequestRowHelper.update_selected_request_iaas_user(self, e.control.text)
 
@@ -613,7 +687,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_heading_column(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self._unlock_form_controls()
         RequestRowHelper.sort_column(self, self.session, e.control.label.value)
         self.deactivate_action_button()
@@ -621,15 +696,15 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_selected_delete(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
-        if self.btnActions.disabled: return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
+        if self.btnActions.disabled:
+            return
         self._save_keyboard_shortcuts()
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 削除確認時に”はい”を選択
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="Enter", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="Enter", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_delete_request_yes,
         )
         # 削除確認時に”キャンセル”を選択
@@ -639,20 +714,22 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
             ),
             func=self.on_click_delete_request_cancel,
         )
-        self._unlock_form_controls()
         self.open_delete_confirm_dialog()
+        self._unlock_form_controls()
 
     @Logging.func_logger
     def on_click_add_request(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self._unlock_form_controls()
         self.open_add_request_dialog()
 
     @Logging.func_logger
     def on_click_delete_request_yes(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm):
+            return
         RequestRowHelper.delete_selected_requests(self)
         self._unlock_form_controls()
         self.dlgDeleteConfirm.open = False
@@ -663,7 +740,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_delete_request_cancel(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgDeleteConfirm):
+            return
         self._unlock_form_controls()
         self.dlgDeleteConfirm.open = False
         self.page.update()
@@ -674,7 +752,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     def on_click_edit_request_save(self, e):
         self._lock_form_controls()
 
-        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgEditRequest): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session, self.dlgEditRequest):
+            return
         RequestRowHelper.update_request(self.session)
         self._unlock_form_controls()
         self.dlgEditRequest.open = False
@@ -684,7 +763,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_next_page(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         if self.btnNextPage.disabled:
             self._unlock_form_controls()
             return
@@ -697,7 +777,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_previous_page(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         if self.btnPreviousPage.disabled:
             self._unlock_form_controls()
             return
@@ -709,7 +790,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
     @Logging.func_logger
     def on_click_search_request_text(self, e):
         self._lock_form_controls()
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self._unlock_form_controls()
         self.data_row_offset = 0
         self.session.set("request_text_search_string", self.tfSearchRequestText.value)
@@ -717,7 +799,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_focus_search_request_text(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         self.session.set("search_request_text_focused", True)
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         keyboard_shortcut_manager.save_key_shortcuts()
@@ -725,7 +808,8 @@ class BaseRequestListForm(ft.Card, metaclass=abc.ABCMeta):
 
     @Logging.func_logger
     def on_blur_search_request_text(self, e):
-        if SessionHelper.logout_if_session_expired(self.page, self.session): return
+        if SessionHelper.logout_if_session_expired(self.page, self.session):
+            return
         if self.session.contains_key("search_request_text_focused"):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             keyboard_shortcut_manager.restore_key_shortcuts()

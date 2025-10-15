@@ -40,10 +40,16 @@ class SetVmCpuForm(BaseWizardCard):
 
         # controls
         formTitle = FormTitle("CPUの割り当て変更", "変更内容")
-        formDescription = FormDescription("仮想マシンに割り当てるCPUコア数を変更します。＊は入力/選択が必須の項目です。")
+        formDescription = FormDescription(
+            "仮想マシンに割り当てるCPUコア数を変更します。＊は入力/選択が必須の項目です。"
+        )
         self.checkChangeVmCpuEnabled = ft.Checkbox(
             label="CPUコア数を変更する",
-            value=self.session.get("job_options")["change_vm_cpu_enabled"] if "change_vm_cpu_enabled" in self.session.get("job_options") else True,
+            value=(
+                self.session.get("job_options")["change_vm_cpu_enabled"]
+                if "change_vm_cpu_enabled" in self.session.get("job_options")
+                else True
+            ),
             autofocus=True,
             on_change=self.on_change_vm_cpu_enabled,
         )
@@ -57,7 +63,7 @@ class SetVmCpuForm(BaseWizardCard):
 
         # 設定変更前のCPUコア数が選択可能なCPUコア数に含まれていない場合は、選択可能なCPUコア数に追加
         if self.session.contains_key("vcpus_default"):
-            if not str(self.session.get("vcpus_default")) in vm_cpus_array:
+            if str(self.session.get("vcpus_default")) not in vm_cpus_array:
                 vm_cpu_options.append(ft.dropdown.Option(str(self.session.get("vcpus_default"))))
 
         # CPUコア数のデフォルト値を決定
@@ -81,7 +87,9 @@ class SetVmCpuForm(BaseWizardCard):
         )
         self.btnNext = ft.FilledButton("次へ", tooltip="次へ (Shift+Alt+N)", on_click=self.on_click_next)
         self.btnPrev = ft.ElevatedButton("戻る", tooltip="戻る (Shift+Alt+P)", on_click=self.on_click_previous)
-        self.btnCancel = ft.ElevatedButton("キャンセル", tooltip="キャンセル (Shift+Alt+X)", on_click=self.on_click_cancel)
+        self.btnCancel = ft.ElevatedButton(
+            "キャンセル", tooltip="キャンセル (Shift+Alt+X)", on_click=self.on_click_cancel
+        )
 
         # Content
         header = ft.Container(

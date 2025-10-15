@@ -34,18 +34,18 @@ class DashboardForm(ft.Card):
 
         formTitle = FormTitle(self.FORM_TITLE, None)
         self.formInProgress = InProgressTabForm(
-            session = self.session,
-            page = self.page,
-            height = self.tab_content_height,
-            width = self.tab_content_width,
-            body_height = self.tab_body_height,
+            session=self.session,
+            page=self.page,
+            height=self.tab_content_height,
+            width=self.tab_content_width,
+            body_height=self.tab_body_height,
         )
         self.tabRequest = ft.Tabs(
             selected_index=0,
             animation_duration=300,
             tabs=[
                 ft.Tab(
-                    tab_content=ft.Text('対応中', tooltip='対応中 (Shift+Alt+G)'),
+                    tab_content=ft.Text("対応中", tooltip="対応中 (Shift+Alt+G)"),
                     content=self.formInProgress,
                     # height=self.tab_body_height,
                 ),
@@ -88,10 +88,8 @@ class DashboardForm(ft.Card):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="F", shift=True, ctrl=False, alt=True, meta=False
-            ),
-            func=lambda e: self.tabRequest.focus()
+            key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+            func=lambda e: self.tabRequest.focus(),
         )
 
     @Logging.func_logger
@@ -100,9 +98,7 @@ class DashboardForm(ft.Card):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # autofocus=Trueである、最初のコントロールにフォーカスを移動する
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="F", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
             )
 
     def refresh(self, e=None):
