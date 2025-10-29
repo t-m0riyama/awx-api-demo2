@@ -42,6 +42,10 @@ class VmListHelper:
             vm_detail = VlbSimpleClient.get_vm(
                 api_client=api_client, vcenter=vm_object.vcenter, vm_instance_uuid=vm_object.instance_uuid
             )
+            # 仮想マシンの詳細情報が取得できない場合は、Noneを返す
+            if vm_detail is None:
+                return None
+
             # 電源状態を日本語に変換
             if vm_detail.power_state == "poweredOn":
                 power_state = "電源オン"

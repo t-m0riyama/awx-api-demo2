@@ -418,7 +418,9 @@ class SelectTargetVmsForm(BaseWizardCard):
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm, "disk_devices"):
             tooltip_str = VmListHelper.generate_vm_detail_tooltip(vm, self.api_client)
-            e.control.content.tooltip = tooltip_str
+            # 仮想マシンの詳細情報を正常に取得できた場合、ツールチップを更新する
+            if tooltip_str:
+                e.control.content.tooltip = tooltip_str
             # コントロールが初期化前の場合、エラーが発生するため、try-exceptで処理
             try:
                 e.control.content.update()
