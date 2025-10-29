@@ -1,5 +1,6 @@
 import os
 import re
+from distutils.util import strtobool
 
 import flet as ft
 
@@ -22,6 +23,7 @@ class LoginForm(ft.Card):
     CONTENT_WIDTH = 700
     BODY_HEIGHT = 250
     AWX_URL_DEFAULT = "https://awx.example.com"
+    AWX_URL_EDITABLE_DEFAULT = "False"
     ADMIN_TEAM_DEFAULT = "requestmanager-admins"
     OPERATOR_TEAM_DEFAULT = "requestmanager-operators"
     SYSTEM_ID_PREFIX_TEAM_NAME_DEFAULT = "requestmanager-sid-"
@@ -35,6 +37,7 @@ class LoginForm(ft.Card):
 
         # controls
         default_awx_url = re.sub("/$", "", os.getenv("RMX_AWX_URL", self.AWX_URL_DEFAULT))
+        awx_url_editable = bool(strtobool(os.getenv("RMX_AWX_URL_EDITABLE", self.AWX_URL_EDITABLE_DEFAULT)))
         app_title = os.getenv("RMX_APP_TITLE", self.APP_TITLE_DEFAULT).strip('"')
         self.tfLoginid = ParameterInputText(
             label="Login ID",
@@ -51,6 +54,7 @@ class LoginForm(ft.Card):
             label="AWX URL",
             value=(self.session.get("awx_url") if self.session.contains_key("awx_url") else default_awx_url),
             on_submit=self.on_click_login,
+            disabled=not awx_url_editable,
         )
         self.txtLoginMessage = ft.Text(
             "ログイン失敗: 認証に失敗しました。ログインIDとパスワードを確認して下さい。",

@@ -7,6 +7,9 @@ services:
       # AWX/AAPのURL(ex. https://awx.example.com)
       - RMX_AWX_URL=<YOUR AWX URL>
 
+      # AWX/AAPのURLをログイン時に変更できるかどうかを指定する 有効/無効
+      - RMX_AWX_URL_EDITABLE=False
+
       # AWX/AAPを利用する際、HTTPプロキシを利用する 有効/無効
       - RMX_AWX_PROXY_ENABLED=False
 
