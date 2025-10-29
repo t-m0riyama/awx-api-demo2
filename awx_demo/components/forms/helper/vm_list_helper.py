@@ -1,6 +1,7 @@
 import flet as ft
 
 from awx_demo.utils.logging import Logging
+from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClient
 
 
 class VmListHelper:
@@ -32,6 +33,24 @@ class VmListHelper:
             vms_available=vm_list_form.vms_available,
             is_targeted=True,
         )
+
+    @staticmethod
+    @Logging.func_logger
+    def generate_vm_detail_tooltip(vm_object, api_client):
+        # 仮想マシンの詳細情報を取得
+        if not hasattr(vm_object, "disk_devices"):
+            vm_detail = VlbSimpleClient.get_vm(
+                api_client=api_client, vcenter=vm_object.vcenter, vm_instance_uuid=vm_object.instance_uuid
+            )
+            # 電源状態を日本語に変換
+            if vm_detail.power_state == "poweredOn":
+                power_state = "電源オン"
+            else:
+                power_state = "電源オフ"
+            tooltip_str = f"仮想マシン名: {vm_detail.name}, ホスト名: {vm_detail.hostname},\n"
+            tooltip_str += f"vCenter: {vm_detail.vcenter}, システム識別子: {vm_object.vm_folder}, \n"
+            tooltip_str += f"電源状態: {power_state}, CPUコア数: {vm_detail.num_cpu}, メモリ容量(GB): {int(vm_detail.memory_size_mb / 1024)}, IPアドレス: {vm_detail.ip_address}"
+            return tooltip_str
 
     @staticmethod
     @Logging.func_logger
@@ -123,6 +142,7 @@ class VmListHelper:
         vms_available: dict,
         # is_targeted: 選択対象の仮想マシンか変更対象の仮想マシンかどうかを指定
         is_targeted: bool,
+        single_vm_list: bool = False,
     ):
         dtVmlist.rows = []
         # 選択可能な仮想マシンが0件の場合、処理せず終了する
@@ -130,7 +150,11 @@ class VmListHelper:
             return
 
         for vm in vms_available:
-            targeted = True if vm_list_form.target_vms_array and vm.name in vm_list_form.target_vms_array else False
+            if single_vm_list:
+                targeted = is_targeted
+            else:
+                targeted = True if vm_list_form.target_vms_array and vm.name in vm_list_form.target_vms_array else False
+
             if targeted is is_targeted:
                 vm_tooltip = f"仮想マシン名: {vm.name}, ホスト名: {vm.hostname},\nvCenter: {vm.vcenter}, システム識別子: {vm.vm_folder}"
                 dtVmlist.rows.append(

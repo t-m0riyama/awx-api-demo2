@@ -417,12 +417,7 @@ class SelectTargetVmsForm(BaseWizardCard):
         vm = next((vm for vm in self.vms_available if vm.name == vm_name), None)
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm, "disk_devices"):
-            vm_detail = VlbSimpleClient.get_vm(
-                api_client=self.api_client, vcenter=vm.vcenter, vm_instance_uuid=vm.instance_uuid
-            )
-            tooltip_str = f"仮想マシン名: {vm_detail.name}, ホスト名: {vm_detail.hostname},\n"
-            tooltip_str += f"vCenter: {vm_detail.vcenter}, システム識別子: {vm_detail.vm_folder}, \n"
-            tooltip_str += f"電源状態: {vm_detail.power_state}, CPUコア数: {vm_detail.num_cpu}, メモリ容量(GB): {int(vm_detail.memory_size_mb / 1024)}, IPアドレス: {vm_detail.ip_address}"
+            tooltip_str = VmListHelper.generate_vm_detail_tooltip(vm, self.api_client)
             e.control.content.tooltip = tooltip_str
             # コントロールが初期化前の場合、エラーが発生するため、try-exceptで処理
             try:
