@@ -141,7 +141,7 @@ class SetVmStartStopWizard(BaseWizard):
                 self.page.title = f"{self.session.get('app_title_base')} - 変更対象のvCenter選択"
                 self.page.open(self.wizard_dialog)
             case "select_start_stop_operation":
-                self.session.set("new_request_wizard_step", "select_target")
+                self.session.set("new_request_wizard_step", "select_target_vms")
                 self.formStep = SelectTargetVmsForm(
                     session=self.session,
                     page=self.page,
