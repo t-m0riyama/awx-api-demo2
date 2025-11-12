@@ -78,3 +78,51 @@ class VlbSimpleClient:
                 return api_response.results
             except ApiException as e:
                 Logging.warning(f"Exception when calling VMsApi->get_vm: {e}")
+
+    @staticmethod
+    @Logging.func_logger
+    def get_vm_instance_uuid_by_vm_name(
+        api_client: ApiClient,
+        vcenter: str,
+        system_ids: list[str],
+        vm_name: str,
+    ):
+        with api_client:
+            results = VlbSimpleClient.get_vms_by_vm_folders(
+                api_client=api_client, vcenter=vcenter, system_ids=system_ids
+            )
+            for result in results:
+                if result.name == vm_name:
+                    return result.instance_uuid
+            return None
+
+    @staticmethod
+    @Logging.func_logger
+    def get_vm_snapshots(
+        api_client: ApiClient,
+        vcenter: str,
+        vm_instance_uuid: str,
+    ):
+        with api_client:
+            # APIインスタンスを生成
+            api_instance = vcenter_lookup_bridge_client.VmSnapshotsApi(api_client)
+            try:
+                api_response = api_instance.get_vm_snapshots(vcenter=vcenter, vm_instance_uuid=vm_instance_uuid)
+                return api_response.results
+            except ApiException as e:
+                Logging.warning(f"Exception when calling VmSnapshotsApi->get_vm_snapshots: {e}")
+
+    @staticmethod
+    @Logging.func_logger
+    def list_vm_snapshots(
+        api_client: ApiClient,
+        vcenter: str,
+    ):
+        with api_client:
+            # APIインスタンスを生成
+            api_instance = vcenter_lookup_bridge_client.VmSnapshotsApi(api_client)
+            try:
+                api_response = api_instance.list_vm_snapshots(vcenter=vcenter)
+                return api_response.results
+            except ApiException as e:
+                Logging.warning(f"Exception when calling VmSnapshotsApi->list_vm_snapshots: {e}")
