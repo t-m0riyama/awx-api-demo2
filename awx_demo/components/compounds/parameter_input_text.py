@@ -3,8 +3,31 @@ import flet as ft
 
 class ParameterInputText(ft.TextField):
 
-    def __init__(self, value=None, label='', hint_text='', helper_text='', is_password=False, text_size=16, text_align=ft.TextAlign.LEFT,
-                 max_length=None, width=0, expand=False, input_filter=None, disabled=False, on_change=None, on_submit=None, on_focus=None, on_blur=None):
+    def __init__(
+        self,
+        value=None,
+        label="",
+        hint_text="",
+        helper_text="",
+        is_password=False,
+        text_size=16,
+        text_align=ft.TextAlign.LEFT,
+        max_length=None,
+        show_counter=False,
+        width=0,
+        expand=False,
+        input_filter=None,
+        disabled=False,
+        on_change=None,
+        on_submit=None,
+        on_focus=None,
+        on_blur=None,
+    ):
+        if show_counter:
+            counter_text = "{value_length} / {max_length}"
+        else:
+            counter_text = None
+
         if width:
             super().__init__(
                 value=value,
@@ -18,6 +41,7 @@ class ParameterInputText(ft.TextField):
                 text_size=text_size,
                 text_align=text_align,
                 max_length=max_length,
+                counter_text=counter_text,
                 input_filter=input_filter,
                 disabled=disabled,
                 on_change=on_change,
@@ -41,6 +65,7 @@ class ParameterInputText(ft.TextField):
                 text_size=text_size,
                 text_align=text_align,
                 max_length=max_length,
+                counter_text=counter_text,
                 input_filter=input_filter,
                 disabled=disabled,
                 on_change=on_change,
