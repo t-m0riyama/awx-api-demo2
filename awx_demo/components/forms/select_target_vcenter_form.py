@@ -265,7 +265,7 @@ class SelectTargetVcenterForm(BaseWizardCard):
         # セッションと次へボタンの有効/無効を更新
         if len(self.system_ids_array) > 0:
             self.session.get("job_options")["system_ids"] = ",".join(self.system_ids_array)
-            if self.dropVcenter.value == "" or self.dropSystemIds.value == "指定なし":
+            if self.dropVcenter.value == "" or self.dropVcenter.value == "指定なし":
                 self.btnNext.disabled = True
             else:
                 self.btnNext.disabled = False
@@ -287,7 +287,7 @@ class SelectTargetVcenterForm(BaseWizardCard):
     @Logging.func_logger
     def on_click_next(self, e):
         # 変更対象のvCenterが指定されていない場合は、処理せず終了する
-        if self.dropVcenter.value == "" or self.dropSystemIds.value == "指定なし":
+        if self.dropVcenter.value == "" or self.dropVcenter.value == "指定なし":
             return
 
         self._lock_form_controls()
