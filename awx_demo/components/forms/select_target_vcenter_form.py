@@ -95,31 +95,19 @@ class SelectTargetVcenterForm(BaseWizardCard):
                 # ユーザの所属するシステム識別子以外は、選択肢から除外する
                 if system_id.name not in self.session.get("system_ids"):
                     continue
-                # ユーザの所属するシステム識別子は、選択肢に含め、チェックをつける
-                self.system_id_options.append(
-                    ft.dropdown.Option(
-                        key=system_id.name,
-                        content=ft.Checkbox(
-                            label=system_id.name,
-                            value=True,
-                            on_change=self.on_change_system_ids,
-                        ),
-                    )
+
+            # 選択済みのシステム識別子については、チェックをつける
+            checked = True if system_id.name in selected_system_ids else False
+            self.system_id_options.append(
+                ft.dropdown.Option(
+                    key=system_id.name,
+                    content=ft.Checkbox(
+                        label=system_id.name,
+                        value=checked,
+                        on_change=self.on_change_system_ids,
+                    ),
                 )
-            # 申請者ロール以外の場合
-            else:
-                # 選択済みのシステム識別子については、チェックをつける
-                checked = True if system_id.name in selected_system_ids else False
-                self.system_id_options.append(
-                    ft.dropdown.Option(
-                        key=system_id.name,
-                        content=ft.Checkbox(
-                            label=system_id.name,
-                            value=checked,
-                            on_change=self.on_change_system_ids,
-                        ),
-                    )
-                )
+            )
 
         # 初回の読み込み時、チェックされたシステム識別子をシステム識別子の配列に追加する
         if len(self.system_ids_array) == 0:
