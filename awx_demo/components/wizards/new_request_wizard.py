@@ -5,6 +5,7 @@ from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.wizards.base_wizard import BaseWizard
 from awx_demo.components.wizards.set_vm_cpu_memory_wizard import SetVmCpuMemoryWizard
 from awx_demo.components.wizards.set_vm_start_stop_wizard import SetVmStartStopWizard
+from awx_demo.components.wizards.vm_snapshot_wizard import VmSnapshotWizard
 from awx_demo.db_helper.types.request_category import RequestOperation
 from awx_demo.utils.logging import Logging
 
@@ -73,6 +74,15 @@ class NewRequestWizard(BaseWizard):
                         child_wizard.on_click_next(e)
                     case RequestOperation.VM_START_OR_STOP_FRIENDLY:
                         child_wizard = SetVmStartStopWizard(
+                            session=self.session,
+                            page=self.page,
+                            wizard_dialog=self.wizard_dialog,
+                            parent_wizard=self,
+                            parent_refresh_func=self.parent_refresh_func,
+                        )
+                        child_wizard.on_click_next(e)
+                    case RequestOperation.VM_SNAPSHOT_OPERATION_FRIENDLY:
+                        child_wizard = VmSnapshotWizard(
                             session=self.session,
                             page=self.page,
                             wizard_dialog=self.wizard_dialog,

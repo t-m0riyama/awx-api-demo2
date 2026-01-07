@@ -1,5 +1,7 @@
 import flet as ft
 
+from distutils.util import strtobool
+
 from awx_demo.components.compounds.form_title import FormTitle
 from awx_demo.components.forms.edit_tab.manage_info_tab_form import ManageInfoTabForm
 from awx_demo.components.forms.edit_tab.request_common_info_tab_form import (
@@ -8,12 +10,18 @@ from awx_demo.components.forms.edit_tab.request_common_info_tab_form import (
 from awx_demo.components.forms.edit_tab.select_target_vcenter_tab_form import (
     SelectTargetVCenterTabForm,
 )
+from awx_demo.components.forms.edit_tab.select_target_vm_tab_form import SelectTargetVmTabForm
 from awx_demo.components.forms.edit_tab.select_target_vms_tab_form import SelectTargetVmsTabForm
 from awx_demo.components.forms.edit_tab.set_vm_cpu_tab_form import SetVmCpuTabForm
 from awx_demo.components.forms.edit_tab.set_vm_memory_tab_form import SetVmMemoryTabForm
 from awx_demo.components.forms.edit_tab.set_vm_start_stop_tab_form import (
     SetVmStartStopTabForm,
 )
+from awx_demo.components.forms.edit_tab.select_vm_snapshot_operation_tab_form import (
+    SelectVmSnapshotOperationTabForm,
+)
+from awx_demo.components.forms.edit_tab.input_vm_snapshot_name_tab_form import InputVmSnapshotNameTabForm
+from awx_demo.components.forms.edit_tab.select_target_vm_snapshot_tab_form import SelectTargetVmSnapshotTabForm
 from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.types.user_role import UserRole
@@ -93,7 +101,7 @@ class EditRequestForm(BaseWizardCard):
                     self.tab_content_height,
                     self.tab_content_width,
                     self.tab_body_height,
-                    on_change_vcenter_or_system_ids=self.formSelectTargetVms.refresh_vms_available,
+                    on_change_vcenter_or_system_ids_hook=self.formSelectTargetVms.refresh_vms_available,
                     lock_form_controls=self._lock_form_controls,
                     unlock_form_controls=self._unlock_form_controls,
                 )
@@ -166,7 +174,7 @@ class EditRequestForm(BaseWizardCard):
                     self.tab_content_height,
                     self.tab_content_width,
                     self.tab_body_height,
-                    on_change_vcenter_or_system_ids=self.formSelectTargetVms.refresh_vms_available,
+                    on_change_vcenter_or_system_ids_hook=self.formSelectTargetVms.refresh_vms_available,
                     lock_form_controls=self._lock_form_controls,
                     unlock_form_controls=self._unlock_form_controls,
                 )
@@ -210,6 +218,118 @@ class EditRequestForm(BaseWizardCard):
                     scrollable=True,
                     expand=1,
                 )
+            case RequestOperation.VM_SNAPSHOT_OPERATION_FRIENDLY:
+                self.formCommonInfo = RequestCommonInfoTabForm(
+                    self.session,
+                    self.page,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                match self.session.get("job_options")["snapshot_operation"]:
+                    case "take_vm_snapshot":
+                        # スナップショットの取得を行う場合は、スナップショット名の入力フォームを表示
+                        self.formVmSnapshotOption = InputVmSnapshotNameTabForm(
+                            self.session,
+                            self.page,
+                            self.tab_content_height,
+                            self.tab_content_width,
+                            self.tab_body_height,
+                        )
+                    case _:
+                        # スナップショットの取得以外の場合は、スナップショットの選択フォームを表示
+                        self.formVmSnapshotOption = SelectTargetVmSnapshotTabForm(
+                            self.session,
+                            self.page,
+                            self.tab_content_height,
+                            self.tab_content_width,
+                            self.tab_body_height,
+                            lock_form_controls=self._lock_form_controls,
+                            unlock_form_controls=self._unlock_form_controls,
+                        )
+
+                # 変更対象の仮想マシンが単一か複数かに応じて、仮想マシンの選択フォームを設定
+                if bool(strtobool(str(self.session.get("job_options")["target_vm_multiple"]))):
+                    self.formSelectTargetVms = SelectTargetVmsTabForm(
+                        self.session,
+                        self.tab_content_height,
+                        self.tab_content_width,
+                        self.tab_body_height,
+                        on_change_vms_hook=self.formVmSnapshotOption.refresh_vm_snapshots_available,
+                        lock_form_controls=self._lock_form_controls,
+                        unlock_form_controls=self._unlock_form_controls,
+                    )
+                else:
+                    self.formSelectTargetVms = SelectTargetVmTabForm(
+                        self.session,
+                        self.tab_content_height,
+                        self.tab_content_width,
+                        self.tab_body_height,
+                        on_change_vms_hook=self.formVmSnapshotOption.refresh_vm_snapshots_available,
+                        lock_form_controls=self._lock_form_controls,
+                        unlock_form_controls=self._unlock_form_controls,
+                    )
+
+                self.formSelectTargetVCenter = SelectTargetVCenterTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                    on_change_vcenter_or_system_ids_hook=self.formSelectTargetVms.refresh_vms_available,
+                    lock_form_controls=self._lock_form_controls,
+                    unlock_form_controls=self._unlock_form_controls,
+                )
+                self.formSelectVmSnapshotOperation = SelectVmSnapshotOperationTabForm(
+                    self.session,
+                    self.page,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+
+                self.formManageInfo = ManageInfoTabForm(
+                    self.session,
+                    self.tab_content_height,
+                    self.tab_content_width,
+                    self.tab_body_height,
+                )
+                self.tabRequest = ft.Tabs(
+                    selected_index=0,
+                    animation_duration=300,
+                    tabs=[
+                        ft.Tab(
+                            tab_content=ft.Text("共通", tooltip="共通 (Shift+Alt+G)"),
+                            content=ft.SelectionArea(content=self.formCommonInfo),
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+O)"),
+                            content=ft.SelectionArea(content=self.formSelectTargetVCenter),
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text("変更対象の仮想マシン", tooltip="変更対象の仮想マシン (Shift+Alt+O)"),
+                            content=ft.SelectionArea(content=self.formSelectTargetVms),
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text("スナップショット操作", tooltip="スナップショット操作 (Shift+Alt+S)"),
+                            content=ft.SelectionArea(content=self.formSelectVmSnapshotOperation),
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text(
+                                "スナップショットの指定", tooltip="スナップショットの指定 (Shift+Alt+S)"
+                            ),
+                            content=ft.SelectionArea(content=self.formVmSnapshotOption),
+                        ),
+                        ft.Tab(
+                            tab_content=ft.Text("管理情報", tooltip="管理情報 (Shift+Alt+A)"),
+                            content=ft.SelectionArea(content=self.formManageInfo),
+                        ),
+                    ],
+                    scrollable=True,
+                    expand=1,
+                )
+            case _:
+                Logging.error(f"undefined request operation: {request_operation}")
+
         change_disabled = True if self.session.get("user_role") == UserRole.USER_ROLE else False
         is_execute_disabled = self.session.get("request_status") not in [
             RequestStatus.APPROVED,
@@ -277,23 +397,24 @@ class EditRequestForm(BaseWizardCard):
         request_operation = IaasRequestHelper.get_request(db_session, self.request_id).request_operation
         db_session.close()
         confirm_text = "== 基本情報 ====================="
+        confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
+        confirm_text += "\n依頼内容: " + (
+            self.session.get("request_text")
+            if self.session.contains_key("request_text") and self.session.get("request_text") != ""
+            else "(未指定)"
+        )
+        confirm_text += "\n依頼区分: " + self.session.get("request_category")
+        confirm_text += "\n申請項目: " + self.session.get("request_operation")
+        request_deadline = (
+            self.session.get("request_deadline").strftime("%Y/%m/%d")
+            if self.session.contains_key("request_deadline")
+            else "(未指定)"
+        )
+        confirm_text += "\nリリース希望日: " + request_deadline
+        confirm_text += "\n\n== 詳細情報 ====================="
+
         match request_operation:
             case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
-                confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
-                confirm_text += "\n依頼内容: " + (
-                    self.session.get("request_text")
-                    if self.session.contains_key("request_text") and self.session.get("request_text") != ""
-                    else "(未指定)"
-                )
-                confirm_text += "\n依頼区分: " + self.session.get("request_category")
-                confirm_text += "\n申請項目: " + self.session.get("request_operation")
-                request_deadline = (
-                    self.session.get("request_deadline").strftime("%Y/%m/%d")
-                    if self.session.contains_key("request_deadline")
-                    else "(未指定)"
-                )
-                confirm_text += "\nリリース希望日: " + request_deadline
-                confirm_text += "\n\n== 詳細情報 ====================="
                 confirm_text += "\nvCenter: " + self.session.get("job_options")["vsphere_vcenter"]
                 confirm_text += "\n仮想マシン: " + self.session.get("job_options")["target_vms"]
                 if str(self.session.get("job_options")["change_vm_cpu_enabled"]) == "True":
@@ -301,21 +422,6 @@ class EditRequestForm(BaseWizardCard):
                 if str(self.session.get("job_options")["change_vm_memory_enabled"]) == "True":
                     confirm_text += "\nメモリ容量(GB): " + str(self.session.get("job_options")["memory_gb"])
             case RequestOperation.VM_START_OR_STOP_FRIENDLY:
-                confirm_text += "\n依頼者(アカウント): " + self.session.get("awx_loginid")
-                confirm_text += "\n依頼内容: " + (
-                    self.session.get("request_text")
-                    if self.session.contains_key("request_text") and self.session.get("request_text") != ""
-                    else "(未指定)"
-                )
-                confirm_text += "\n依頼区分: " + self.session.get("request_category")
-                confirm_text += "\n申請項目: " + self.session.get("request_operation")
-                request_deadline = (
-                    self.session.get("request_deadline").strftime("%Y/%m/%d")
-                    if self.session.contains_key("request_deadline")
-                    else "(未指定)"
-                )
-                confirm_text += "\nリリース希望日: " + request_deadline
-                confirm_text += "\n\n== 詳細情報 ====================="
                 confirm_text += "\nvCenter: " + self.session.get("job_options")["vsphere_vcenter"]
                 confirm_text += "\n仮想マシン: " + self.session.get("job_options")["target_vms"]
                 if str(self.session.get("job_options")["vm_start_stop_enabled"]) == "True":
@@ -328,6 +434,33 @@ class EditRequestForm(BaseWizardCard):
                     confirm_text += "\n起動時の最大待ち合わせ時間(秒): " + str(
                         self.session.get("job_options")["tools_wait_timeout_sec"]
                     )
+            case RequestOperation.VM_SNAPSHOT_OPERATION_FRIENDLY:
+                confirm_text += "\nvCenter: " + self.session.get("job_options")["vsphere_vcenter"]
+                confirm_text += "\n仮想マシン: " + self.session.get("job_options")["target_vms"]
+                match self.session.get("job_options")["snapshot_operation"]:
+                    case "take_vm_snapshot":
+                        confirm_text += "\nスナップショット操作: スナップショットの取得"
+                    case "revert_vm_snapshot":
+                        confirm_text += "\nスナップショット操作: スナップショットの切り戻し"
+                    case "remove_vm_snapshot":
+                        confirm_text += "\nスナップショット操作: スナップショットの削除"
+                    case _:
+                        assert False, "スナップショット操作が不正です。"
+                if (
+                    bool(strtobool(str(self.session.get("job_options")["target_vm_multiple"])))
+                    or self.session.get("job_options")["snapshot_operation"] == "take_vm_snapshot"
+                ):
+                    confirm_text += (
+                        f"\nスナップショット名: {self.session.get('job_options')['target_vm_snapshot_name']}"
+                    )
+                    confirm_text += (
+                        f"\nスナップショット説明: {self.session.get('job_options')['target_vm_snapshot_description']}"
+                    )
+                else:
+                    confirm_text += (
+                        f"\nスナップショット名: {self.session.get('job_options')['target_vm_snapshot_name']}"
+                    )
+                    confirm_text += f"\nスナップショットID: {self.session.get('job_options')['target_vm_snapshot_id']}"
         return confirm_text
 
     @Logging.func_logger

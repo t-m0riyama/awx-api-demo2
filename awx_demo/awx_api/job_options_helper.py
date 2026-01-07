@@ -8,6 +8,7 @@ class JobOptionsHelper:
     # const
     JOB_TEMPLATE_SET_VM_CPU_MEMORY_DEFAULT = "vm-config-utils_set_vm_cpu"
     JOB_TEMPLATE_VM_START_STOP_DEFAULT = "vm-config-utils_vm_start_stop"
+    JOB_TEMPLATE_VM_SNAPSHOT_OPERATION_DEFAULT = "vm-config-utils_vm_snapshot_operation"
 
     @staticmethod
     @Logging.func_logger
@@ -38,6 +39,20 @@ class JobOptionsHelper:
                     "shutdown_timeout_sec",
                     "tools_wait_timeout_sec",
                 ]
+            case RequestOperation.VM_SNAPSHOT_OPERATION:
+                target_options = [
+                    "vsphere_cluster",
+                    "vsphere_vcenter",
+                    "system_ids",
+                    "target_vms",
+                    "snapshot_operation",
+                    "target_vm_snapshot_name",
+                    "target_vm_snapshot_description",
+                    "target_vm_snapshot_id",
+                    "target_vm_multiple",
+                    "shutdown_before_change",
+                    "startup_after_change",
+                ]
         job_options = {}
         for key in target_options:
             if key in session.get("job_options"):
@@ -57,3 +72,7 @@ class JobOptionsHelper:
                 )
             case RequestOperation.VM_START_OR_STOP:
                 return os.getenv("JOB_TEMPLATE_VM_START_STOP", JobOptionsHelper.JOB_TEMPLATE_VM_START_STOP_DEFAULT)
+            case RequestOperation.VM_SNAPSHOT_OPERATION:
+                return os.getenv(
+                    "JOB_TEMPLATE_VM_SNAPSHOT_OPERATION", JobOptionsHelper.JOB_TEMPLATE_VM_SNAPSHOT_OPERATION_DEFAULT
+                )

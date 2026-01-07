@@ -55,6 +55,11 @@ class IaasRequestReportHelper:
         "vm_start_stop_enabled",
         "shutdown_timeout_sec",
         "tools_wait_timeout_sec",
+        "snapshot_operation",
+        "target_vm_snapshot_name",
+        "target_vm_snapshot_description",
+        "target_vm_snapshot_id",
+        "target_vm_multiple",
     ]
     JOB_OPTIONS_FRIENDLY_KEYS = [
         "クラスタ名",
@@ -71,11 +76,28 @@ class IaasRequestReportHelper:
         "仮想マシンの起動/停止の変更",
         "シャットダウン時の最大待ち合わせ時間(秒)",
         "起動時の最大待ち合わせ時間(秒)",
+        "スナップショット操作",
+        "スナップショット名",
+        "スナップショット説明",
+        "スナップショットID",
+        "スナップショット複数選択",
+    ]
+    SNAPSHOT_OPEARTION_KEYS = [
+        "take_vm_snapshot",
+        "revert_vm_snapshot",
+        "remove_vm_snapshot",
+    ]
+    SNAPSHOT_OPEARTION_FRIENDLY_KEYS = [
+        "スナップショットの取得",
+        "スナップショットの切り戻し",
+        "スナップショットの削除",
     ]
 
     @classmethod
     @Logging.func_logger
-    def diff_request_change(cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old):
+    def diff_request_change(
+        cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old
+    ):
         diff_request = {}
         if request.request_text != request_text_old:
             diff_request["request_text"] = "{} -> {}".format(request_text_old, request.request_text)
@@ -123,7 +145,9 @@ class IaasRequestReportHelper:
 
     @classmethod
     @Logging.func_logger
-    def generate_diff_request(cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old):
+    def generate_diff_request(
+        cls, request, request_deadline_old, request_text_old, job_options_old, request_status_old, iaas_user_old
+    ):
         diff_request = cls.diff_request_change(
             request=request,
             request_deadline_old=request_deadline_old,
@@ -148,7 +172,15 @@ class IaasRequestReportHelper:
 
     @classmethod
     @Logging.func_logger
-    def generate_common_fields(cls, request_id, event_type_friendly, is_succeeded, request_text=None, request_deadline=None, additional_info=None):
+    def generate_common_fields(
+        cls,
+        request_id,
+        event_type_friendly,
+        is_succeeded,
+        request_text=None,
+        request_deadline=None,
+        additional_info=None,
+    ):
         ok_ng = "OK" if is_succeeded else "NG"
         status = EventStatus.SUCCEED if is_succeeded else EventStatus.FAILED
         title = "[申請通知 / {}({}) / {}]".format(event_type_friendly, request_id, ok_ng)
@@ -171,11 +203,13 @@ class IaasRequestReportHelper:
         for i, request_key in enumerate(cls.REQUEST_KEYS):
             if request.get(request_key):
                 if isinstance(request[request_key], datetime.datetime):
-                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value).strftime("%Y/%m/%d")
+                    request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value).strftime(
+                        "%Y/%m/%d"
+                    )
                 else:
                     request_friendly[cls.REQUEST_FRIENDLY_KEYS[i]] = request.get(request_key, default_value)
         if request_friendly.get("ジョブ設定"):
-            request_friendly["ジョブ設定"] = cls.to_friendly_job_options(
+            request_friendly["ジョブ設定"] = cls._to_friendly_job_options(
                 job_options_str=json.dumps(request_friendly["ジョブ設定"]), convert_to_yaml=False
             )
         yaml_string = yaml.safe_dump(data=request_friendly, allow_unicode=True, sort_keys=False)
@@ -183,11 +217,20 @@ class IaasRequestReportHelper:
 
     @classmethod
     @Logging.func_logger
-    def to_friendly_job_options(cls, job_options_str, convert_to_yaml=True, default_value=None):
+    def _to_friendly_job_options(cls, job_options_str, convert_to_yaml=True, default_value=None):
         job_options_dict = json.loads(job_options_str)
         for i, job_options_key in enumerate(cls.JOB_OPTIONS_KEYS):
-            if job_options_dict.get(job_options_key):
-                job_options_dict[f"+--{cls.JOB_OPTIONS_FRIENDLY_KEYS[i]}"] = job_options_dict.pop(job_options_key, default_value)
+            if job_options_dict.get(job_options_key) is not None:
+                if job_options_key == "snapshot_operation":
+                    job_options_dict[f"+--{cls.JOB_OPTIONS_FRIENDLY_KEYS[i]}"] = cls._to_friendly_snapshot_operation(
+                        job_options_dict.pop(job_options_key, default_value)
+                    )
+                else:
+                    job_options_dict[f"+--{cls.JOB_OPTIONS_FRIENDLY_KEYS[i]}"] = job_options_dict.pop(
+                        job_options_key, default_value
+                    )
+            else:
+                Logging.warning(f"job_options_key: {job_options_key} not found")
 
         if convert_to_yaml:
             # YAML文字列として返却
@@ -196,3 +239,8 @@ class IaasRequestReportHelper:
         else:
             # ディクショナリとして返却
             return job_options_dict
+
+    @classmethod
+    @Logging.func_logger
+    def _to_friendly_snapshot_operation(cls, snapshot_operation):
+        return cls.SNAPSHOT_OPEARTION_FRIENDLY_KEYS[cls.SNAPSHOT_OPEARTION_KEYS.index(snapshot_operation)]

@@ -103,6 +103,7 @@ class RequestCommonInfoTabForm(ft.Card):
             options=[
                 ft.dropdown.Option(RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY),
                 ft.dropdown.Option(RequestOperation.VM_START_OR_STOP_FRIENDLY),
+                ft.dropdown.Option(RequestOperation.VM_SNAPSHOT_OPERATION_FRIENDLY),
             ],
             disabled=True,
             expand=True,

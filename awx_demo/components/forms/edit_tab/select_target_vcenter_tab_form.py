@@ -19,12 +19,12 @@ class SelectTargetVCenterTabForm(ft.Card):
         height=CONTENT_HEIGHT,
         width=CONTENT_WIDTH,
         body_height=BODY_HEIGHT,
-        on_change_vcenter_or_system_ids=None,
-        lock_form_controls=None,
-        unlock_form_controls=None,
+        on_change_vcenter_or_system_ids_hook: callable = None,
+        lock_form_controls: callable = None,
+        unlock_form_controls: callable = None,
     ):
         self.session = session
-        self.on_change_vcenter_or_system_ids = on_change_vcenter_or_system_ids
+        self.on_change_vcenter_or_system_ids_hook = on_change_vcenter_or_system_ids_hook
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
@@ -167,7 +167,7 @@ class SelectTargetVCenterTabForm(ft.Card):
         # 変更対象の仮想マシンのリストを更新する関数を呼び出す
         if self._is_valid_vcenter_and_system_ids():
             self._lock_form_controls()
-            self.on_change_vcenter_or_system_ids()
+            self.on_change_vcenter_or_system_ids_hook()
             self._unlock_form_controls()
 
     @Logging.func_logger
@@ -191,5 +191,5 @@ class SelectTargetVCenterTabForm(ft.Card):
         # 変更対象の仮想マシンのリストを更新する関数を呼び出す
         if self._is_valid_vcenter_and_system_ids():
             self._lock_form_controls()
-            self.on_change_vcenter_or_system_ids()
+            self.on_change_vcenter_or_system_ids_hook()
             self._unlock_form_controls()
