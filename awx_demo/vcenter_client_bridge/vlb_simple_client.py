@@ -50,14 +50,17 @@ class VlbSimpleClient:
     @Logging.func_logger
     def get_vms_by_vm_folders(
         api_client: ApiClient,
-        vcenter: str,
         system_ids: list[str],
+        vcenter: str = None,
     ):
         with api_client:
             # APIインスタンスを生成
             api_instance = vcenter_lookup_bridge_client.VmsApi(api_client)
             try:
-                api_response = api_instance.list_vms(vcenter=vcenter, vm_folders=system_ids)
+                if vcenter is not None:
+                    api_response = api_instance.list_vms(vcenter=vcenter, vm_folders=system_ids)
+                else:
+                    api_response = api_instance.list_vms(vm_folders=system_ids)
                 api_response.results.sort(key=lambda x: x.name)
                 return api_response.results
             except ApiException as e:
