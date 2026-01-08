@@ -16,11 +16,23 @@ class SelectTargetVmsTabForm(ft.Card):
     VM_LIST_MAX_WIDTH = 320
     VM_LIST_PADDING_SIZE = 5
 
-    def __init__(self, session, height=CONTENT_HEIGHT, width=CONTENT_WIDTH, body_height=BODY_HEIGHT):
+    def __init__(
+        self,
+        session,
+        height=CONTENT_HEIGHT,
+        width=CONTENT_WIDTH,
+        body_height=BODY_HEIGHT,
+        on_change_vms_hook: callable = None,
+        lock_form_controls: callable = None,
+        unlock_form_controls: callable = None,
+    ):
         self.session = session
+        self.on_change_vms_hook = on_change_vms_hook
         self.content_height = height
         self.content_width = width
         self.body_height = body_height
+        self._lock_form_controls = lock_form_controls
+        self._unlock_form_controls = unlock_form_controls
 
         # target_vmsを配列に変換
         if "target_vms" in self.session.get("job_options"):
@@ -48,8 +60,6 @@ class SelectTargetVmsTabForm(ft.Card):
             divider_thickness=1,
             heading_row_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             column_spacing=60,
-            # heading_row_height=25,
-            # data_row_max_height=50,
             heading_row_height=25,
             data_row_max_height=50,
             sort_column_index=0,
@@ -276,7 +286,7 @@ class SelectTargetVmsTabForm(ft.Card):
 
     @Logging.func_logger
     def on_select_vmlist_row(self, e=None, selected_index=None):
-        # self._lock_form_controls()
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session):
             return
 
@@ -294,11 +304,11 @@ class SelectTargetVmsTabForm(ft.Card):
             if row.selected:
                 checked_vms.append(row.cells[0].content.content.value)
         self.vmlist_checked = checked_vms
-        # self._unlock_form_controls()
+        self._unlock_form_controls()
 
     @Logging.func_logger
     def on_select_targeted_vmlist_row(self, e=None, selected_index=None):
-        # self._lock_form_controls()
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session):
             return
 
@@ -318,7 +328,7 @@ class SelectTargetVmsTabForm(ft.Card):
             if row.selected:
                 checked_vms.append(row.cells[0].content.content.value)
         self.targeted_vmlist_checked = checked_vms
-        # self._unlock_form_controls()
+        self._unlock_form_controls()
 
     @Logging.func_logger
     def on_hover_datacell(self, e):
@@ -341,7 +351,7 @@ class SelectTargetVmsTabForm(ft.Card):
 
     @Logging.func_logger
     def on_click_add_vm(self, e):
-        # self._lock_form_controls()
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session):
             return
 
@@ -366,10 +376,12 @@ class SelectTargetVmsTabForm(ft.Card):
         if len(self.dtVmlist.rows) == 0:
             self.btnAddVm.disabled = True
             self.btnAddVm.update()
+        self._change_vms_hook()
+        self._unlock_form_controls()
 
     @Logging.func_logger
     def on_click_remove_vm(self, e):
-        # self._lock_form_controls()
+        self._lock_form_controls()
         if SessionHelper.logout_if_session_expired(self.page, self.session):
             return
 
@@ -394,6 +406,8 @@ class SelectTargetVmsTabForm(ft.Card):
         if len(self.dtTargetedVmlist.rows) == 0:
             self.btnRemoveVm.disabled = True
             self.btnRemoveVm.update()
+        self._change_vms_hook()
+        self._unlock_form_controls()
 
     @Logging.func_logger
     def _get_vms_available(self):
@@ -435,39 +449,6 @@ class SelectTargetVmsTabForm(ft.Card):
         )
 
     @Logging.func_logger
-    def on_change_vms(self, e):
+    def _change_vms_hook(self):
         self.session.get("job_options")["target_vms"] = ",".join(sorted(self.target_vms_array))
-
-    # @Logging.func_logger
-    # def on_click_next(self, e):
-    #     # 変更対象の仮想マシンが指定されていない場合は、処理せず終了する
-    #     if len(self.target_vms_array) == 0:
-    #         return
-
-    #     # self._lock_form_controls()
-    #     self.session.get("job_options")["target_vms"] = ",".join(sorted(self.target_vms_array))
-
-    #     # 変更対象に選択された１台目の仮想マシンのCPUコア数とメモリ容量をセッションにセット
-    #     available_vm_names = [vm.name for vm in self.vms_available]
-    #     for vm_name in sorted(self.target_vms_array):
-    #         if vm_name in sorted(available_vm_names):
-    #             # 該当する仮想マシン名のオブジェクトを取得
-    #             vm = next((vm for vm in self.vms_available if vm.name == vm_name), None)
-
-    #             # セッションに保存されているデフォルト値と変更対象の仮想マシンのCPUコア数とメモリ容量が異なる場合は、セッションの値をクリア
-    #             if self.session.contains_key("vcpus_default") and self.session.get("vcpus_default") != vm.num_cpu:
-    #                 if "vcpus" in self.session.get("job_options"):
-    #                     deleted_vcpus = self.session.get("job_options").pop("vcpus")
-    #             if self.session.contains_key("memory_gb_default") and self.session.get("memory_gb_default") != int(
-    #                 vm.memory_size_mb / 1024
-    #             ):
-    #                 if "memory_gb" in self.session.get("job_options"):
-    #                     deleted_memory_gb = self.session.get("job_options").pop("memory_gb")
-
-    #             # セッションにデフォルト値をセット（設定変更前のデフォルト値として利用するため）
-    #             self.session.set("vcpus_default", vm.num_cpu)
-    #             self.session.set("memory_gb_default", int(vm.memory_size_mb / 1024))
-    #             break
-
-    #     # self._unlock_form_controls()
-    #     self.step_change_next(e)
+        self.on_change_vms_hook()
