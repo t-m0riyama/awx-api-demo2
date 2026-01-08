@@ -8,13 +8,13 @@ class VmListHelper:
 
     @staticmethod
     @Logging.func_logger
-    def generate_vm_list_labels(vm_list_form):
+    def _generate_vm_list_labels(vm_list_form):
         vm_list_form.textVms.value = f"選択可能な仮想マシン ({len(vm_list_form.dtVmlist.rows)}件)"
         vm_list_form.textTargetedVms.value = f"変更対象の仮想マシン ({len(vm_list_form.dtTargetedVmlist.rows)}件)"
 
     @staticmethod
     @Logging.func_logger
-    def generate_vm_list(vm_list_form):
+    def _generate_vm_list(vm_list_form):
         # 選択可能な仮想マシンのリストを再生成
         VmListHelper.generate_vm_list_rows(
             vm_list_form=vm_list_form,
@@ -82,8 +82,8 @@ class VmListHelper:
                 vm_list_form.target_vms_array = vm_list_form.vmlist_checked
 
         # 仮想マシンのリストを再生成
-        VmListHelper.generate_vm_list(vm_list_form)
-        VmListHelper.generate_vm_list_labels(vm_list_form)
+        VmListHelper._generate_vm_list(vm_list_form)
+        VmListHelper._generate_vm_list_labels(vm_list_form)
 
         # 仮想マシンリストのチェック状態をクリア
         VmListHelper.uncheck_all_vms_from_vmlists(vm_list_form)
