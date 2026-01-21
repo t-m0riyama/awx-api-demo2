@@ -5,6 +5,13 @@ from awx_demo.components.session_helper import SessionHelper
 from awx_demo.utils.logging import Logging
 
 
+class BaseWizardCardError(Exception):
+    """Raised when BaseWizardCard fails."""
+
+    def __init__(self, message):
+        super().__init__(message)
+
+
 class BaseWizardCard(ft.Card):
 
     def __init__(self, controls):
@@ -21,43 +28,49 @@ class BaseWizardCard(ft.Card):
         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
         # 次へ
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="N", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="N", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_next,
         )
         # 前へ
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="P", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="P", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_previous,
         )
         # キャンセル
         keyboard_shortcut_manager.register_key_shortcut(
-            key_set=keyboard_shortcut_manager.create_key_set(
-                key="X", shift=True, ctrl=False, alt=True, meta=False
-            ),
+            key_set=keyboard_shortcut_manager.create_key_set(key="X", shift=True, ctrl=False, alt=True, meta=False),
             func=self.on_click_cancel,
         )
         # ログへのセッションダンプ
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="V", shift=True, ctrl=False, alt=True, meta=False,
+                key="V",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=lambda e, session=self.session: SessionHelper.dump_session(session),
         )
         # Semantics Debuggerの有効化/無効化
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Y", shift=True, ctrl=False, alt=True, meta=False,
+                key="Y",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=self.toggle_show_semantics_debugger,
         )
         # ログへのキーボードショートカット一覧出力
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(
-                key="Z", shift=True, ctrl=False, alt=True, meta=False,
+                key="Z",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
             ),
             func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
         )
@@ -68,39 +81,27 @@ class BaseWizardCard(ft.Card):
             keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
             # 次へ
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="N", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="N", shift=True, ctrl=False, alt=True, meta=False),
             )
             # 前へ
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="P", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="P", shift=True, ctrl=False, alt=True, meta=False),
             )
             # キャンセル
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="X", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="X", shift=True, ctrl=False, alt=True, meta=False),
             )
             # ログへのセッションダンプ
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="V", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="V", shift=True, ctrl=False, alt=True, meta=False),
             )
             # Semantics Debuggerの有効化/無効化
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Y", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="Y", shift=True, ctrl=False, alt=True, meta=False),
             )
             # ログへのキーボードショートカット一覧出力
             keyboard_shortcut_manager.unregister_key_shortcut(
-                key_set=keyboard_shortcut_manager.create_key_set(
-                    key="Z", shift=True, ctrl=False, alt=True, meta=False
-                ),
+                key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=False, alt=True, meta=False),
             )
 
     @Logging.func_logger

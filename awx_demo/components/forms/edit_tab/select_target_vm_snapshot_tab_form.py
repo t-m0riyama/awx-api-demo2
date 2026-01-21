@@ -3,10 +3,12 @@ from distutils.util import strtobool
 import flet as ft
 
 from awx_demo.components.session_helper import SessionHelper
-from awx_demo.utils.logging import Logging
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.components.forms.helper.vm_snapshot_list_helper import VmSnapshotListHelper
 from awx_demo.components.forms.helper.vm_snapshot_helper import VmSnapshotHelper
+from awx_demo.utils.logging import Logging
 from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClient
+from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClientError
 
 
 class SelectTargetVmSnapshotTabForm(ft.Card):
@@ -46,10 +48,13 @@ class SelectTargetVmSnapshotTabForm(ft.Card):
         if not "target_vm_snapshot_name" in self.session.get("job_options"):
             self.session.get("job_options")["target_vm_snapshot_name"] = self.TARGET_VM_SNAPSHOT_NAME_NOTFOUND
 
-        # vCenter Lookup Bridge Clientの設定を生成
-        vlb_configuration = VlbSimpleClient.generate_configuration()
-        # vCenter Lookup Bridge ClientのAPIクライアントを生成
-        self.api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        try:
+            # vCenter Lookup Bridge Clientの設定を生成
+            vlb_configuration = VlbSimpleClient.generate_configuration()
+            # vCenter Lookup Bridge ClientのAPIクライアントを生成
+            self.api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        except VlbSimpleClientError as e:
+            raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
 
         # controls
         # スナップショットのリストを生成
@@ -201,17 +206,20 @@ class SelectTargetVmSnapshotTabForm(ft.Card):
 
         # 選択可能なスナップショットのリストを取得
         if vcenter != "":
-            # スナップショット操作対象の仮想マシンのインスタンスUUIDを取得
-            vm_instance_uuid = VlbSimpleClient.get_vm_instance_uuid_by_vm_name(
-                api_client=self.api_client,
-                vcenter=vcenter,
-                system_ids=system_ids_array,
-                vm_name=self.session.get("job_options")["target_vms"].split(",")[0],
-            )
-            # スナップショット操作対象の仮想マシンのスナップショットのリストを取得
-            vm_snapshots = VlbSimpleClient.get_vm_snapshots(
-                api_client=self.api_client, vcenter=vcenter, vm_instance_uuid=vm_instance_uuid
-            )
+            try:
+                # スナップショット操作対象の仮想マシンのインスタンスUUIDを取得
+                vm_instance_uuid = VlbSimpleClient.get_vm_instance_uuid_by_vm_name(
+                    api_client=self.api_client,
+                    vcenter=vcenter,
+                    system_ids=system_ids_array,
+                    vm_name=self.session.get("job_options")["target_vms"].split(",")[0],
+                )
+                # スナップショット操作対象の仮想マシンのスナップショットのリストを取得
+                vm_snapshots = VlbSimpleClient.get_vm_snapshots(
+                    api_client=self.api_client, vcenter=vcenter, vm_instance_uuid=vm_instance_uuid
+                )
+            except VlbSimpleClientError as e:
+                raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
 
             if vm_snapshots:
                 snapshot_tree = VmSnapshotHelper.build_snapshot_tree(snapshots=vm_snapshots)

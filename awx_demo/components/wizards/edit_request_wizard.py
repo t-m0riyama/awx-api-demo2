@@ -5,6 +5,7 @@ from awx_demo.components.forms.job_execute_confirm_form import JobExecuteConfirm
 from awx_demo.components.forms.job_progress_form import JobProgressForm
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.wizards.base_wizard import BaseWizard
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.db import db
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.utils.logging import Logging
@@ -61,64 +62,84 @@ class EditRequestWizard(BaseWizard):
     def on_click_next(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
             return
-        match self.session.get("edit_request_wizard_step"):
-            case "edit_request":
-                self.session.set("edit_request_wizard_step", "job_execute_confirm")
-                formStep = JobExecuteConfirmForm(
-                    session=self.session,
-                    page=self.page,
-                    title=self.CONFIRM_FORM_TITLE,
-                    height=self.CONTENT_HEIGHT,
-                    width=self.CONTENT_WIDTH,
-                    body_height=self.BODY_HEIGHT - 70,
-                    step_change_next=self.on_click_next,
-                    step_change_previous=self.on_click_previous,
-                    step_change_cancel=self.on_click_cancel,
-                )
-                self.wizard_dialog.content = formStep
-                self.page.title = f"{self.session.get('app_title_base')} - 変更内容の確認"
-                self.page.open(self.wizard_dialog)
-            case "job_execute_confirm":
-                self.session.set("edit_request_wizard_step", "job_progress")
-                formStep = JobProgressForm(
-                    session=self.session,
-                    page=self.page,
-                    request_id=self.session.get("request_id"),
-                    height=self.CONTENT_HEIGHT,
-                    width=self.CONTENT_WIDTH,
-                    body_height=self.BODY_HEIGHT - 70,
-                    step_change_exit=self.on_click_cancel,
-                )
-                self._update_request()
-                self.wizard_dialog.content = formStep
-                self.page.title = f"{self.session.get('app_title_base')} - 処理の進捗"
-                self.page.open(self.wizard_dialog)
-            case _:
-                Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
+        try:
+            match self.session.get("edit_request_wizard_step"):
+                case "edit_request":
+                    self.session.set("edit_request_wizard_step", "job_execute_confirm")
+                    formStep = JobExecuteConfirmForm(
+                        session=self.session,
+                        page=self.page,
+                        title=self.CONFIRM_FORM_TITLE,
+                        height=self.CONTENT_HEIGHT,
+                        width=self.CONTENT_WIDTH,
+                        body_height=self.BODY_HEIGHT - 70,
+                        step_change_next=self.on_click_next,
+                        step_change_previous=self.on_click_previous,
+                        step_change_cancel=self.on_click_cancel,
+                    )
+                    self.wizard_dialog.content = formStep
+                    self.page.title = f"{self.session.get('app_title_base')} - 変更内容の確認"
+                    self.page.open(self.wizard_dialog)
+                case "job_execute_confirm":
+                    self.session.set("edit_request_wizard_step", "job_progress")
+                    formStep = JobProgressForm(
+                        session=self.session,
+                        page=self.page,
+                        request_id=self.session.get("request_id"),
+                        height=self.CONTENT_HEIGHT,
+                        width=self.CONTENT_WIDTH,
+                        body_height=self.BODY_HEIGHT - 70,
+                        step_change_exit=self.on_click_cancel,
+                    )
+                    self._update_request()
+                    self.wizard_dialog.content = formStep
+                    self.page.title = f"{self.session.get('app_title_base')} - 処理の進捗"
+                    self.page.open(self.wizard_dialog)
+                case _:
+                    Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
+        except BaseWizardCardError as e:
+            SessionHelper.logout_with_confirm(
+                page=self.page,
+                session=self.session,
+                old_dialog=self.wizard_dialog,
+                confirm_text=f"{e}しばらくお待ちいただいた後、再度ログインするかブラウザの再読み込みを行って、操作して下さい。",
+            )
+            return
+
         self.page.update()
 
     @Logging.func_logger
     def on_click_previous(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
             return
-        match self.session.get("edit_request_wizard_step"):
-            case "job_execute_confirm":
-                self.session.set("edit_request_wizard_step", "edit_request")
-                formStep = EditRequestForm(
-                    session=self.session,
-                    page=self.page,
-                    request_id=self.session.get("request_id"),
-                    height=self.CONTENT_HEIGHT,
-                    width=self.CONTENT_WIDTH,
-                    body_height=self.BODY_HEIGHT,
-                    click_execute_func=self.on_click_next,
-                    click_save_func=self.on_click_save,
-                    click_duplicate_func=self.on_click_duplicate,
-                    click_cancel_func=self.on_click_cancel,
-                )
-                self.wizard_dialog.content = formStep
-                self.page.title = f"{self.session.get('app_title_base')} - 申請の編集"
-                self.page.open(self.wizard_dialog)
-            case _:
-                Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
+        try:
+            match self.session.get("edit_request_wizard_step"):
+                case "job_execute_confirm":
+                    self.session.set("edit_request_wizard_step", "edit_request")
+                    formStep = EditRequestForm(
+                        session=self.session,
+                        page=self.page,
+                        request_id=self.session.get("request_id"),
+                        height=self.CONTENT_HEIGHT,
+                        width=self.CONTENT_WIDTH,
+                        body_height=self.BODY_HEIGHT,
+                        click_execute_func=self.on_click_next,
+                        click_save_func=self.on_click_save,
+                        click_duplicate_func=self.on_click_duplicate,
+                        click_cancel_func=self.on_click_cancel,
+                    )
+                    self.wizard_dialog.content = formStep
+                    self.page.title = f"{self.session.get('app_title_base')} - 申請の編集"
+                    self.page.open(self.wizard_dialog)
+                case _:
+                    Logging.error(f'undefined step: {self.session.get("edit_request_wizard_step")}')
+        except BaseWizardCardError as e:
+            SessionHelper.logout_with_confirm(
+                page=self.page,
+                session=self.session,
+                old_dialog=self.wizard_dialog,
+                confirm_text=f"{e}しばらくお待ちいただいた後、再度ログインするかブラウザの再読み込みを行って、操作して下さい。",
+            )
+            return
+
         self.page.update()

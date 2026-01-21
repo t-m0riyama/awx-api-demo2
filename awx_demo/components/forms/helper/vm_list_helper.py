@@ -39,9 +39,12 @@ class VmListHelper:
     def generate_vm_detail_tooltip(vm_object, api_client):
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm_object, "disk_devices"):
-            vm_detail = VlbSimpleClient.get_vm(
-                api_client=api_client, vcenter=vm_object.vcenter, vm_instance_uuid=vm_object.instance_uuid
-            )
+            try:
+                vm_detail = VlbSimpleClient.get_vm(
+                    api_client=api_client, vcenter=vm_object.vcenter, vm_instance_uuid=vm_object.instance_uuid
+                )
+            except Exception as e:
+                raise e
             # 仮想マシンの詳細情報が取得できない場合は、Noneを返す
             if vm_detail is None:
                 return None

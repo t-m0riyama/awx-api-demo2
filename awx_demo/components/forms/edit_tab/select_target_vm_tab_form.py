@@ -2,8 +2,10 @@ import flet as ft
 
 from awx_demo.components.forms.helper.vm_list_helper import VmListHelper
 from awx_demo.components.session_helper import SessionHelper
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.utils.logging import Logging
 from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClient
+from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClientError
 
 
 class SelectTargetVmTabForm(ft.Card):
@@ -42,10 +44,13 @@ class SelectTargetVmTabForm(ft.Card):
         else:
             self.target_vms_array = []
 
-        # vCenter Lookup Bridge Clientの設定を生成
-        vlb_configuration = VlbSimpleClient.generate_configuration()
-        # vCenter Lookup Bridge ClientのAPIクライアントを生成
-        self.api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        try:
+            # vCenter Lookup Bridge Clientの設定を生成
+            vlb_configuration = VlbSimpleClient.generate_configuration()
+            # vCenter Lookup Bridge ClientのAPIクライアントを生成
+            self.api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        except VlbSimpleClientError as e:
+            raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
 
         # controls
         # 選択可能な仮想マシンのリスト
@@ -205,9 +210,12 @@ class SelectTargetVmTabForm(ft.Card):
         vm = next((vm for vm in self.vms_available if vm.name == vm_name), None)
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm, "disk_devices"):
-            vm_detail = VlbSimpleClient.get_vm(
-                api_client=self.api_client, vcenter=vm.vcenter, vm_instance_uuid=vm.instance_uuid
-            )
+            try:
+                vm_detail = VlbSimpleClient.get_vm(
+                    api_client=self.api_client, vcenter=vm.vcenter, vm_instance_uuid=vm.instance_uuid
+                )
+            except VlbSimpleClientError as e:
+                raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
             tooltip_str = f"仮想マシン名: {vm_detail.name}, ホスト名: {vm_detail.hostname},\n"
             tooltip_str += f"vCenter: {vm_detail.vcenter}, システム識別子: {vm_detail.vm_folder}, \n"
             tooltip_str += f"電源状態: {vm_detail.power_state}, CPUコア数: {vm_detail.num_cpu}, メモリ容量(GB): {int(vm_detail.memory_size_mb / 1024)}, IPアドレス: {vm_detail.ip_address}"
@@ -235,20 +243,23 @@ class SelectTargetVmTabForm(ft.Card):
         else:
             vcenter = ""
 
-        # 選択可能な仮想マシンのリストを取得
-        if vcenter != "" and vcenter != "指定なし":
-            # vCenterが指定されている場合は、vCenterとシステム識別子を指定して仮想マシンのリストを取得
-            vms_available = VlbSimpleClient.get_vms_by_vm_folders(
-                api_client=self.api_client,
-                vcenter=vcenter,
-                system_ids=system_ids_array,
-            )
-        else:
-            # vCenterが指定されていない場合は、システム識別子のみを指定して仮想マシンのリストを取得
-            vms_available = VlbSimpleClient.get_vms_by_vm_folders(
-                api_client=self.api_client,
-                system_ids=system_ids_array,
-            )
+        try:
+            # 選択可能な仮想マシンのリストを取得
+            if vcenter != "" and vcenter != "指定なし":
+                # vCenterが指定されている場合は、vCenterとシステム識別子を指定して仮想マシンのリストを取得
+                vms_available = VlbSimpleClient.get_vms_by_vm_folders(
+                    api_client=self.api_client,
+                    vcenter=vcenter,
+                    system_ids=system_ids_array,
+                )
+            else:
+                # vCenterが指定されていない場合は、システム識別子のみを指定して仮想マシンのリストを取得
+                vms_available = VlbSimpleClient.get_vms_by_vm_folders(
+                    api_client=self.api_client,
+                    system_ids=system_ids_array,
+                )
+        except VlbSimpleClientError as e:
+            raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
 
         return vms_available
 
@@ -316,7 +327,10 @@ class SelectTargetVmTabForm(ft.Card):
         vm = next((vm for vm in self.vms_available if vm.name == vm_name), None)
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm, "disk_devices"):
-            tooltip_str = VmListHelper.generate_vm_detail_tooltip(vm, self.api_client)
+            try:
+                tooltip_str = VmListHelper.generate_vm_detail_tooltip(vm, self.api_client)
+            except Exception as e:
+                raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
             e.control.content.tooltip = tooltip_str
             # コントロールが初期化前の場合、エラーが発生するため、try-exceptで処理
             try:

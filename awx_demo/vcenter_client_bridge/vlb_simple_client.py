@@ -1,9 +1,16 @@
 import os
 
+from urllib3.exceptions import HTTPError
+from urllib3.exceptions import RequestError
+
 from awx_demo.utils.logging import Logging
 import vcenter_lookup_bridge_client
 from vcenter_lookup_bridge_client import ApiClient
 from vcenter_lookup_bridge_client.rest import ApiException
+
+
+class VlbSimpleClientError(Exception):
+    """Raised when VLB Simple Client fails."""
 
 
 class VlbSimpleClient:
@@ -31,8 +38,8 @@ class VlbSimpleClient:
             try:
                 api_response = api_instance.list_vcenters()
                 return api_response.results
-            except ApiException as e:
-                Logging.warning(f"Exception when calling VcentersApi->list_vcenters: {e}")
+            except Exception as e:
+                VlbSimpleClient._handle_exception(e, "VcentersApi->list_vcenters")
 
     @staticmethod
     @Logging.func_logger
@@ -43,8 +50,8 @@ class VlbSimpleClient:
             try:
                 api_response = api_instance.list_vm_folders()
                 return api_response.results
-            except ApiException as e:
-                Logging.warning(f"Exception when calling VMsApi->list_vm_folders: {e}")
+            except Exception as e:
+                VlbSimpleClient._handle_exception(e, "VmFoldersApi->list_vm_folders")
 
     @staticmethod
     @Logging.func_logger
@@ -63,8 +70,8 @@ class VlbSimpleClient:
                     api_response = api_instance.list_vms(vm_folders=system_ids)
                 api_response.results.sort(key=lambda x: x.name)
                 return api_response.results
-            except ApiException as e:
-                Logging.warning(f"Exception when calling VMsApi->list_vm_folders: {e}")
+            except Exception as e:
+                VlbSimpleClient._handle_exception(e, "VmsApi->list_vms")
 
     @staticmethod
     @Logging.func_logger
@@ -79,8 +86,8 @@ class VlbSimpleClient:
             try:
                 api_response = api_instance.get_vm(vcenter=vcenter, vm_instance_uuid=vm_instance_uuid)
                 return api_response.results
-            except ApiException as e:
-                Logging.warning(f"Exception when calling VMsApi->get_vm: {e}")
+            except Exception as e:
+                VlbSimpleClient._handle_exception(e, "VmsApi->get_vm")
 
     @staticmethod
     @Logging.func_logger
@@ -112,8 +119,8 @@ class VlbSimpleClient:
             try:
                 api_response = api_instance.get_vm_snapshots(vcenter=vcenter, vm_instance_uuid=vm_instance_uuid)
                 return api_response.results
-            except ApiException as e:
-                Logging.warning(f"Exception when calling VmSnapshotsApi->get_vm_snapshots: {e}")
+            except Exception as e:
+                VlbSimpleClient._handle_exception(e, "VmSnapshotsApi->get_vm_snapshots")
 
     @staticmethod
     @Logging.func_logger
@@ -127,5 +134,21 @@ class VlbSimpleClient:
             try:
                 api_response = api_instance.list_vm_snapshots(vcenter=vcenter)
                 return api_response.results
-            except ApiException as e:
-                Logging.warning(f"Exception when calling VmSnapshotsApi->list_vm_snapshots: {e}")
+            except Exception as e:
+                VlbSimpleClient._handle_exception(e, "VmSnapshotsApi->list_vm_snapshots")
+
+    @staticmethod
+    @Logging.func_logger
+    def _handle_exception(
+        e: Exception,
+        api_name: str,
+    ):
+        if isinstance(e, RequestError):
+            Logging.error(f"RequestErrorが発生しました: {e}")
+            raise VlbSimpleClientError(f"RequestError when calling {api_name}: {e}")
+        elif isinstance(e, HTTPError):
+            Logging.error(f"HTTPErrorが発生しました: {e}")
+            raise VlbSimpleClientError(f"HTTPError when calling {api_name}: {e}")
+        else:
+            Logging.error(f"不明な例外が発生しました: {e}")
+            raise VlbSimpleClientError(f"Exception when calling {api_name}: {e}")

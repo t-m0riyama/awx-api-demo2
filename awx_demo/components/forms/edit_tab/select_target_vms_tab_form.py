@@ -2,8 +2,10 @@ import flet as ft
 
 from awx_demo.components.forms.helper.vm_list_helper import VmListHelper
 from awx_demo.components.session_helper import SessionHelper
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.utils.logging import Logging
 from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClient
+from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClientError
 
 
 class SelectTargetVmsTabForm(ft.Card):
@@ -40,10 +42,13 @@ class SelectTargetVmsTabForm(ft.Card):
         else:
             self.target_vms_array = []
 
-        # vCenter Lookup Bridge Clientの設定を生成
-        vlb_configuration = VlbSimpleClient.generate_configuration()
-        # vCenter Lookup Bridge ClientのAPIクライアントを生成
-        self.api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        try:
+            # vCenter Lookup Bridge Clientの設定を生成
+            vlb_configuration = VlbSimpleClient.generate_configuration()
+            # vCenter Lookup Bridge ClientのAPIクライアントを生成
+            self.api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        except VlbSimpleClientError as e:
+            raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
 
         # controls
         # 選択可能な仮想マシンのリスト
@@ -336,9 +341,12 @@ class SelectTargetVmsTabForm(ft.Card):
         vm = next((vm for vm in self.vms_available if vm.name == vm_name), None)
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm, "disk_devices"):
-            vm_detail = VlbSimpleClient.get_vm(
-                api_client=self.api_client, vcenter=vm.vcenter, vm_instance_uuid=vm.instance_uuid
-            )
+            try:
+                vm_detail = VlbSimpleClient.get_vm(
+                    api_client=self.api_client, vcenter=vm.vcenter, vm_instance_uuid=vm.instance_uuid
+                )
+            except VlbSimpleClientError as e:
+                raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
             tooltip_str = f"仮想マシン名: {vm_detail.name}, ホスト名: {vm_detail.hostname},\n"
             tooltip_str += f"vCenter: {vm_detail.vcenter}, システム識別子: {vm_detail.vm_folder}, \n"
             tooltip_str += f"電源状態: {vm_detail.power_state}, CPUコア数: {vm_detail.num_cpu}, メモリ容量(GB): {int(vm_detail.memory_size_mb / 1024)}, IPアドレス: {vm_detail.ip_address}"
@@ -428,11 +436,14 @@ class SelectTargetVmsTabForm(ft.Card):
 
         # 選択可能な仮想マシンのリストを取得
         if vcenter != "":
-            vms_available = VlbSimpleClient.get_vms_by_vm_folders(
-                api_client=self.api_client,
-                vcenter=vcenter,
-                system_ids=system_ids_array,
-            )
+            try:
+                vms_available = VlbSimpleClient.get_vms_by_vm_folders(
+                    api_client=self.api_client,
+                    vcenter=vcenter,
+                    system_ids=system_ids_array,
+                )
+            except VlbSimpleClientError as e:
+                raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
         else:
             vms_available = []
 

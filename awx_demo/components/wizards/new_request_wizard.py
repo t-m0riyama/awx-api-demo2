@@ -3,6 +3,7 @@ import flet as ft
 from awx_demo.components.forms.create_request_form import CreateRequestForm
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.wizards.base_wizard import BaseWizard
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.components.wizards.set_vm_cpu_memory_wizard import SetVmCpuMemoryWizard
 from awx_demo.components.wizards.set_vm_start_stop_wizard import SetVmStartStopWizard
 from awx_demo.components.wizards.vm_snapshot_wizard import VmSnapshotWizard
@@ -60,51 +61,71 @@ class NewRequestWizard(BaseWizard):
         if self.formStep is not None:
             self.formStep.unregister_key_shortcuts()
 
-        match self.session.get("new_request_wizard_step"):
-            case "create_request":
-                match self.session.get("request_operation"):
-                    case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
-                        child_wizard = SetVmCpuMemoryWizard(
-                            session=self.session,
-                            page=self.page,
-                            wizard_dialog=self.wizard_dialog,
-                            parent_wizard=self,
-                            parent_refresh_func=self.parent_refresh_func,
-                        )
-                        child_wizard.on_click_next(e)
-                    case RequestOperation.VM_START_OR_STOP_FRIENDLY:
-                        child_wizard = SetVmStartStopWizard(
-                            session=self.session,
-                            page=self.page,
-                            wizard_dialog=self.wizard_dialog,
-                            parent_wizard=self,
-                            parent_refresh_func=self.parent_refresh_func,
-                        )
-                        child_wizard.on_click_next(e)
-                    case RequestOperation.VM_SNAPSHOT_OPERATION_FRIENDLY:
-                        child_wizard = VmSnapshotWizard(
-                            session=self.session,
-                            page=self.page,
-                            wizard_dialog=self.wizard_dialog,
-                            parent_wizard=self,
-                            parent_refresh_func=self.parent_refresh_func,
-                        )
-                        child_wizard.on_click_next(e)
-                    case _:
-                        Logging.error("undefined operation!!!")
-            case _:
-                Logging.error("undefined step!!!")
+        try:
+            match self.session.get("new_request_wizard_step"):
+                case "create_request":
+                    match self.session.get("request_operation"):
+                        case RequestOperation.VM_CPU_MEMORY_CAHNGE_FRIENDLY:
+                            child_wizard = SetVmCpuMemoryWizard(
+                                session=self.session,
+                                page=self.page,
+                                wizard_dialog=self.wizard_dialog,
+                                parent_wizard=self,
+                                parent_refresh_func=self.parent_refresh_func,
+                            )
+                            child_wizard.on_click_next(e)
+                        case RequestOperation.VM_START_OR_STOP_FRIENDLY:
+                            child_wizard = SetVmStartStopWizard(
+                                session=self.session,
+                                page=self.page,
+                                wizard_dialog=self.wizard_dialog,
+                                parent_wizard=self,
+                                parent_refresh_func=self.parent_refresh_func,
+                            )
+                            child_wizard.on_click_next(e)
+                        case RequestOperation.VM_SNAPSHOT_OPERATION_FRIENDLY:
+                            child_wizard = VmSnapshotWizard(
+                                session=self.session,
+                                page=self.page,
+                                wizard_dialog=self.wizard_dialog,
+                                parent_wizard=self,
+                                parent_refresh_func=self.parent_refresh_func,
+                            )
+                            child_wizard.on_click_next(e)
+                        case _:
+                            Logging.error("undefined operation!!!")
+                case _:
+                    Logging.error("undefined step!!!")
+        except BaseWizardCardError as e:
+            SessionHelper.logout_with_confirm(
+                page=self.page,
+                session=self.session,
+                old_dialog=self.wizard_dialog,
+                confirm_text=f"{e}しばらくお待ちいただいた後、再度ログインするかブラウザの再読み込みを行って、操作して下さい。",
+            )
+            return
+
         self.page.update()
 
     @Logging.func_logger
     def on_click_previous(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
             return
-        match self.session.get("new_request_wizard_step"):
-            case _:
-                self.session.set("new_request_wizard_step", "create_request")
-                self.wizard_dialog.content = self.formStep
-                self.page.title = f"{self.session.get('app_title_base')} - 申請の追加"
-                self.page.open(self.wizard_dialog)
-                self.formStep.register_key_shortcuts()
+        try:
+            match self.session.get("new_request_wizard_step"):
+                case _:
+                    self.session.set("new_request_wizard_step", "create_request")
+                    self.wizard_dialog.content = self.formStep
+                    self.page.title = f"{self.session.get('app_title_base')} - 申請の追加"
+                    self.page.open(self.wizard_dialog)
+                    self.formStep.register_key_shortcuts()
+        except BaseWizardCardError as e:
+            SessionHelper.logout_with_confirm(
+                page=self.page,
+                session=self.session,
+                old_dialog=self.wizard_dialog,
+                confirm_text=f"{e}しばらくお待ちいただいた後、再度ログインするかブラウザの再読み込みを行って、操作して下さい。",
+            )
+            return
+
         self.page.update()

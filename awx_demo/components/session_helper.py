@@ -3,6 +3,7 @@ import json
 import flet as ft
 
 from awx_demo.components.forms.session_timeout_confirm_form import SessionTimeoutConfirmForm
+from awx_demo.components.forms.logout_confirm_form import LogoutConfirmForm
 from awx_demo.db_helper.iaas_request_helper import IaasRequestHelper
 from awx_demo.utils.logging import Logging
 
@@ -112,6 +113,35 @@ class SessionHelper:
             return True
         else:
             return False
+
+    @classmethod
+    @Logging.func_logger
+    def logout_with_confirm(
+        cls,
+        page,
+        session,
+        old_dialog=None,
+        confirm_text: str = "アプリケーションにエラーが発生しました。ログイン後に再度操作を行なって下さい。",
+    ):
+        def _logout(cls):
+            page.close(dlgLogoutConfirm)
+            page.go("/login")
+            page.update()
+
+        formLogoutConfirm = LogoutConfirmForm(session=session, page=page, description=confirm_text)
+        dlgLogoutConfirm = ft.AlertDialog(
+            modal=True,
+            content=formLogoutConfirm,
+            actions=[ft.FilledButton("OK", on_click=_logout)],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+
+        SessionHelper.clean_session(session)
+        if old_dialog:
+            old_dialog.open = False
+        page.open(dlgLogoutConfirm)
+        dlgLogoutConfirm.open = True
+        page.update()
 
     @staticmethod
     @Logging.func_logger

@@ -1,8 +1,10 @@
 import flet as ft
 
 from awx_demo.components.types.user_role import UserRole
+from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.utils.logging import Logging
 from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClient
+from awx_demo.vcenter_client_bridge.vlb_simple_client import VlbSimpleClientError
 
 
 class SelectTargetVCenterTabForm(ft.Card):
@@ -31,10 +33,13 @@ class SelectTargetVCenterTabForm(ft.Card):
         self._lock_form_controls = lock_form_controls
         self._unlock_form_controls = unlock_form_controls
 
-        # vCenter Lookup Bridge Clientの設定を生成
-        vlb_configuration = VlbSimpleClient.generate_configuration()
-        # vCenter Lookup Bridge ClientのAPIクライアントを生成
-        api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        try:
+            # vCenter Lookup Bridge Clientの設定を生成
+            vlb_configuration = VlbSimpleClient.generate_configuration()
+            # vCenter Lookup Bridge ClientのAPIクライアントを生成
+            api_client = VlbSimpleClient.get_api_client(configuration=vlb_configuration)
+        except VlbSimpleClientError as e:
+            raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
 
         # system_idsを配列に変換
         if "system_ids" in self.session.get("job_options"):
@@ -44,7 +49,10 @@ class SelectTargetVCenterTabForm(ft.Card):
 
         # controls
         # 選択可能なvCenterの決定
-        vsphere_vcenters = VlbSimpleClient.get_vcenters(api_client=api_client)
+        try:
+            vsphere_vcenters = VlbSimpleClient.get_vcenters(api_client=api_client)
+        except VlbSimpleClientError as e:
+            raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
         vcenter_options = [ft.dropdown.Option("指定なし")]
         for vsphere_vcenter in vsphere_vcenters:
             vcenter_options.append(
@@ -74,7 +82,10 @@ class SelectTargetVCenterTabForm(ft.Card):
         )
 
         # 選択可能なシステム識別子の決定
-        all_system_ids = VlbSimpleClient.get_vm_folders(api_client=api_client)
+        try:
+            all_system_ids = VlbSimpleClient.get_vm_folders(api_client=api_client)
+        except VlbSimpleClientError as e:
+            raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
         selected_system_ids = self.system_ids_array
         self.system_id_options = []
 
