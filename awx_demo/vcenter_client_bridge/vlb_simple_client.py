@@ -6,7 +6,7 @@ from urllib3.exceptions import RequestError
 from awx_demo.utils.logging import Logging
 import vcenter_lookup_bridge_client
 from vcenter_lookup_bridge_client import ApiClient
-from vcenter_lookup_bridge_client.rest import ApiException
+from vcenter_lookup_bridge_client.exceptions import NotFoundException
 
 
 class VlbSimpleClientError(Exception):
@@ -149,6 +149,9 @@ class VlbSimpleClient:
         elif isinstance(e, HTTPError):
             Logging.error(f"HTTPErrorが発生しました: {e}")
             raise VlbSimpleClientError(f"HTTPError when calling {api_name}: {e}")
+        elif isinstance(e, NotFoundException):
+            Logging.warning(f"該当するvCenterオブジェクトが見つかりませんでした: {e}")
+            pass
         else:
             Logging.error(f"不明な例外が発生しました: {e}")
             raise VlbSimpleClientError(f"Exception when calling {api_name}: {e}")
