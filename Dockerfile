@@ -12,8 +12,10 @@ COPY ./awx_demo /app/awx_demo/
 COPY ./assets /app/assets/
 COPY ./migrations /app/migrations/
 COPY ./pip.conf /root/.pip/pip.conf
+COPY ./work /work
 RUN pip install -U pip \
     && pip install -r /app/requirements.txt
+RUN pip install /work/vcenter_lookup_bridge_client-*.whl
 
 WORKDIR /app
 
