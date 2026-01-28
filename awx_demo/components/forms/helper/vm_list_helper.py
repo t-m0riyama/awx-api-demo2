@@ -1,3 +1,4 @@
+import re
 import flet as ft
 
 from awx_demo.utils.logging import Logging
@@ -20,7 +21,7 @@ class VmListHelper:
             vm_list_form=vm_list_form,
             dtVmlist=vm_list_form.dtVmlist,
             on_select_changed=vm_list_form.on_select_vmlist_row,
-            on_hover_datacell=vm_list_form.on_hover_datacell,
+            on_hover_datacell=lambda e: vm_list_form.on_hover_datacell(e, False),
             vms_available=vm_list_form.vms_available,
             is_targeted=False,
         )
@@ -29,14 +30,14 @@ class VmListHelper:
             vm_list_form=vm_list_form,
             dtVmlist=vm_list_form.dtTargetedVmlist,
             on_select_changed=vm_list_form.on_select_targeted_vmlist_row,
-            on_hover_datacell=vm_list_form.on_hover_datacell,
+            on_hover_datacell=lambda e: vm_list_form.on_hover_datacell(e, True),
             vms_available=vm_list_form.vms_available,
             is_targeted=True,
         )
 
     @staticmethod
     @Logging.func_logger
-    def generate_vm_detail_tooltip(vm_object, api_client):
+    def generate_vm_detail_tooltip(vm_object, api_client, is_targeted: bool = False, shortcut_index: int = -1):
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm_object, "disk_devices"):
             try:
@@ -58,6 +59,24 @@ class VmListHelper:
             tooltip_str += f"vCenter: {vm_detail.vcenter}, システム識別子: {vm_object.vm_folder}, \n"
             tooltip_str += f"電源状態: {power_state}, CPUコア数: {vm_detail.num_cpu}, メモリ容量(GB): {int(vm_detail.memory_size_mb / 1024)}, IPアドレス: {vm_detail.ip_address}"
             return tooltip_str
+
+    @staticmethod
+    @Logging.func_logger
+    def generate_shortcut_tooltip(is_targeted: bool = False, shortcut_index: int = -1):
+        if shortcut_index is not None and shortcut_index >= 0 and shortcut_index <= 9:
+            if is_targeted:
+                return f" (Shift+Alt+{shortcut_index})"
+            else:
+                return f" (Shift+{shortcut_index})"
+        else:
+            return ""
+
+    @staticmethod
+    @Logging.func_logger
+    def remove_shortcut_from_tooltip(tooltip_str: str):
+        tooltip_str = re.sub(r"\s*\(Shift\+Alt\+\d+\)$", "", tooltip_str)
+        tooltip_str = re.sub(r"\s*\(Shift\+\d+\)$", "", tooltip_str)
+        return tooltip_str
 
     @staticmethod
     @Logging.func_logger
@@ -152,6 +171,7 @@ class VmListHelper:
         single_vm_list: bool = False,
     ):
         dtVmlist.rows = []
+        shortcut_index = 0
         # 選択可能な仮想マシンが0件の場合、処理せず終了する
         if vms_available is None:
             return
@@ -163,7 +183,13 @@ class VmListHelper:
                 targeted = True if vm_list_form.target_vms_array and vm.name in vm_list_form.target_vms_array else False
 
             if targeted is is_targeted:
-                vm_tooltip = f"仮想マシン名: {vm.name}, ホスト名: {vm.hostname},\nvCenter: {vm.vcenter}, システム識別子: {vm.vm_folder}"
+                if shortcut_index <= 9:
+                    if is_targeted:
+                        vm_tooltip = f"仮想マシン名: {vm.name}, ホスト名: {vm.hostname},\nvCenter: {vm.vcenter}, システム識別子: {vm.vm_folder} (Shift+Alt+{shortcut_index})"
+                    else:
+                        vm_tooltip = f"仮想マシン名: {vm.name}, ホスト名: {vm.hostname},\nvCenter: {vm.vcenter}, システム識別子: {vm.vm_folder} (Shift+{shortcut_index})"
+                else:
+                    vm_tooltip = f"仮想マシン名: {vm.name}, ホスト名: {vm.hostname},\nvCenter: {vm.vcenter}, システム識別子: {vm.vm_folder}"
                 dtVmlist.rows.append(
                     ft.DataRow(
                         cells=[
@@ -187,6 +213,7 @@ class VmListHelper:
                         on_select_changed=on_select_changed,
                     )
                 )
+                shortcut_index += 1
         dtVmlist.rows.sort(key=lambda x: x.cells[0].content.content.value)
 
     @staticmethod
@@ -197,3 +224,16 @@ class VmListHelper:
             if row.cells[0].content.value:
                 vms.append(row.cells[0].content.value)
         return vms
+
+    @staticmethod
+    @Logging.func_logger
+    def get_shortcut_index_from_tooltip(tooltip: str):
+        shortcut_index = re.findall(r"\s*\(Shift\+(\d)\)$", tooltip)
+        if len(shortcut_index) > 0:
+            return int(shortcut_index[0])
+        else:
+            shortcut_index = re.findall(r"\s*\(Shift\+Alt\+(\d)\)$", tooltip)
+            if len(shortcut_index) > 0:
+                return int(shortcut_index[0])
+            else:
+                return None

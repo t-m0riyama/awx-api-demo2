@@ -13,7 +13,7 @@ AWX API DEMO キーボードショートカット一覧
   - 'E': 'shift':True,'ctrl':False,'alt':False		申請の状態変更（完了）
   - 'R': 'shift':True,'ctrl':False,'alt':True		申請の削除
   - '0'-'9': 'shift':True,'ctrl':False,'alt':False		申請の編集
-  - '0'-'9': 'shift':True,'ctrl':False,'alt':True		申請の選択
+  - '0'-'9': 'shift':True,'ctrl':False,'alt':True		申請の選択・選択解除
   - 'L': 'shift':True,'ctrl':False,'alt':True		申請メニュー（最新）
   - 'D': 'shift':True,'ctrl':False,'alt':True		申請メニュー（リリース希望日）
   - 'M': 'shift':True,'ctrl':False,'alt':True		申請メニュー（自身の申請）
@@ -31,17 +31,44 @@ AWX API DEMO キーボードショートカット一覧
   - 'N': 'shift':True,'ctrl':False,'alt':True		次へ、申請する
   - 'P': 'shift':True,'ctrl':False,'alt':True		戻る
   - 'X': 'shift':True,'ctrl':False,'alt':True		キャンセル
+  - '0'-'9': 'shift':True,'ctrl':False,'alt':False		仮想マシンの選択・選択解除(変更対象の仮想マシン)
+  - '0'-'9': 'shift':True,'ctrl':False,'alt':True		変更対象仮想マシンの選択・選択解除(変更対象の仮想マシン(複数指定))
+  - '0'-'9': 'shift':True,'ctrl':True,'alt':False		変更対象のスナップショットの選択・選択解除(スナップショットの指定)
 
 * 編集画面
-  - 'F': 'shift':True,'ctrl':False,'alt':True		コントロールフォーカスの初期化（デバッグ用）
-  - 'N': 'shift':True,'ctrl':False,'alt':True		実行
-  - 'P': 'shift':True,'ctrl':False,'alt':True		戻る
-  - 'S': 'shift':True,'ctrl':False,'alt':True		保存
-  - 'D': 'shift':True,'ctrl':False,'alt':True		複製
-  - 'X': 'shift':True,'ctrl':False,'alt':True		キャンセル
-  - 'G': 'shift':True,'ctrl':False,'alt':True		共通タブに切り替え
-  - 'O': 'shift':True,'ctrl':False,'alt':True		変更対象タブに切り替え
-  - 'C': 'shift':True,'ctrl':False,'alt':True		CPUタブに切り替え
-  - 'M': 'shift':True,'ctrl':False,'alt':True		メモリタブに切り替え
-  - 'B': 'shift':True,'ctrl':False,'alt':True		起動/停止タブに切り替え
-  - 'A': 'shift':True,'ctrl':False,'alt':True		管理情報タブに切り替え
+  * 全申請項目共通
+    - 'F': 'shift':True,'ctrl':False,'alt':True		コントロールフォーカスの初期化（デバッグ用）
+    - 'N': 'shift':True,'ctrl':False,'alt':True		実行
+    - 'P': 'shift':True,'ctrl':False,'alt':True		戻る
+    - 'S': 'shift':True,'ctrl':False,'alt':True		保存
+    - 'D': 'shift':True,'ctrl':False,'alt':True		複製
+    - 'X': 'shift':True,'ctrl':False,'alt':True		キャンセル
+    - 'G': 'shift':True,'ctrl':False,'alt':True		共通タブに切り替え
+    - 'A': 'shift':True,'ctrl':False,'alt':True		管理情報タブに切り替え
+  * 「CPUコア/メモリの割り当て変更」の申請固有
+    - 'I': 'shift':True,'ctrl':False,'alt':True		vCenterタブに切り替え
+    - 'O': 'shift':True,'ctrl':False,'alt':True		変更対象の仮想マシンタブに切り替え
+    - '0'-'9': 'shift':True,'ctrl':False,'alt':False		仮想マシンの選択・選択解除(変更対象の仮想マシンタブ)
+    - '0'-'9': 'shift':True,'ctrl':False,'alt':True		変更対象仮想マシンの選択・選択解除(変更対象の仮想マシンタブ)
+    - 'ArrowRight': 'shift':True,'ctrl':False,'alt'		選択した仮想マシンを変更対象に追加(変更対象の仮想マシンタブ)
+    - 'ArrowLeft': 'shift':True,'ctrl':False,'alt'		選択した仮想マシンを変更対象から削除(変更対象の仮想マシンタブ)
+    - 'C': 'shift':True,'ctrl':False,'alt':True		CPUタブに切り替え
+    - 'M': 'shift':True,'ctrl':False,'alt':True		メモリタブに切り替え
+  * 「サーバの停止/起動」の申請固有
+    - 'I': 'shift':True,'ctrl':False,'alt':True		vCenterタブに切り替え
+    - 'O': 'shift':True,'ctrl':False,'alt':True		変更対象の仮想マシンタブに切り替え
+    - '0'-'9': 'shift':True,'ctrl':False,'alt':False		仮想マシンの選択・選択解除(変更対象の仮想マシンタブ)
+    - '0'-'9': 'shift':True,'ctrl':False,'alt':True		変更対象仮想マシンの選択・選択解除(変更対象の仮想マシンタブ)
+    - 'ArrowRight': 'shift':True,'ctrl':False,'alt'		選択した仮想マシンを変更対象に追加(変更対象の仮想マシンタブ)
+    - 'ArrowLeft': 'shift':True,'ctrl':False,'alt'		選択した仮想マシンを変更対象から削除(変更対象の仮想マシンタブ)
+    - 'B': 'shift':True,'ctrl':False,'alt':True		起動/停止タブに切り替え
+  * 「スナップショットの操作」の申請固有
+    - 'I': 'shift':True,'ctrl':False,'alt':True		vCenterタブに切り替え
+    - 'O': 'shift':True,'ctrl':False,'alt':True		変更対象の仮想マシンタブに切り替え
+    - '0'-'9': 'shift':True,'ctrl':False,'alt':False		仮想マシンの選択・選択解除(変更対象の仮想マシンタブ)
+    - '0'-'9': 'shift':True,'ctrl':False,'alt':True		変更対象仮想マシンの選択・選択解除(変更対象の仮想マシンタブ)
+    - 'ArrowRight': 'shift':True,'ctrl':False,'alt'		選択した仮想マシンを変更対象に追加(変更対象の仮想マシンタブ)
+    - 'ArrowLeft': 'shift':True,'ctrl':False,'alt'		選択した仮想マシンを変更対象から削除(変更対象の仮想マシンタブ)
+    - 'B': 'shift':True,'ctrl':False,'alt':True		スナップショットの操作タブに切り替え
+    - 'C': 'shift':True,'ctrl':False,'alt':True		スナップショットの指定タブに切り替え
+    - '0'-'9': 'shift':True,'ctrl':True,'alt':False		変更対象のスナップショットの選択・選択解除(スナップショットの指定タブ)

@@ -1,6 +1,7 @@
 import flet as ft
 
 from awx_demo.components.forms.helper.vm_list_helper import VmListHelper
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.utils.logging import Logging
@@ -21,6 +22,7 @@ class SelectTargetVmTabForm(ft.Card):
     def __init__(
         self,
         session,
+        page,
         height=CONTENT_HEIGHT,
         width=CONTENT_WIDTH,
         body_height=BODY_HEIGHT,
@@ -29,6 +31,7 @@ class SelectTargetVmTabForm(ft.Card):
         unlock_form_controls: callable = None,
     ):
         self.session = session
+        self.page = page
         self.on_change_vms_hook = on_change_vms_hook
         self.content_height = height
         self.content_width = width
@@ -152,57 +155,75 @@ class SelectTargetVmTabForm(ft.Card):
             height=self.content_height,
             padding=30,
         )
+        self.register_key_shortcuts()
         super().__init__(self.controls)
 
-    # @Logging.func_logger
-    # def register_key_shortcuts(self):
-    #     keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-    #     # autofocus=Trueである、最初のコントロールにフォーカスを移動する
-    #     keyboard_shortcut_manager.register_key_shortcut(
-    #         key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
-    #         func=lambda e: self.panelListVms.focus(),
-    #     )
-    #     # ログへのキーボードショートカット一覧出力
-    #     keyboard_shortcut_manager.register_key_shortcut(
-    #         key_set=keyboard_shortcut_manager.create_key_set(
-    #             key="Z",
-    #             shift=True,
-    #             ctrl=False,
-    #             alt=True,
-    #             meta=False,
-    #         ),
-    #         func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
-    #     )
-    #     super().register_key_shortcuts()
+    @Logging.func_logger
+    def register_key_shortcuts(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        # keyboard_shortcut_manager.register_key_shortcut(
+        #     key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+        #     func=lambda e: self.dtVmlist.focus(),
+        # )
+        # ログへのキーボードショートカット一覧出力
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="Z",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
+            ),
+            func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
+        )
+        self._register_key_shortcuts_rows()
 
-    # @Logging.func_logger
-    # def unregister_key_shortcuts(self):
-    #     if self.page:
-    #         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-    #         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
-    #         keyboard_shortcut_manager.unregister_key_shortcut(
-    #             key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
-    #         )
-    #         # ログへのキーボードショートカット一覧出力
-    #         keyboard_shortcut_manager.unregister_key_shortcut(
-    #             key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=False, alt=True, meta=False),
-    #         )
-    #         super().unregister_key_shortcuts()
+    @Logging.func_logger
+    def unregister_key_shortcuts(self):
+        if self.page:
+            keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+            # autofocus=Trueである、最初のコントロールにフォーカスを移動する
+            # keyboard_shortcut_manager.unregister_key_shortcut(
+            #     key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+            # )
+            # ログへのキーボードショートカット一覧出力
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=False, alt=True, meta=False),
+            )
+            self._unregister_key_shortcuts_rows()
 
-    # @Logging.func_logger
-    # def get_query_filters(self):
-    #     filters = []
-    #     if self.session.get('user_role') == UserRole.USER_ROLE:
-    #         match self.session.get("selected_indicator"):
-    #             case _:
-    #                 filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.APPLYING_FAILED]))
-    #         filters.append(IaasRequestHelper.get_filter_request_user(self.session.get('awx_loginid')))
-    #     else:
-    #         match self.session.get("selected_indicator"):
-    #             case _:
-    #                 filters.append(IaasRequestHelper.get_filter_request_status([RequestStatus.APPLYING_FAILED]))
+    @Logging.func_logger
+    def _register_key_shortcuts_rows(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        max_row_shortcuts = min(10, len(self.dtVmlist.rows))
+        # 仮想マシンの選択・選択解除
+        for selected_index in range(0, max_row_shortcuts):
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=f"{selected_index}",
+                    shift=True,
+                    ctrl=False,
+                    alt=False,
+                    meta=False,
+                ),
+                func=lambda e, selected_index=selected_index: self.on_select_vmlist_row(selected_index=selected_index),
+            )
 
-    #     return filters
+    @Logging.func_logger
+    def _unregister_key_shortcuts_rows(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # 仮想マシンの選択・選択解除
+        for row_index in range(0, 10):
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=str(row_index),
+                    shift=True,
+                    ctrl=False,
+                    alt=False,
+                    meta=False,
+                ),
+            )
 
     @Logging.func_logger
     def on_hover_datacell(self, e):
@@ -294,16 +315,14 @@ class SelectTargetVmTabForm(ft.Card):
 
         # キーボードショートカットから呼ばれた場合、
         # selected_indexにセットされている値を申請一覧のインデックスの代わりに利用する
-        # if selected_index is not None:
-        #     self.dtVmlist.rows[selected_index].selected = not self.dtVmlist.rows[selected_index].selected
-        #     self.dtVmlist.rows[selected_index].update()
-        # else:
-        #     e.control.selected = not e.control.selected
-        #     e.control.update()
+        if selected_index is not None:
+            selected_vm_name = self.dtVmlist.rows[selected_index].cells[0].content.content.value
+            selected_hostname = self.dtVmlist.rows[selected_index].cells[1].content.content.value
+        else:
+            selected_vm_name = e.control.cells[0].content.content.value
+            selected_hostname = e.control.cells[1].content.content.value
 
-        selected_vm_name = e.control.cells[0].content.content.value
-        selected_hostname = e.control.cells[1].content.content.value
-
+        # 対象の仮想マシンを選択・選択解除、それ以外の仮想マシンは選択解除
         for row in self.dtVmlist.rows:
             if (
                 row.cells[0].content.content.value == selected_vm_name
@@ -324,19 +343,30 @@ class SelectTargetVmTabForm(ft.Card):
     @Logging.func_logger
     def on_hover_datacell(self, e):
         vm_name = e.control.content.value
+        shortcut_index = VmListHelper.get_shortcut_index_from_tooltip(e.control.content.tooltip)
         vm = next((vm for vm in self.vms_available if vm.name == vm_name), None)
         # 仮想マシンの詳細情報を取得
         if not hasattr(vm, "disk_devices"):
             try:
-                tooltip_str = VmListHelper.generate_vm_detail_tooltip(vm, self.api_client)
+                tooltip_str = VmListHelper.generate_vm_detail_tooltip(
+                    vm_object=vm, api_client=self.api_client, is_targeted=False, shortcut_index=shortcut_index
+                )
             except Exception as e:
                 raise BaseWizardCardError("vCenter参照機能の呼び出しに失敗しました。")
+        else:
+            tooltip_str = VmListHelper.remove_shortcut_from_tooltip(e.control.content.tooltip)
+
+        # ツールチップにショートカットを追加
+        tooltip_str += VmListHelper.generate_shortcut_tooltip(is_targeted=False, shortcut_index=shortcut_index)
+
+        # 仮想マシンの詳細情報を正常に取得できた場合、ツールチップを更新する
+        if tooltip_str:
             e.control.content.tooltip = tooltip_str
-            # コントロールが初期化前の場合、エラーが発生するため、try-exceptで処理
-            try:
-                e.control.content.update()
-            except:
-                pass
+        # コントロールが初期化前の場合、エラーが発生するため、try-exceptで処理
+        try:
+            e.control.content.update()
+        except:
+            pass
 
     @Logging.func_logger
     def on_select_all_dtVmlist(self, e):

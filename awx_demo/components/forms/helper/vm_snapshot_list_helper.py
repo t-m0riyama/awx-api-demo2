@@ -126,16 +126,17 @@ class VmSnapshotListHelper:
 
         latest_vm_snapshot = sorted(vm_snapshots_available, key=lambda x: x.create_time, reverse=True)[0]
         latest_vm_snapshot_id = latest_vm_snapshot.id
+        sort_id = 0
         for vm_snapshot in vm_snapshots_available:
-            sort_id = 0
             latest_icon = VmSnapshotListHelper._vm_snapshot_latest_to_icon(
                 vm_snapshot=vm_snapshot, latest_vm_snapshot_id=latest_vm_snapshot_id
             )
             if target_vm_multiple:
-                sort_id = sort_id + 1
                 vm_snapshot_name_trimmed = vm_snapshot.name.strip().replace("└", "")
                 vm_snapshot_tooltip = f"スナップショット名: {vm_snapshot_name_trimmed}, \n"
-                vm_snapshot_tooltip += f"作成日時: {vm_snapshot.create_time}"
+                vm_snapshot_tooltip += f"作成日時: {vm_snapshot.create_time}\n"
+                vm_snapshot_tooltip += f"(Control+Shift+{sort_id})"
+                sort_id = sort_id + 1
                 dtVmSnapshots.rows.append(
                     ft.DataRow(
                         cells=[
@@ -193,13 +194,14 @@ class VmSnapshotListHelper:
                     )
                 )
             else:
-                sort_id = sort_id + 1
                 vm_snapshot_name_trimmed = vm_snapshot.name.strip().replace("└", "")
                 vm_snapshot_tooltip = f"ID: {vm_snapshot.id}, \n"
                 vm_snapshot_tooltip += f"スナップショット名: {vm_snapshot_name_trimmed}, \n"
                 vm_snapshot_tooltip += f"仮想マシン名: {vm_snapshot.vm_name}, \n"
                 vm_snapshot_tooltip += f"作成日時: {vm_snapshot.create_time}, \n"
-                vm_snapshot_tooltip += f"説明: {vm_snapshot.description}"
+                vm_snapshot_tooltip += f"説明: {vm_snapshot.description}\n"
+                vm_snapshot_tooltip += f"(Control+Shift+{sort_id})"
+                sort_id = sort_id + 1
                 dtVmSnapshots.rows.append(
                     ft.DataRow(
                         cells=[

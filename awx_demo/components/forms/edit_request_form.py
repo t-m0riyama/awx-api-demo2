@@ -92,6 +92,7 @@ class EditRequestForm(BaseWizardCard):
                 )
                 self.formSelectTargetVms = SelectTargetVmsTabForm(
                     self.session,
+                    self.page,
                     self.tab_content_height,
                     self.tab_content_width,
                     self.tab_body_height,
@@ -132,7 +133,7 @@ class EditRequestForm(BaseWizardCard):
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+O)"),
+                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+I)"),
                             content=ft.SelectionArea(content=self.formSelectTargetVCenter),
                         ),
                         ft.Tab(
@@ -165,6 +166,7 @@ class EditRequestForm(BaseWizardCard):
                 )
                 self.formSelectTargetVms = SelectTargetVmsTabForm(
                     self.session,
+                    self.page,
                     self.tab_content_height,
                     self.tab_content_width,
                     self.tab_body_height,
@@ -199,7 +201,7 @@ class EditRequestForm(BaseWizardCard):
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+O)"),
+                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+I)"),
                             content=ft.SelectionArea(content=self.formSelectTargetVCenter),
                         ),
                         ft.Tab(
@@ -252,6 +254,7 @@ class EditRequestForm(BaseWizardCard):
                 if bool(strtobool(str(self.session.get("job_options")["target_vm_multiple"]))):
                     self.formSelectTargetVms = SelectTargetVmsTabForm(
                         self.session,
+                        self.page,
                         self.tab_content_height,
                         self.tab_content_width,
                         self.tab_body_height,
@@ -262,6 +265,7 @@ class EditRequestForm(BaseWizardCard):
                 else:
                     self.formSelectTargetVms = SelectTargetVmTabForm(
                         self.session,
+                        self.page,
                         self.tab_content_height,
                         self.tab_content_width,
                         self.tab_body_height,
@@ -302,7 +306,7 @@ class EditRequestForm(BaseWizardCard):
                             content=ft.SelectionArea(content=self.formCommonInfo),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+O)"),
+                            tab_content=ft.Text("vCenter", tooltip="vCenter (Shift+Alt+I)"),
                             content=ft.SelectionArea(content=self.formSelectTargetVCenter),
                         ),
                         ft.Tab(
@@ -310,12 +314,12 @@ class EditRequestForm(BaseWizardCard):
                             content=ft.SelectionArea(content=self.formSelectTargetVms),
                         ),
                         ft.Tab(
-                            tab_content=ft.Text("スナップショット操作", tooltip="スナップショット操作 (Shift+Alt+S)"),
+                            tab_content=ft.Text("スナップショット操作", tooltip="スナップショット操作 (Shift+Alt+B)"),
                             content=ft.SelectionArea(content=self.formSelectVmSnapshotOperation),
                         ),
                         ft.Tab(
                             tab_content=ft.Text(
-                                "スナップショットの指定", tooltip="スナップショットの指定 (Shift+Alt+S)"
+                                "スナップショットの指定", tooltip="スナップショットの指定 (Shift+Alt+C)"
                             ),
                             content=ft.SelectionArea(content=self.formVmSnapshotOption),
                         ),
@@ -496,10 +500,15 @@ class EditRequestForm(BaseWizardCard):
             key_set=keyboard_shortcut_manager.create_key_set(key="G", shift=True, ctrl=False, alt=True, meta=False),
             func=lambda e: self._keyboard_switch_tab(0),
         )
+        # vCenterタブに切り替え
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(key="I", shift=True, ctrl=False, alt=True, meta=False),
+            func=lambda e: self._keyboard_switch_tab(1),
+        )
         # 変更対象タブに切り替え
         keyboard_shortcut_manager.register_key_shortcut(
             key_set=keyboard_shortcut_manager.create_key_set(key="O", shift=True, ctrl=False, alt=True, meta=False),
-            func=lambda e: self._keyboard_switch_tab(1),
+            func=lambda e: self._keyboard_switch_tab(2),
         )
 
         # 申請の種類に応じて、タブに対応したキーボードショートカットを登録
@@ -513,12 +522,27 @@ class EditRequestForm(BaseWizardCard):
                     key_set=keyboard_shortcut_manager.create_key_set(
                         key="C", shift=True, ctrl=False, alt=True, meta=False
                     ),
-                    func=lambda e: self._keyboard_switch_tab(2),
+                    func=lambda e: self._keyboard_switch_tab(3),
                 )
                 # メモリタブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
                         key="M", shift=True, ctrl=False, alt=True, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(4),
+                )
+                # 管理情報タブに切り替え
+                keyboard_shortcut_manager.register_key_shortcut(
+                    key_set=keyboard_shortcut_manager.create_key_set(
+                        key="A", shift=True, ctrl=False, alt=True, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(5),
+                )
+            case RequestOperation.VM_START_OR_STOP_FRIENDLY:
+                # 起動/停止タブに切り替え
+                keyboard_shortcut_manager.register_key_shortcut(
+                    key_set=keyboard_shortcut_manager.create_key_set(
+                        key="B", shift=True, ctrl=False, alt=True, meta=False
                     ),
                     func=lambda e: self._keyboard_switch_tab(3),
                 )
@@ -529,20 +553,27 @@ class EditRequestForm(BaseWizardCard):
                     ),
                     func=lambda e: self._keyboard_switch_tab(4),
                 )
-            case RequestOperation.VM_START_OR_STOP_FRIENDLY:
-                # 起動/停止タブに切り替え
+            case RequestOperation.VM_SNAPSHOT_OPERATION_FRIENDLY:
+                # スナップショット操作タブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
                         key="B", shift=True, ctrl=False, alt=True, meta=False
                     ),
-                    func=lambda e: self._keyboard_switch_tab(2),
+                    func=lambda e: self._keyboard_switch_tab(3),
+                )
+                # スナップショットの指定タブに切り替え
+                keyboard_shortcut_manager.register_key_shortcut(
+                    key_set=keyboard_shortcut_manager.create_key_set(
+                        key="C", shift=True, ctrl=False, alt=True, meta=False
+                    ),
+                    func=lambda e: self._keyboard_switch_tab(4),
                 )
                 # 管理情報タブに切り替え
                 keyboard_shortcut_manager.register_key_shortcut(
                     key_set=keyboard_shortcut_manager.create_key_set(
                         key="A", shift=True, ctrl=False, alt=True, meta=False
                     ),
-                    func=lambda e: self._keyboard_switch_tab(3),
+                    func=lambda e: self._keyboard_switch_tab(5),
                 )
 
         # ログへのセッションダンプ

@@ -2,6 +2,7 @@ from distutils.util import strtobool
 
 import flet as ft
 
+from awx_demo.components.keyboard_shortcut_manager import KeyboardShortcutManager
 from awx_demo.components.session_helper import SessionHelper
 from awx_demo.components.wizards.base_wizard_card import BaseWizardCardError
 from awx_demo.components.forms.helper.vm_snapshot_list_helper import VmSnapshotListHelper
@@ -150,42 +151,77 @@ class SelectTargetVmSnapshotTabForm(ft.Card):
             height=self.content_height,
             padding=30,
         )
+        self.register_key_shortcuts()
         super().__init__(self.controls)
 
-    # @Logging.func_logger
-    # def register_key_shortcuts(self):
-    #     keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-    #     # autofocus=Trueである、最初のコントロールにフォーカスを移動する
-    #     keyboard_shortcut_manager.register_key_shortcut(
-    #         key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
-    #         func=lambda e: self.panelListVms.focus(),
-    #     )
-    #     # ログへのキーボードショートカット一覧出力
-    #     keyboard_shortcut_manager.register_key_shortcut(
-    #         key_set=keyboard_shortcut_manager.create_key_set(
-    #             key="Z",
-    #             shift=True,
-    #             ctrl=False,
-    #             alt=True,
-    #             meta=False,
-    #         ),
-    #         func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
-    #     )
-    #     super().register_key_shortcuts()
+    @Logging.func_logger
+    def register_key_shortcuts(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        ## autofocus=Trueである、最初のコントロールにフォーカスを移動する
+        # keyboard_shortcut_manager.register_key_shortcut(
+        #     key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+        #     func=lambda e: self.panelListVms.focus(),
+        # )
+        # ログへのキーボードショートカット一覧出力
+        keyboard_shortcut_manager.register_key_shortcut(
+            key_set=keyboard_shortcut_manager.create_key_set(
+                key="Z",
+                shift=True,
+                ctrl=False,
+                alt=True,
+                meta=False,
+            ),
+            func=lambda e: keyboard_shortcut_manager.dump_key_shortcuts(),
+        )
+        self._register_key_shortcuts_rows()
 
-    # @Logging.func_logger
-    # def unregister_key_shortcuts(self):
-    #     if self.page:
-    #         keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
-    #         # autofocus=Trueである、最初のコントロールにフォーカスを移動する
-    #         keyboard_shortcut_manager.unregister_key_shortcut(
-    #             key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
-    #         )
-    #         # ログへのキーボードショートカット一覧出力
-    #         keyboard_shortcut_manager.unregister_key_shortcut(
-    #             key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=False, alt=True, meta=False),
-    #         )
-    #         super().unregister_key_shortcuts()
+    @Logging.func_logger
+    def unregister_key_shortcuts(self):
+        if self.page:
+            keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+            ## autofocus=Trueである、最初のコントロールにフォーカスを移動する
+            # keyboard_shortcut_manager.unregister_key_shortcut(
+            #     key_set=keyboard_shortcut_manager.create_key_set(key="F", shift=True, ctrl=False, alt=True, meta=False),
+            # )
+            # ログへのキーボードショートカット一覧出力
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(key="Z", shift=True, ctrl=False, alt=True, meta=False),
+            )
+            self._unregister_key_shortcuts_rows()
+
+    @Logging.func_logger
+    def _register_key_shortcuts_rows(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        max_row_shortcuts = min(10, len(self.dtVmSnapshots.rows))
+        # 仮想マシンの選択・選択解除
+        for selected_index in range(0, max_row_shortcuts):
+            keyboard_shortcut_manager.register_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=f"{selected_index}",
+                    shift=True,
+                    ctrl=True,
+                    alt=False,
+                    meta=False,
+                ),
+                func=lambda e, selected_index=selected_index: self.on_select_vm_snapshot_list_row(
+                    selected_index=selected_index
+                ),
+            )
+
+    @Logging.func_logger
+    def _unregister_key_shortcuts_rows(self):
+        keyboard_shortcut_manager = KeyboardShortcutManager(self.page)
+        # 仮想マシンの選択・選択解除
+        for row_index in range(0, 10):
+            keyboard_shortcut_manager.unregister_key_shortcut(
+                key_set=keyboard_shortcut_manager.create_key_set(
+                    key=str(row_index),
+                    shift=True,
+                    ctrl=True,
+                    alt=False,
+                    meta=False,
+                ),
+            )
 
     @Logging.func_logger
     def _get_vm_snapshots_available(self):
@@ -298,16 +334,14 @@ class SelectTargetVmSnapshotTabForm(ft.Card):
 
         # キーボードショートカットから呼ばれた場合、
         # selected_indexにセットされている値を申請一覧のインデックスの代わりに利用する
-        # if selected_index is not None:
-        #     self.dtVmlist.rows[selected_index].selected = not self.dtVmlist.rows[selected_index].selected
-        #     self.dtVmlist.rows[selected_index].update()
-        # else:
-        #     e.control.selected = not e.control.selected
-        #     e.control.update()
+        if selected_index is not None:
+            selected_snapshot_id = self.dtVmSnapshots.rows[selected_index].cells[1].content.content.value
+            selected_snapshot_name = self.dtVmSnapshots.rows[selected_index].cells[2].content.content.value
+        else:
+            selected_snapshot_id = e.control.cells[1].content.content.value
+            selected_snapshot_name = e.control.cells[2].content.content.value
 
-        selected_snapshot_id = e.control.cells[1].content.content.value
-        selected_snapshot_name = e.control.cells[2].content.content.value
-
+        # 対象のスナップショットを選択・選択解除、それ以外のスナップショットは選択解除
         for row in self.dtVmSnapshots.rows:
             if (
                 row.cells[1].content.content.value == selected_snapshot_id

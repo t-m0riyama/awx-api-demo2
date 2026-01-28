@@ -36,6 +36,12 @@ class VmSnapshotWizard(BaseWizard):
     def on_click_next(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
             return
+        Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
+
+        # 遷移前のフォームのショートカットキーを登録解除
+        if self.formStep is not None:
+            self.formStep.unregister_key_shortcuts()
+
         try:
             match self.session.get("new_request_wizard_step"):
                 case "create_request":
@@ -109,7 +115,7 @@ class VmSnapshotWizard(BaseWizard):
                             description = "削除するスナップショットを選択して下さい。"
                         case _:
                             Logging.error(
-                                f"undefined snapshot operation!!!: {self.session.get("job_options")["snapshot_operation"]}"
+                                f"undefined snapshot operation!!!: {self.session.get('job_options')['snapshot_operation']}"
                             )
                             assert False, "スナップショット操作が不正です。"
 
@@ -196,6 +202,12 @@ class VmSnapshotWizard(BaseWizard):
     def on_click_previous(self, e):
         if SessionHelper.logout_if_session_expired(self.page, self.session, self.wizard_dialog):
             return
+        Logging.warning("WIZARD_STEP: " + self.session.get("new_request_wizard_step"))
+
+        # 遷移前のフォームのショートカットキーを登録解除
+        if self.formStep is not None:
+            self.formStep.unregister_key_shortcuts()
+
         try:
             match self.session.get("new_request_wizard_step"):
                 case "select_snapshot_operation":
@@ -271,7 +283,7 @@ class VmSnapshotWizard(BaseWizard):
                             description = "削除するスナップショットを選択して下さい。"
                         case _:
                             Logging.error(
-                                f"undefined snapshot operation!!!: {self.session.get("job_options")["snapshot_operation"]}"
+                                f"undefined snapshot operation!!!: {self.session.get('job_options')['snapshot_operation']}"
                             )
                             assert False, "スナップショット操作が不正です。"
 
